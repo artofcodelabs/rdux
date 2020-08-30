@@ -7,11 +7,14 @@ require "rudux/version"
 Gem::Specification.new do |spec|
   spec.name        = "rudux"
   spec.version     = Rudux::VERSION
-  spec.authors     = ["himn1"]
+  spec.authors     = ['Zbigniew Humeniuk']
   spec.email       = ["hello@artofcode.co"]
-  spec.homepage    = "TODO"
-  spec.summary     = "TODO: Summary of Rudux."
-  spec.description = "TODO: Description of Rudux."
+  spec.homepage    = "https://artofcode.co"
+  spec.summary     = "..."
+  spec.description = <<~DESC
+    ...
+    ...
+  DESC
   spec.license     = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
@@ -25,7 +28,9 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.md"]
 
-  spec.add_dependency "rails", "~> 6.0.3", ">= 6.0.3.2"
+  spec.add_dependency 'rails', '>= 5.0', '< 7.0'
 
+  spec.add_development_dependency 'rubocop'
+  spec.add_development_dependency 'rubocop-rails'
   spec.add_development_dependency "sqlite3"
 end
