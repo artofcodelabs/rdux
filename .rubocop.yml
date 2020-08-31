@@ -1,0 +1,8 @@
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 2.6
+  Exclude:
+    - test/dummy/db/schema.rb
+
+Style/Documentation:
+  Enabled: false
