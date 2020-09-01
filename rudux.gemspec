@@ -12,21 +12,14 @@ Gem::Specification.new do |spec|
   spec.authors     = ['Zbigniew Humeniuk']
   spec.email       = ['hello@artofcode.co']
   spec.homepage    = 'https://artofcode.co'
-  spec.summary     = '...'
+  spec.summary     = 'Rudux adds a new layer to Rails apps - actions.'
   spec.description = <<~DESC
-    ...
-    ...
+    Write apps that are easy to test.
+    Rudux gives you a possibility to centralize your app's state modification logic (DB changes).
+    It enables powerful capabilities like undo/redo.
+    Rudux makes it easy to trace when, where, why, and how your application's state changed.
   DESC
   spec.license = 'MIT'
-
-  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # to allow pushing to a single host or delete this section to allow pushing to any host.
-  if spec.respond_to?(:metadata)
-    spec.metadata['allowed_push_host'] = "TODO: Set to 'http://mygemserver.com'"
-  else
-    raise 'RubyGems 2.0 or newer is required to protect against ' \
-      'public gem pushes.'
-  end
 
   spec.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
