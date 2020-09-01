@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # This migration comes from rdux (originally 20200823045609)
 
 class CreateRduxActions < ActiveRecord::Migration[6.0]
