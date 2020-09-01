@@ -6,6 +6,7 @@ ENV['RAILS_ENV'] = 'test'
 require_relative '../test/dummy/config/environment'
 ActiveRecord::Migrator.migrations_paths = [File.expand_path('../test/dummy/db/migrate', __dir__)]
 require 'rails/test_help'
+require 'minitest/spec'
 
 # Filter out the backtrace from minitest while preserving the one from other libraries.
 Minitest.backtrace_filter = Minitest::BacktraceFilter.new
@@ -20,3 +21,11 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.file_fixture_path = "#{ActiveSupport::TestCase.fixture_path}/files"
   ActiveSupport::TestCase.fixtures :all
 end
+
+module ActiveSupport
+  class TestCase
+    extend MiniTest::Spec::DSL
+  end
+end
+
+TC = ActiveSupport::TestCase

@@ -2,7 +2,10 @@
 Short description and motivation.
 
 ## Usage
-How to use my plugin.
+
+```bash
+$ bin/rails rudux:install:migrations
+```
 
 ## Installation
 Add this line to your application's Gemfile:
@@ -19,6 +22,21 @@ $ bundle
 Or install it yourself as:
 ```bash
 $ gem install rudux
+```
+
+## Test
+
+### Setup
+
+```bash
+$ cd test/dummy
+$ bin/rails db:migrate RAILS_ENV=test
+```
+
+# Run (from the top directory)
+
+```bash
+$ bin/test
 ```
 
 ## Contributing
