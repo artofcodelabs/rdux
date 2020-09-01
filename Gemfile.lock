@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rudux (0.1.0)
+    rdux (0.1.0)
       rails (>= 5.0, < 7.0)
 
 GEM
@@ -160,9 +160,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  rdux!
   rubocop
   rubocop-rails
-  rudux!
   sqlite3
 
 BUNDLED WITH

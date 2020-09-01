@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'rudux/engine'
+require 'rdux/engine'
 
-module Rudux
+module Rdux
   Result = Struct.new(:ok, :down_payload, :resp, :action) do
     def payload
       resp || down_payload

@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_01_085626) do
+ActiveRecord::Schema.define(version: 2020_09_01_100718) do
 
-  create_table "rudux_actions", force: :cascade do |t|
+  create_table "rdux_actions", force: :cascade do |t|
     t.string "name"
     t.text "up_payload"
     t.text "down_payload"

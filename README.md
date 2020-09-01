@@ -1,17 +1,17 @@
-# Rudux
+# Rdux
 Short description and motivation.
 
 ## Usage
 
 ```bash
-$ bin/rails rudux:install:migrations
+$ bin/rails rdux:install:migrations
 ```
 
 ## Installation
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rudux'
+gem 'rdux'
 ```
 
 And then execute:
@@ -21,7 +21,7 @@ $ bundle
 
 Or install it yourself as:
 ```bash
-$ gem install rudux
+$ gem install rdux
 ```
 
 ## Test

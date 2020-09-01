@@ -2,7 +2,7 @@
 
 require 'test_helper'
 
-module Rudux
+module Rdux
   class ActionTest < TC
     it 'serializes payload' do
       payload = { 'name' => 'Foo bar baz' }

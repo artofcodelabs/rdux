@@ -3,21 +3,21 @@
 $LOAD_PATH.push File.expand_path('lib', __dir__)
 
 # Maintain your gem's version:
-require 'rudux/version'
+require 'rdux/version'
 
 # Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
-  spec.name        = 'rudux'
-  spec.version     = Rudux::VERSION
+  spec.name        = 'rdux'
+  spec.version     = Rdux::VERSION
   spec.authors     = ['Zbigniew Humeniuk']
   spec.email       = ['hello@artofcode.co']
   spec.homepage    = 'https://artofcode.co'
-  spec.summary     = 'Rudux adds a new layer to Rails apps - actions.'
+  spec.summary     = 'Rdux adds a new layer to Rails apps - actions.'
   spec.description = <<~DESC
     Write apps that are easy to test.
-    Rudux gives you a possibility to centralize your app's state modification logic (DB changes).
+    Rdux gives you a possibility to centralize your app's state modification logic (DB changes).
     It does it via introducing a new architectural layer - actions.
-    Rudux enables powerful capabilities like undo/redo.
+    Rdux enables powerful capabilities like undo/redo.
     It makes it easy to trace when, where, why, and how your application's state changed.
   DESC
   spec.license = 'MIT'

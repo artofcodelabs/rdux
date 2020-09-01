@@ -10,7 +10,7 @@ require_relative 'boot'
 end
 
 Bundler.require(*Rails.groups)
-require 'rudux'
+require 'rdux'
 
 module Dummy
   class Application < Rails::Application

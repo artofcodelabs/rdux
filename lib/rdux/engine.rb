@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-module Rudux
+module Rdux
   class Engine < ::Rails::Engine
-    isolate_namespace Rudux
+    isolate_namespace Rdux
   end
 end

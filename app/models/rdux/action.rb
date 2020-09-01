@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Rudux
+module Rdux
   class Action < ApplicationRecord
     def self.table_name_prefix
-      'rudux_'
+      'rdux_'
     end
 
     serialize :up_payload, JSON
