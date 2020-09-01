@@ -26,15 +26,6 @@ $ gem install rdux
 
 ## Test
 
-### Setup
-
-```bash
-$ cd test/dummy
-$ bin/rails db:migrate RAILS_ENV=test
-```
-
-# Run (from the top directory)
-
 ```bash
 $ bin/test
 ```
