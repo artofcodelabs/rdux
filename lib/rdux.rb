@@ -2,13 +2,9 @@
 
 require 'rdux/engine'
 
-module Rdux
-  Result = Struct.new(:ok, :down_payload, :resp, :action) do
-    def payload
-      resp || down_payload
-    end
-  end
+require 'rdux/result'
 
+module Rdux
   module_function
 
   def dispatch(action_name, payload, opts = {})
