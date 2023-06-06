@@ -24,7 +24,6 @@ module Rdux
       perform_action(:down, opts)
     end
 
-
     private
 
     def action_creator(meth)
