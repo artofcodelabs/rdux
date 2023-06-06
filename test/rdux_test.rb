@@ -13,13 +13,17 @@ module Rdux
       it 'returns an action' do
         assert_instance_of Rdux::Action, emit.action
       end
+
+      it 'uses up/down or call' do
+        Rdux.dispatch(CreateActivity, { user_id: users(:zbig).id, task_id: tasks(:homework).id })
+      end
     end
 
     private
 
     def emit
       user = users(:zbig)
-      Rdux.dispatch(:create_task, { user_id: user.id, task: { name: 'Foo bar baz' } }, { user: user })
+      Rdux.dispatch(CreateTask, { user_id: user.id, task: { name: 'Foo bar baz' } }, { user: user })
     end
   end
 end

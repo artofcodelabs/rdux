@@ -12,22 +12,38 @@ module Rdux
     validates :name, presence: true
     validates :up_payload, presence: true
 
+    def call(opts)
+      perform_action(:call, opts)
+    end
+
     def up(opts)
-      if opts.any?
-        action_creator.up(up_payload, opts)
-      else
-        action_creator.up(up_payload)
-      end
+      perform_action(:up, opts)
     end
 
     def down
-      action_creator.down(down_payload)
+      perform_action(:down, opts)
     end
+
 
     private
 
-    def action_creator
-      name.to_s.classify.constantize.new
+    def action_creator(meth)
+      name_const = name.to_s.classify.constantize
+      return name_const if name_const.respond_to?(meth)
+
+      obj = name_const.new
+      obj.respond_to?(meth) ? obj : nil
+    end
+
+    def perform_action(meth, opts)
+      responder = action_creator(meth)
+      return if responder.nil?
+
+      if opts.any?
+        responder.public_send(meth, up_payload, opts)
+      else
+        responder.public_send(meth, up_payload)
+      end
     end
   end
 end
