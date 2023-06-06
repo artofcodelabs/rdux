@@ -18,15 +18,16 @@ module Rdux
     end
 
     def call(opts)
-      perform_action(:call, opts)
+      perform_action(:call, up_payload, opts)
     end
 
     def up(opts)
-      perform_action(:up, opts)
+      perform_action(:up, up_payload, opts)
     end
 
     def down
-      perform_action(:down, opts)
+      perform_action(:down, down_payload, {})
+      update(down_at: Time.current)
     end
 
     private
@@ -39,14 +40,14 @@ module Rdux
       obj.respond_to?(meth) ? obj : nil
     end
 
-    def perform_action(meth, opts)
+    def perform_action(meth, payload, opts)
       responder = action_creator(meth)
       return if responder.nil?
 
       if opts.any?
-        responder.public_send(meth, up_payload, opts)
+        responder.public_send(meth, payload, opts)
       else
-        responder.public_send(meth, up_payload)
+        responder.public_send(meth, payload)
       end
     end
   end

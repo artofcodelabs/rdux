@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class CreateTask
-  def up(payload, opts)
+  def up(payload, opts = {})
     user = opts[:user] || User.find(payload['user_id'])
     task = user.tasks.new(payload['task'])
     if task.save

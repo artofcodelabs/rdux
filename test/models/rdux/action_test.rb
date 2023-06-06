@@ -4,11 +4,27 @@ require 'test_helper'
 
 module Rdux
   class ActionTest < TC
-    it 'serializes payload' do
-      payload = { name: 'Foo bar baz' }
-      action = Action.create!(name: :create_task, up_payload: payload)
+    TASK_PAYLOAD = { task: { 'name' => 'Foo bar baz' } }.freeze
 
-      assert_equal payload.stringify_keys, action.up_payload
+    it 'serializes payload' do
+      user = users(:zbig)
+      up_payload = { user_id: user.id }.merge(TASK_PAYLOAD).stringify_keys
+      assert_equal up_payload, perform_action(user).action.up_payload
+    end
+
+    describe '#down' do
+      it 'sets down_at' do
+        res = perform_action
+        assert_nil res.action.down_at
+        res.action.down
+        assert_not_nil res.action.down_at
+      end
+    end
+
+    private
+
+    def perform_action(user = users(:zbig))
+      Rdux.dispatch(CreateTask, { user_id: user.id }.merge(TASK_PAYLOAD))
     end
   end
 end
