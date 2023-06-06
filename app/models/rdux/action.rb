@@ -11,6 +11,11 @@ module Rdux
 
     validates :name, presence: true
     validates :up_payload, presence: true
+    validates :up_at, presence: true
+
+    before_validation do
+      self.up_at = Time.current if new_record?
+    end
 
     def call(opts)
       perform_action(:call, opts)

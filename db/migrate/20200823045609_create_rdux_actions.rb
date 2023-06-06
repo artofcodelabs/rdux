@@ -6,6 +6,8 @@ class CreateRduxActions < ActiveRecord::Migration[6.0]
       t.string :name
       t.text :up_payload
       t.text :down_payload
+      t.datetime :up_at
+      t.datetime :down_at
 
       t.timestamps
     end
