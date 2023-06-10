@@ -32,7 +32,7 @@ module Rdux
             last_name: 'Zbigowski',
             number: '4242424242424242',
             expiration_month: 5,
-            expiration_year: Time.current.year + 1,
+            expiration_year: Time.current.year + 1
           }
         }
         res = Rdux.dispatch(CreditCard::Create, payload)

@@ -4,5 +4,9 @@ AllCops:
   Exclude:
     - test/dummy/db/schema.rb
 
+Metrics/BlockLength:
+  Exclude:
+    - test/**/*_test.rb
+
 Style/Documentation:
   Enabled: false

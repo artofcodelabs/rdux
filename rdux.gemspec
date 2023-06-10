@@ -28,8 +28,5 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rails', '>= 5.0', '< 8.0'
 
-  spec.add_development_dependency 'rubocop', '~> 1.48'
-  spec.add_development_dependency 'rubocop-rails', '~> 2.18'
-  spec.add_development_dependency 'sqlite3', '~> 1.6.2'
   spec.metadata['rubygems_mfa_required'] = 'true'
 end

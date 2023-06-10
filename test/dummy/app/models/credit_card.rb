@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreditCard < ApplicationRecord
   belongs_to :user
 
@@ -6,7 +8,7 @@ class CreditCard < ApplicationRecord
   validates :last_four, presence: true
   validates :expiration_month, presence: true
   validates :expiration_year, presence: true
-  validates :token, presence: true, if: -> { !validation_context.is_a?(Hash) || validation_context[:context] != :before_request_gateway }
+  validates :token, presence: true, if: :not_before_request_gateway?
   validates :user, presence: true
 
   def number
@@ -15,5 +17,13 @@ class CreditCard < ApplicationRecord
 
   def number=(val)
     self.last_four = val.to_s[-4..]
+  end
+
+  private
+
+  def not_before_request_gateway?
+    return false unless validation_context.is_a?(Hash)
+
+    validation_context[:context] != :before_request_gateway
   end
 end
