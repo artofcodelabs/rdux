@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_06_215200) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_09_220030) do
   create_table "activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "task_id", null: false
@@ -20,6 +20,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_06_215200) do
     t.datetime "updated_at", null: false
     t.index ["task_id"], name: "index_activities_on_task_id"
     t.index ["user_id"], name: "index_activities_on_user_id"
+  end
+
+  create_table "credit_cards", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "last_four"
+    t.integer "expiration_month"
+    t.integer "expiration_year"
+    t.string "token"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_credit_cards_on_user_id"
   end
 
   create_table "rdux_actions", force: :cascade do |t|
@@ -48,5 +61,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_06_215200) do
 
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
+  add_foreign_key "credit_cards", "users"
   add_foreign_key "tasks", "users"
 end
