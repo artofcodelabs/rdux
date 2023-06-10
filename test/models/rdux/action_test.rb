@@ -24,7 +24,7 @@ module Rdux
     private
 
     def perform_action(user = users(:zbig))
-      Rdux.dispatch(CreateTask, { user_id: user.id }.merge(TASK_PAYLOAD))
+      Rdux.dispatch(Task::Create, { user_id: user.id }.merge(TASK_PAYLOAD))
     end
   end
 end

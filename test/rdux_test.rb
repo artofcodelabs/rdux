@@ -15,7 +15,7 @@ module Rdux
       end
 
       it 'uses self.call unless up/down' do
-        res = Rdux.dispatch(CreateActivity, { user_id: users(:zbig).id, task_id: tasks(:homework).id })
+        res = Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: tasks(:homework).id })
         assert res.ok
         assert_equal users(:zbig).activities.last.id, res.payload['activity_id']
       end
@@ -45,7 +45,7 @@ module Rdux
 
     def emit
       user = users(:zbig)
-      Rdux.dispatch(CreateTask, { user_id: user.id, task: { name: 'Foo bar baz' } }, { user: user })
+      Rdux.dispatch(Task::Create, { user_id: user.id, task: { name: 'Foo bar baz' } }, { user: user })
     end
   end
 end
