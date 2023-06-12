@@ -14,14 +14,12 @@ module Rdux
         assert_instance_of Rdux::Action, emit.action
       end
 
-      it 'uses self.call unless up/down' do
+      it 'uses self.call unless up/down and does not store down_payload' do
         res = Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: tasks(:homework).id })
         assert res.ok
         assert_equal users(:zbig).activities.last.id, res.payload['activity_id']
-      end
-
-      it 'does not store down_payload if no down method' do
-        skip 'TODO'
+        assert_nil res.down_payload
+        assert_nil res.action.down_payload
       end
 
       it 'uses self.up/self.down' do
