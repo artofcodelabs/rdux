@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CreditCard < ApplicationRecord
+  attr_accessor :number
+
   belongs_to :user
 
   validates :first_name, presence: true
@@ -11,12 +13,8 @@ class CreditCard < ApplicationRecord
   validates :token, presence: true, if: :not_before_request_gateway?
   validates :user, presence: true
 
-  def number
-    "**** **** **** #{last_four}"
-  end
-
-  def number=(val)
-    self.last_four = val.to_s[-4..]
+  before_validation do
+    self.last_four = number.to_s[-4..] if new_record?
   end
 
   private

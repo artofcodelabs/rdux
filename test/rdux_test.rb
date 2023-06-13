@@ -35,7 +35,7 @@ module Rdux
         }
         res = Rdux.dispatch(CreditCard::Create, payload)
         assert res.ok
-        assert_equal '**** **** **** 4242', CreditCard.find(res.payload[:id]).number
+        assert_equal '4242', CreditCard.find(res.payload[:id]).last_four
       end
     end
 
