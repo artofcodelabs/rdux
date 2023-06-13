@@ -22,7 +22,7 @@ module Rdux
         assert_nil res.action.down_payload
       end
 
-      it 'uses self.up/self.down' do
+      it 'uses self.up/self.down and filters defined params' do
         payload = {
           user_id: users(:zbig).id,
           credit_card: {
@@ -36,6 +36,7 @@ module Rdux
         res = Rdux.dispatch(CreditCard::Create, payload)
         assert res.ok
         assert_equal '4242', CreditCard.find(res.payload[:id]).last_four
+        assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
       end
     end
 
