@@ -4,10 +4,10 @@
 class CreateRduxActions < ActiveRecord::Migration[6.0]
   def change
     create_table :rdux_actions do |t|
-      t.string :name
-      t.text :up_payload
+      t.string :name, null: false
+      t.text :up_payload, null: false
       t.text :down_payload
-      t.datetime :up_at
+      t.datetime :up_at, null: false
       t.datetime :down_at
 
       t.timestamps

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_09_220030) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_14_131357) do
   create_table "activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "task_id", null: false
@@ -36,10 +36,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_09_220030) do
   end
 
   create_table "rdux_actions", force: :cascade do |t|
-    t.string "name"
-    t.text "up_payload"
+    t.string "name", null: false
+    t.text "up_payload", null: false
     t.text "down_payload"
-    t.datetime "up_at", precision: nil
+    t.datetime "up_at", precision: nil, null: false
     t.datetime "down_at", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
