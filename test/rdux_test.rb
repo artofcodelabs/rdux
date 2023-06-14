@@ -25,13 +25,7 @@ module Rdux
       it 'uses self.up/self.down and filters defined params' do
         payload = {
           user_id: users(:zbig).id,
-          credit_card: {
-            first_name: 'Zbig',
-            last_name: 'Zbigowski',
-            number: '4242424242424242',
-            expiration_month: 5,
-            expiration_year: Time.current.year + 1
-          }
+          credit_card: TEST_PAYLOAD[:valid_credit_card]
         }
         res = Rdux.dispatch(CreditCard::Create, payload)
         assert res.ok

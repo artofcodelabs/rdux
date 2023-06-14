@@ -29,3 +29,13 @@ module ActiveSupport
 end
 
 TC = ActiveSupport::TestCase
+
+TEST_PAYLOAD = {
+  valid_credit_card: {
+    first_name: 'Zbig',
+    last_name: 'Zbigowski',
+    number: '4242424242424242',
+    expiration_month: 5,
+    expiration_year: Time.current.year + 1
+  }
+}.freeze
