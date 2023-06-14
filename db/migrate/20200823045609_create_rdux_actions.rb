@@ -8,6 +8,7 @@ class CreateRduxActions < ActiveRecord::Migration[6.0]
       t.text :down_payload
       t.datetime :up_at, null: false
       t.datetime :down_at
+      t.boolean :up_payload_sanitized, default: false
 
       t.timestamps
     end

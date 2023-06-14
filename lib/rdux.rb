@@ -31,7 +31,9 @@ module Rdux
 
     def assign_and_persist(res, action)
       if res.ok
-        action.up_payload = Sanitize.call(action.up_payload)
+        up_payload_sanitized = Sanitize.call(action.up_payload)
+        action.up_payload_sanitized = action.up_payload != up_payload_sanitized
+        action.up_payload = up_payload_sanitized
         action.save!
       end
       res.action = action

@@ -12,6 +12,12 @@ module Rdux
       assert_equal up_payload, perform_action(user).action.up_payload
     end
 
+    it 'prevents going up again if sanitized payload' do
+      res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
+      res.action.down
+      assert_equal false, res.action.up
+    end
+
     describe '#down' do
       it 'sets down_at' do
         res = perform_action

@@ -10,7 +10,7 @@ module TestData
   }.freeze
 
   ACTIONS = {
-    'CreditCard::Create' => -> (user) {
+    'CreditCard::Create' => lambda { |user|
       {
         user_id: user.id,
         credit_card: VALID_CREDIT_CARD

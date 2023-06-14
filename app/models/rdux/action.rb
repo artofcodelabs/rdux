@@ -17,11 +17,13 @@ module Rdux
       self.up_at = Time.current if new_record?
     end
 
-    def call(opts)
+    def call(opts = {})
       perform_action(:call, up_payload, opts)
     end
 
-    def up(opts)
+    def up(opts = {})
+      return false if up_payload_sanitized
+
       perform_action(:up, up_payload, opts)
     end
 
