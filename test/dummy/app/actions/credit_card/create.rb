@@ -14,7 +14,9 @@ class CreditCard
     end
 
     def self.down(payload)
-      CreditCard.find(payload['credit_card_id']).destroy
+      cc = CreditCard.find(payload['credit_card_id'])
+      PaymentGateway.delete_credit_card(cc.token)
+      CreditCard.find(cc.id).destroy
     end
   end
 end

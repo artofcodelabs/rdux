@@ -14,6 +14,8 @@ Minitest.backtrace_filter = Minitest::BacktraceFilter.new
 require 'rails/test_unit/reporter'
 Rails::TestUnitReporter.executable = 'bin/test'
 
+Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each { |f| require f }
+
 # Load fixtures from the engine
 if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixture_path = File.expand_path('fixtures', __dir__)
@@ -29,13 +31,3 @@ module ActiveSupport
 end
 
 TC = ActiveSupport::TestCase
-
-TEST_PAYLOAD = {
-  valid_credit_card: {
-    first_name: 'Zbig',
-    last_name: 'Zbigowski',
-    number: '4242424242424242',
-    expiration_month: 5,
-    expiration_year: Time.current.year + 1
-  }
-}.freeze
