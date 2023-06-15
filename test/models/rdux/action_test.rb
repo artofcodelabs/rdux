@@ -12,10 +12,12 @@ module Rdux
       assert_equal up_payload, perform_action(user).action.up_payload
     end
 
-    it 'prevents going up again if sanitized payload' do
-      res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
-      res.action.down
-      assert_equal false, res.action.up
+    describe '#up' do
+      it 'prevents going up again if sanitized payload' do
+        res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
+        res.action.down
+        assert_equal false, res.action.up
+      end
     end
 
     describe '#down' do
@@ -24,6 +26,18 @@ module Rdux
         assert_nil res.action.down_at
         res.action.down
         assert_not_nil res.action.down_at
+      end
+
+      it 'prevents down if not the last action' do
+        res = perform_action
+        Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: res.payload[:id] })
+        assert_equal false, Action.first.down
+      end
+
+      it 'prevents down if already down' do
+        res = perform_action
+        res.action.down
+        assert_equal false, res.action.down
       end
     end
 

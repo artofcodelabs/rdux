@@ -28,6 +28,9 @@ module Rdux
     end
 
     def down
+      return false unless down_at.nil?
+      return false if self.class.where('created_at > ?', created_at).where(down_at: nil).count.positive?
+
       perform_action(:down, down_payload, {})
       update(down_at: Time.current)
     end
