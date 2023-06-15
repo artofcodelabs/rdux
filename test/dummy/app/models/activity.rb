@@ -8,6 +8,12 @@ class Activity < ApplicationRecord
   validates :task_id, presence: true
   validates :start_at, presence: true
 
+  class << self
+    def current
+      find_by(end_at: nil)
+    end
+  end
+
   before_validation do
     self.start_at ||= Time.current
   end

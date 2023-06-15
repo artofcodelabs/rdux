@@ -2,10 +2,9 @@
 
 class Activity
   module Create
-    def self.call(payload)
-      user = User.find(payload['user_id'])
-      task = user.tasks.find(payload['task_id'])
-      activity = user.activities.new(task: task)
+    def self.call(payload, opts = {})
+      task = opts[:task] || Task.find(payload['task_id'])
+      activity = task.user.activities.new(task: task)
       if activity.save
         Rdux::Result.new(true, { activity_id: activity.id })
       else

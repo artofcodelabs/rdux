@@ -40,6 +40,7 @@ module Rdux
     def action_creator(meth)
       name_const = name.to_s.classify.constantize
       return name_const if name_const.respond_to?(meth)
+      return unless name_const.is_a?(Class)
 
       obj = name_const.new
       obj.respond_to?(meth) ? obj : nil
