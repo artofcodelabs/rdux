@@ -6,12 +6,14 @@ class Activity
       task = opts[:task] || Task.find(payload['task_id'])
       current_activity = task.user.activities.current
       if current_activity
-        Rdux.dispatch(Activity::Stop, { activity_id: current_activity.id }, { activity: current_activity })
+        stop_res = Rdux.dispatch(Activity::Stop, { activity_id: current_activity.id }, { activity: current_activity })
       end
-      res = Rdux.dispatch(Activity::Create, { task_id: task.id }, { task: })
-      Rdux::Result.new(true, res.payload)
+      create_res = Rdux.dispatch(Activity::Create, { task_id: task.id }, { task: task })
+      Rdux::Result.new(ok: true, nested: [stop_res, create_res])
     end
 
-    def self.down(payload); end
+    def self.down(payload)
+      # TODO: ...
+    end
   end
 end

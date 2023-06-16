@@ -10,6 +10,8 @@ class CreateRduxActions < ActiveRecord::Migration[6.0]
       t.datetime :down_at
       t.boolean :up_payload_sanitized, default: false
 
+      t.belongs_to :rdux_action, index: true, foreign_key: true
+
       t.timestamps
     end
   end

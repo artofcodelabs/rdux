@@ -28,6 +28,13 @@ module Rdux
         assert_equal '4242', CreditCard.find(res.payload[:id]).last_four
         assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
       end
+
+      it 'assigns nested actions' do
+        create_activity
+        res = create_task
+        res = Rdux.dispatch(Activity::Switch, { task_id: res.payload[:id] })
+        assert_equal 2, res.action.rdux_actions.count
+      end
     end
 
     private

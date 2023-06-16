@@ -6,6 +6,9 @@ module Rdux
       'rdux_'
     end
 
+    belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
+    has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
+
     serialize :up_payload, JSON
     serialize :down_payload, JSON
 

@@ -24,7 +24,7 @@ module Rdux
 
     def call_up_meth_on_action(action, opts)
       res = action.up(opts)
-      res.down_payload.deep_stringify_keys!
+      res.down_payload&.deep_stringify_keys!
       action.down_payload = res.down_payload
       assign_and_persist(res, action)
     end
@@ -34,6 +34,7 @@ module Rdux
         up_payload_sanitized = Sanitize.call(action.up_payload)
         action.up_payload_sanitized = action.up_payload != up_payload_sanitized
         action.up_payload = up_payload_sanitized
+        res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
         action.save!
       end
       res.action = action

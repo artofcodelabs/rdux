@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_06_14_205429) do
+ActiveRecord::Schema[7.0].define(version: 2023_06_16_082653) do
   create_table "activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "task_id", null: false
@@ -42,8 +42,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_14_205429) do
     t.datetime "up_at", precision: nil, null: false
     t.datetime "down_at", precision: nil
     t.boolean "up_payload_sanitized", default: false
+    t.integer "rdux_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -63,5 +65,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_06_14_205429) do
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
   add_foreign_key "credit_cards", "users"
+  add_foreign_key "rdux_actions", "rdux_actions"
   add_foreign_key "tasks", "users"
 end
