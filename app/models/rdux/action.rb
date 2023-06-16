@@ -20,6 +20,9 @@ module Rdux
       self.up_at = Time.current if new_record?
     end
 
+    scope :up, -> { where(down_at: nil) }
+    scope :down, -> { where.not(down_at: nil) }
+
     def call(opts = {})
       perform_action(:call, up_payload, opts)
     end
@@ -32,9 +35,12 @@ module Rdux
 
     def down
       return false unless down_at.nil?
-      return false if self.class.where('created_at > ?', created_at).where(down_at: nil).count.positive?
+      return false if self.class.where('created_at > ?', created_at)
+                          .where(down_at: nil)
+                          .where('id != ?', rdux_action_id.to_i)
+                          .count.positive?
 
-      perform_action(:down, down_payload, {})
+      perform_action(:down, down_payload, build_opts)
       update(down_at: Time.current)
     end
 
@@ -57,6 +63,13 @@ module Rdux
         responder.public_send(meth, payload, opts)
       else
         responder.public_send(meth, payload)
+      end
+    end
+
+    def build_opts
+      {}.tap do |h|
+        nested = rdux_actions.order(:created_at)
+        h[:nested] = nested if nested.any?
       end
     end
   end

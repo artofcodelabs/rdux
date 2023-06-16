@@ -31,9 +31,15 @@ module Rdux
 
       it 'assigns nested actions' do
         create_activity
-        res = create_task
-        res = Rdux.dispatch(Activity::Switch, { task_id: res.payload[:id] })
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
         assert_equal 2, res.action.rdux_actions.count
+      end
+
+      it 'reverts nested actions' do
+        create_activity
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
+        res.action.down
+        assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
       end
     end
 

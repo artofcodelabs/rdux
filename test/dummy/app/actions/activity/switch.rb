@@ -9,11 +9,11 @@ class Activity
         stop_res = Rdux.dispatch(Activity::Stop, { activity_id: current_activity.id }, { activity: current_activity })
       end
       create_res = Rdux.dispatch(Activity::Create, { task_id: task.id }, { task: task })
-      Rdux::Result.new(ok: true, nested: [stop_res, create_res])
+      Rdux::Result.new(ok: true, nested: [stop_res, create_res].compact)
     end
 
-    def self.down(payload)
-      # TODO: ...
+    def self.down(_, opts)
+      opts[:nested].reverse.map(&:down)
     end
   end
 end
