@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 module TestData
+  TASK_PAYLOAD = { task: { 'name' => 'Foo bar baz' } }.freeze
+
   VALID_CREDIT_CARD = {
     first_name: 'Zbig',
     last_name: 'Zbigowski',

@@ -4,6 +4,8 @@ require 'test_helper'
 
 module Rdux
   class Test < TC
+    include TestHelpers
+
     describe '#dispatch' do
       it 'persists an action' do
         create_task
@@ -41,17 +43,6 @@ module Rdux
         res.action.down
         assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
       end
-    end
-
-    private
-
-    def create_task
-      user = users(:zbig)
-      Rdux.dispatch(Task::Create, { user_id: user.id, task: { name: 'Foo bar baz' } }, { user: user })
-    end
-
-    def create_activity
-      Rdux.dispatch(Activity::Create, { task_id: tasks(:homework).id })
     end
   end
 end
