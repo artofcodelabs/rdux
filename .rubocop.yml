@@ -8,5 +8,10 @@ Metrics/BlockLength:
   Exclude:
     - test/**/*_test.rb
 
+Metrics/MethodLength:
+  Exclude:
+    - db/migrate/20200823045609_create_rdux_actions.rb
+    - test/dummy/db/migrate/20230620200502_create_rdux_actions.rdux.rb
+
 Style/Documentation:
   Enabled: false

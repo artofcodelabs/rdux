@@ -11,14 +11,11 @@ module Rdux
 
     serialize :up_payload, JSON
     serialize :down_payload, JSON
+    serialize :up_result, JSON
+    serialize :meta, JSON
 
     validates :name, presence: true
     validates :up_payload, presence: true
-    validates :up_at, presence: true
-
-    before_validation do
-      self.up_at = Time.current if new_record?
-    end
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
