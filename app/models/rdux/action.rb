@@ -29,6 +29,7 @@ module Rdux
 
     def up(opts = {})
       return false if up_payload_sanitized
+      return false unless down_at.nil?
 
       perform_action(:up, up_payload, opts)
     end

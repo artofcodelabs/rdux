@@ -19,7 +19,7 @@ module Rdux
       it 'uses self.call unless up/down and does not store down_payload' do
         res = create_activity
         assert res.ok
-        assert_equal users(:zbig).activities.last.id, res.payload['activity_id']
+        assert_equal users(:zbig).activities.last.id, res.payload['activity'].id
         assert_nil res.down_payload
         assert_nil res.action.down_payload
       end
