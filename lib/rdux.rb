@@ -6,8 +6,8 @@ require 'rdux/sanitize'
 
 module Rdux
   class << self
-    def dispatch(action_name, payload, opts = {})
-      action = Action.new(name: action_name, up_payload: payload)
+    def dispatch(action_name, payload, opts = {}, meta: nil)
+      action = Action.new(name: action_name, up_payload: payload, meta: meta)
       call_call_meth_on_action(action, opts)
     end
 

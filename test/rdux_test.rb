@@ -43,6 +43,11 @@ module Rdux
         res.action.down
         assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
       end
+
+      it 'sets meta' do
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] }, meta: { foo: 'bar' })
+        assert_equal({ 'foo' => 'bar' }, res.action.meta)
+      end
     end
   end
 end
