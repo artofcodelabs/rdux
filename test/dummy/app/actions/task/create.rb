@@ -13,7 +13,7 @@ class Task
     end
 
     def down(payload)
-      Task.find(payload['task_id']).destroy
+      Delete.up(payload)
     end
   end
 end

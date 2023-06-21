@@ -49,6 +49,13 @@ module Rdux
         res.action.down
         assert_equal false, res.action.down
       end
+
+      it 'allows for reusing other action creators' do
+        res = create_task
+        res.action.down
+        assert_equal 1, Action.count
+        assert_equal 1, Task.count  # fixtures
+      end
     end
   end
 end
