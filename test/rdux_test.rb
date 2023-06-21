@@ -48,6 +48,16 @@ module Rdux
         res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] }, meta: { foo: 'bar' })
         assert_equal({ 'foo' => 'bar' }, res.action.meta)
       end
+
+      it 'sets up_result on action' do
+        res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
+        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.payload['activity'].id })
+        res2.action.up_result.tap do |up_result|
+          assert_nil up_result['end_at'][0]
+          assert_not_nil up_result['end_at'][1]
+          assert up_result['updated_at'][0] < up_result['updated_at'][1]
+        end
+      end
     end
   end
 end

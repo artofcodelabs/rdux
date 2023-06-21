@@ -34,6 +34,7 @@ module Rdux
         up_payload_sanitized = Sanitize.call(action.up_payload)
         action.up_payload_sanitized = action.up_payload != up_payload_sanitized
         action.up_payload = up_payload_sanitized
+        action.up_result = res.up_result
         res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
         action.save!
       end
