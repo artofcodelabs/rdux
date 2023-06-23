@@ -6,7 +6,10 @@ class CreditCard
       def up(payload, opts = {})
         user = opts[:user] || User.find(payload['user_id'])
         card = user.credit_cards.new(payload['credit_card'])
-        return Rdux::Result.new(false, { errors: card.errors }) if card.invalid?(context: :before_request_gateway)
+        if card.invalid?(context: :before_request_gateway)
+          return Rdux::Result.new(ok: false, resp: { errors: card.errors },
+                                  save: true)
+        end
 
         token = PaymentGateway.tokenize(card)
         return Rdux::Result.new(false, { errors: { base: 'Invalid credit card' } }) unless token

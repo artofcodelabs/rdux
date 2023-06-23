@@ -58,6 +58,16 @@ module Rdux
           assert up_result['updated_at'][0] < up_result['updated_at'][1]
         end
       end
+
+      it 'can save failed action' do
+        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload[:credit_card][:number] = '123'
+        Rdux.dispatch(CreditCard::Create, payload)
+        assert_equal 1, Rdux::FailedAction.count
+        assert_equal 0, Rdux::Action.count
+        fa = Rdux::FailedAction.last
+        assert_equal '[FILTERED]', fa.up_payload['credit_card']['number']
+      end
     end
   end
 end

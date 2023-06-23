@@ -2,20 +2,9 @@
 
 module Rdux
   class Action < ApplicationRecord
-    def self.table_name_prefix
-      'rdux_'
-    end
+    include Actionable
 
-    belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
-    has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
-
-    serialize :up_payload, JSON
     serialize :down_payload, JSON
-    serialize :up_result, JSON
-    serialize :meta, JSON
-
-    validates :name, presence: true
-    validates :up_payload, presence: true
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
@@ -40,6 +29,10 @@ module Rdux
 
       perform_action(:down, down_payload, build_opts)
       update(down_at: Time.current)
+    end
+
+    def to_failed_action
+      FailedAction.new(attributes.except('down_payload', 'down_at'))
     end
 
     private
