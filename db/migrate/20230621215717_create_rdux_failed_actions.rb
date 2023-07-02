@@ -10,6 +10,7 @@ class CreateRduxFailedActions < ActiveRecord::Migration[7.0]
       t.text :meta
 
       t.belongs_to :rdux_action, index: true, foreign_key: true
+      t.belongs_to :rdux_failed_action, index: true, foreign_key: true
 
       t.timestamps
     end

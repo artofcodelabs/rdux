@@ -28,7 +28,7 @@ class CreditCard
 
       def save_credit_card(card)
         if card.save
-          Rdux::Result.new(true, { credit_card_id: card.id }, { id: card.id })
+          Rdux::Result.new(true, { credit_card_id: card.id }, { credit_card: card })
         else
           Rdux::Result.new(false, { errors: card.errors })
         end

@@ -18,8 +18,10 @@ module Rdux
       res = action.call(opts)
       return call_up_meth_on_action(action, opts) if res.nil?
 
-      res.resp = res.down_payload.deep_stringify_keys
-      res.down_payload = nil
+      unless res.down_payload.nil?
+        res.resp = res.down_payload.deep_stringify_keys
+        res.down_payload = nil
+      end
       assign_and_persist(res, action)
     end
 
@@ -55,6 +57,7 @@ module Rdux
       assign_and_persist_common(res, action)
       action.up_result ||= res.resp
       res.action = action.to_failed_action.tap(&:save!)
+      res.nested&.each { |nested_res| res.action.rdux_failed_actions << nested_res.action }
     end
 
     def sanitize(action)

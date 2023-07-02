@@ -27,7 +27,7 @@ module Rdux
       it 'uses self.up/self.down and filters defined params' do
         res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
         assert res.ok
-        assert_equal '4242', CreditCard.find(res.payload[:id]).last_four
+        assert_equal '4242', res.payload[:credit_card].last_four
         assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
       end
 
@@ -67,6 +67,14 @@ module Rdux
         assert_equal 0, Rdux::Action.count
         fa = Rdux::FailedAction.last
         assert_equal '[FILTERED]', fa.up_payload['credit_card']['number']
+      end
+
+      it 'can save failed nested action' do
+        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload[:credit_card][:number] = '123'
+        Rdux.dispatch(CreditCard::Charge, payload)
+        assert_equal 2, Rdux::FailedAction.count
+        assert_equal 0, Rdux::Action.count
       end
     end
   end
