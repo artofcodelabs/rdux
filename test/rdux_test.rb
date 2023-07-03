@@ -69,12 +69,12 @@ module Rdux
         assert_equal '[FILTERED]', fa.up_payload['credit_card']['number']
       end
 
-      it 'can save failed nested action' do
+      it 'can save actions assigned to failed action' do
         payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
-        payload[:credit_card][:number] = '123'
+        payload[:amount] = 99.99
         Rdux.dispatch(CreditCard::Charge, payload)
-        assert_equal 2, Rdux::FailedAction.count
-        assert_equal 0, Rdux::Action.count
+        assert_equal 1, Rdux::FailedAction.count
+        assert_equal 1, Rdux::Action.count
       end
     end
   end

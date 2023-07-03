@@ -57,7 +57,17 @@ module Rdux
       assign_and_persist_common(res, action)
       action.up_result ||= res.resp
       res.action = action.to_failed_action.tap(&:save!)
-      res.nested&.each { |nested_res| res.action.rdux_failed_actions << nested_res.action }
+      assign_nested_responses_to_failed_action(res.action, res.nested) unless res.nested.nil?
+    end
+
+    def assign_nested_responses_to_failed_action(failed_action, nested)
+      nested.each do |nested_res|
+        if nested_res.action.is_a?(Rdux::Action)
+          failed_action.rdux_actions << nested_res.action
+        else
+          failed_action.rdux_failed_actions << nested_res.action
+        end
+      end
     end
 
     def sanitize(action)
