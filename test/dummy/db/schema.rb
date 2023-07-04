@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_02_195003) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_04_085606) do
   create_table "activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "task_id", null: false
@@ -33,6 +33,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_02_195003) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_credit_cards_on_user_id"
+  end
+
+  create_table "plans", force: :cascade do |t|
+    t.string "name"
+    t.string "ext_charge_id"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_plans_on_user_id"
   end
 
   create_table "rdux_actions", force: :cascade do |t|
@@ -80,6 +89,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_02_195003) do
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
   add_foreign_key "credit_cards", "users"
+  add_foreign_key "plans", "users"
   add_foreign_key "rdux_actions", "rdux_actions"
   add_foreign_key "rdux_failed_actions", "rdux_actions"
   add_foreign_key "rdux_failed_actions", "rdux_failed_actions"

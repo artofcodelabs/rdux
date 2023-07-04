@@ -76,6 +76,18 @@ module Rdux
         assert_equal 1, Rdux::FailedAction.count
         assert_equal 1, Rdux::Action.count
       end
+
+      it 'can save both: actions and failed action assigned to failed action' do
+        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload[:amount] = 99.99
+        payload[:plan] = 'gold'
+        res = Rdux.dispatch(Plan::Create, payload, { user: users(:zbig) })
+        assert_equal 2, Rdux::FailedAction.count
+        assert_equal 1, Rdux::Action.count
+        assert_equal 'Plan::Create', res.action.name
+        assert_equal ['CreditCard::Charge'], res.action.rdux_failed_actions.map(&:name)
+        assert_equal ['CreditCard::Create'], res.action.rdux_failed_actions[0].rdux_actions.map(&:name)
+      end
     end
   end
 end
