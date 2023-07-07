@@ -8,6 +8,7 @@ require 'active_support/concern'
 module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
+      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
       action = Action.new(name: action_name, up_payload: payload, meta: meta)
       call_call_meth_on_action(action, opts)
     end

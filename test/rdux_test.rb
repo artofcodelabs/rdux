@@ -25,7 +25,7 @@ module Rdux
       end
 
       it 'uses self.up/self.down and filters defined params' do
-        res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
+        res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
         assert res.ok
         assert_equal '4242', res.payload[:credit_card].last_four
         assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
@@ -60,7 +60,7 @@ module Rdux
       end
 
       it 'can save failed action' do
-        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:credit_card][:number] = '123'
         Rdux.dispatch(CreditCard::Create, payload)
         assert_equal 1, Rdux::FailedAction.count
@@ -70,7 +70,7 @@ module Rdux
       end
 
       it 'can save actions assigned to failed action' do
-        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
         Rdux.dispatch(CreditCard::Charge, payload)
         assert_equal 1, Rdux::FailedAction.count
@@ -78,7 +78,7 @@ module Rdux
       end
 
       it 'can save both: actions and failed action assigned to failed action' do
-        payload = TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)).deep_dup
+        payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
         payload[:plan] = 'gold'
         res = Rdux.dispatch(Plan::Create, payload, { user: users(:zbig) })

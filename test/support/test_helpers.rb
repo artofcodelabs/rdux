@@ -2,7 +2,7 @@
 
 module TestHelpers
   def create_task(user = users(:zbig))
-    Rdux.dispatch(Task::Create, { user_id: user.id }.merge(TestData::TASK_PAYLOAD))
+    Rdux.dispatch(Task::Create, TestData::Payloads.task, { ars: { user: user } })
   end
 
   def create_activity

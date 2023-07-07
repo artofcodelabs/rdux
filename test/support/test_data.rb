@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module TestData
-  TASK_PAYLOAD = { task: { 'name' => 'Foo bar baz' } }.freeze
-
   VALID_CREDIT_CARD = {
     first_name: 'Zbig',
     last_name: 'Zbigowski',
@@ -11,12 +9,15 @@ module TestData
     expiration_year: Time.current.year + 1
   }.freeze
 
-  ACTIONS = {
-    'CreditCard::Create' => lambda { |user|
-      {
-        user_id: user.id,
-        credit_card: VALID_CREDIT_CARD
-      }
-    }
-  }.freeze
+  module Payloads
+    class << self
+      def task
+        { task: { 'name' => 'Foo bar baz' } }
+      end
+
+      def credit_card_create(user)
+        { user_id: user.id, credit_card: VALID_CREDIT_CARD.deep_dup }
+      end
+    end
+  end
 end

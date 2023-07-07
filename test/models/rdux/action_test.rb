@@ -8,13 +8,13 @@ module Rdux
 
     it 'serializes payload' do
       user = users(:zbig)
-      up_payload = { user_id: user.id }.merge(TestData::TASK_PAYLOAD).stringify_keys
+      up_payload = { user_id: user.id }.merge(TestData::Payloads.task).stringify_keys
       assert_equal up_payload, create_task(user).action.up_payload
     end
 
     describe '#up' do
       it 'prevents going up again if sanitized payload' do
-        res = Rdux.dispatch(CreditCard::Create, TestData::ACTIONS['CreditCard::Create'].call(users(:zbig)))
+        res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
         res.action.down
         assert_equal false, res.action.up
       end
