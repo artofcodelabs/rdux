@@ -27,7 +27,8 @@ $ gem install rdux
 ## Test
 
 ```bash
-$ bin/test
+$ DB=postgres bin/test
+$ DB=sqlite bin/test
 ```
 
 ## Contributing
