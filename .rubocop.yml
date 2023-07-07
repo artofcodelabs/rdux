@@ -5,6 +5,9 @@ AllCops:
     - test/dummy/db/schema.rb
     - test/dummy/db/secondary_schema.rb
 
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
 Metrics/AbcSize:
   Exclude:
     - db/migrate/20230621215718_create_rdux_actions.rb
