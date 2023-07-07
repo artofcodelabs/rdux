@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_07_095006) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_07_110429) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -49,12 +49,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_07_095006) do
 
   create_table "rdux_actions", force: :cascade do |t|
     t.string "name", null: false
-    t.text "up_payload", null: false
-    t.text "down_payload"
+    t.jsonb "up_payload", null: false
+    t.jsonb "down_payload"
     t.datetime "down_at"
     t.boolean "up_payload_sanitized", default: false
-    t.text "up_result"
-    t.text "meta"
+    t.jsonb "up_result"
+    t.jsonb "meta"
     t.bigint "rdux_action_id"
     t.bigint "rdux_failed_action_id"
     t.datetime "created_at", null: false
@@ -65,10 +65,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_07_095006) do
 
   create_table "rdux_failed_actions", force: :cascade do |t|
     t.string "name", null: false
-    t.text "up_payload", null: false
+    t.jsonb "up_payload", null: false
     t.boolean "up_payload_sanitized", default: false
-    t.text "up_result"
-    t.text "meta"
+    t.jsonb "up_result"
+    t.jsonb "meta"
     t.bigint "rdux_failed_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
