@@ -113,6 +113,7 @@ GEM
     parser (3.2.2.3)
       ast (~> 2.4.1)
       racc
+    pg (1.5.3)
     racc (1.7.0)
     rack (2.2.7)
     rack-test (2.1.0)
@@ -181,6 +182,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  pg (~> 1.5.2)
   rdux!
   rubocop
   rubocop-rails

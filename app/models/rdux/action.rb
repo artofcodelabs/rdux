@@ -4,6 +4,10 @@ module Rdux
   class Action < ApplicationRecord
     include Actionable
 
+    belongs_to :rdux_failed_action, optional: true, class_name: 'Rdux::FailedAction'
+    belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
+    has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
+
     serialize :down_payload, JSON
 
     scope :up, -> { where(down_at: nil) }
@@ -32,7 +36,7 @@ module Rdux
     end
 
     def to_failed_action
-      FailedAction.new(attributes.except('down_payload', 'down_at'))
+      FailedAction.new(attributes.except('down_payload', 'down_at', 'rdux_action_id'))
     end
 
     private

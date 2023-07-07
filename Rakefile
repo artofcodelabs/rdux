@@ -26,4 +26,6 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
+Dir.glob('lib/tasks/**/*.rake').each { |r| import r }
+
 task default: :test

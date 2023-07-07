@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    platform: linux/x86_64
+    image: postgres:14.2
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=mypassword
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
