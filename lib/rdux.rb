@@ -13,6 +13,8 @@ module Rdux
       call_call_meth_on_action(action, opts)
     end
 
+    alias perform dispatch
+
     private
 
     def call_call_meth_on_action(action, opts)

@@ -13,7 +13,7 @@ class CreditCard
       private
 
       def create(payload, opts)
-        res = Rdux.dispatch(Create, payload, opts)
+        res = Rdux.perform(Create, payload, opts)
         return res if res.ok
 
         Rdux::Result.new(ok: false, resp: { errors: res.payload[:errors] }, save: true, nested: [res])
