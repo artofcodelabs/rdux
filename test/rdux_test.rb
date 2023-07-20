@@ -62,11 +62,12 @@ module Rdux
       it 'can save failed action' do
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:credit_card][:number] = '123'
-        Rdux.dispatch(CreditCard::Create, payload)
+        Rdux.dispatch(CreditCard::Create, payload, meta: { foo: 'bar', stream: 'baz' })
         assert_equal 1, Rdux::FailedAction.count
         assert_equal 0, Rdux::Action.count
         fa = Rdux::FailedAction.last
         assert_equal '[FILTERED]', fa.up_payload['credit_card']['number']
+        assert_equal({ 'foo' => 'bar', 'stream' => 'baz' }, fa.meta)
       end
 
       it 'can save actions assigned to failed action' do
