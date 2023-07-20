@@ -11,6 +11,7 @@ class CreateRduxActions < ActiveRecord::Migration[7.0]
       t.boolean :up_payload_sanitized, default: false
       t.column :up_result, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
       t.column :meta, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
+      t.string :stream_hash
 
       t.belongs_to :rdux_action, index: true, foreign_key: true
       t.belongs_to :rdux_failed_action, index: true, foreign_key: true

@@ -8,7 +8,7 @@ module Rdux
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
-    serialize :down_payload, JSON
+    serialize :down_payload, JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
@@ -26,10 +26,7 @@ module Rdux
 
     def down
       return false unless down_at.nil?
-      return false if self.class.where('created_at > ?', created_at)
-                          .where(down_at: nil)
-                          .where('id != ?', rdux_action_id.to_i)
-                          .count.positive?
+      return false unless can_down?
 
       perform_action(:down, down_payload, build_opts)
       update(down_at: Time.current)
@@ -40,6 +37,14 @@ module Rdux
     end
 
     private
+
+    def can_down?
+      q = self.class.where('created_at > ?', created_at)
+              .where(down_at: nil)
+              .where('id != ?', rdux_action_id.to_i)
+      q = q.where(stream_hash: stream_hash) unless stream_hash.nil?
+      !q.count.positive?
+    end
 
     def action_creator(meth)
       name_const = name.to_s.classify.constantize
