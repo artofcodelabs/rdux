@@ -1,10 +1,26 @@
 # Rdux
-Short description and motivation.
+Minimal take on event sourcing.
 
 ## Usage
 
 ```bash
 $ bin/rails rdux:install:migrations
+$ bin/rails db:migrate
+```
+
+### Code structure
+
+### Dispatch action
+
+```ruby
+Rdux.perform(
+  Activity::Stop,
+  { activity_id: current_activity.id },
+  { activity: current_activity },
+  meta: {
+    stream: { user_id: 123, context: 'foo' }, bar: 'baz'
+  }
+)
 ```
 
 ## Installation
@@ -30,9 +46,6 @@ $ gem install rdux
 $ DB=postgres bin/test
 $ DB=sqlite bin/test
 ```
-
-## Contributing
-Contribution directions go here.
 
 ## License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
