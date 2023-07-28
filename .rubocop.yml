@@ -3,6 +3,24 @@ AllCops:
   TargetRubyVersion: 3.0
   Exclude:
     - test/dummy/db/schema.rb
+    - test/dummy/db/secondary_schema.rb
+
+Gemspec/DevelopmentDependencies:
+  EnforcedStyle: gemspec
+
+Metrics/AbcSize:
+  Exclude:
+    - db/migrate/20230621215718_create_rdux_actions.rb
+    - test/dummy/db/migrate/*.rdux.rb
+
+Metrics/BlockLength:
+  Exclude:
+    - test/**/*_test.rb
+
+Metrics/MethodLength:
+  Exclude:
+    - db/migrate/20230621215718_create_rdux_actions.rb
+    - test/dummy/db/migrate/*.rdux.rb
 
 Style/Documentation:
   Enabled: false

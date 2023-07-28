@@ -11,9 +11,12 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "activities", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "task_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "task_id", null: false
     t.datetime "start_at"
     t.datetime "end_at"
     t.datetime "created_at", null: false
@@ -29,7 +32,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
     t.integer "expiration_month"
     t.integer "expiration_year"
     t.string "token"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_credit_cards_on_user_id"
@@ -38,7 +41,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
   create_table "plans", force: :cascade do |t|
     t.string "name"
     t.string "ext_charge_id"
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_plans_on_user_id"
@@ -46,15 +49,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
 
   create_table "rdux_actions", force: :cascade do |t|
     t.string "name", null: false
-    t.text "up_payload", null: false
-    t.text "down_payload"
+    t.jsonb "up_payload", null: false
+    t.jsonb "down_payload"
     t.datetime "down_at"
     t.boolean "up_payload_sanitized", default: false
-    t.text "up_result"
-    t.text "meta"
+    t.jsonb "up_result"
+    t.jsonb "meta"
     t.string "stream_hash"
-    t.integer "rdux_action_id"
-    t.integer "rdux_failed_action_id"
+    t.bigint "rdux_action_id"
+    t.bigint "rdux_failed_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
@@ -63,12 +66,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
 
   create_table "rdux_failed_actions", force: :cascade do |t|
     t.string "name", null: false
-    t.text "up_payload", null: false
+    t.jsonb "up_payload", null: false
     t.boolean "up_payload_sanitized", default: false
-    t.text "up_result"
-    t.text "meta"
+    t.jsonb "up_result"
+    t.jsonb "meta"
     t.string "stream_hash"
-    t.integer "rdux_failed_action_id"
+    t.bigint "rdux_failed_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["rdux_failed_action_id"], name: "index_rdux_failed_actions_on_rdux_failed_action_id"
@@ -76,7 +79,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
 
   create_table "tasks", force: :cascade do |t|
     t.string "name"
-    t.integer "user_id"
+    t.bigint "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_tasks_on_user_id"
