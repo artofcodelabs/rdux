@@ -5,11 +5,9 @@ module Rdux
     extend ActiveSupport::Concern
 
     included do
-      if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
-        serialize :up_payload, JSON
-        serialize :up_result, JSON
-        serialize :meta, JSON
-      end
+      serialize :up_payload, JSON
+      serialize :up_result, JSON
+      serialize :meta, JSON
 
       validates :name, presence: true
       validates :up_payload, presence: true

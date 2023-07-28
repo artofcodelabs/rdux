@@ -26,7 +26,7 @@ end
 
 module ActiveSupport
   class TestCase
-    extend MiniTest::Spec::DSL
+    extend Minitest::Spec::DSL
   end
 end
 

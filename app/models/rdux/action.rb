@@ -8,7 +8,7 @@ module Rdux
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
-    serialize :down_payload, JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+    serialize :down_payload, JSON
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
