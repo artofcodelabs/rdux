@@ -49,7 +49,7 @@ module Rdux
         res_a1 = create_activity(task_id: res_t1.payload[:id], meta: { stream: { user_id: users(:zbig).id } })
         create_task(users(:joe), meta: { stream: { user_id: users(:joe).id } })
         assert_equal false, res_t1.action.down
-        assert res_a1.action.down
+        assert_nil res_a1.action.down
         assert res_t1.action.down
       end
 
@@ -64,6 +64,10 @@ module Rdux
         res.action.down
         assert_equal 1, Action.count
         assert_equal 1, Task.count  # fixtures
+      end
+
+      it 'returns a response from an action performer' do
+        assert_equal Rdux::Result, create_task.action.down.class
       end
     end
   end
