@@ -28,8 +28,9 @@ module Rdux
       return false unless down_at.nil?
       return false unless can_down?
 
-      perform_action(:down, down_payload, build_opts)
+      res = perform_action(:down, down_payload, build_opts)
       update(down_at: Time.current)
+      res
     end
 
     def to_failed_action
