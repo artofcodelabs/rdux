@@ -49,7 +49,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
     t.text "up_payload", null: false
     t.text "down_payload"
     t.datetime "down_at"
-    t.boolean "up_payload_sanitized", default: false
+    t.boolean "up_payload_sanitized", default: false, null: false
     t.text "up_result"
     t.text "meta"
     t.string "stream_hash"
@@ -64,7 +64,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
   create_table "rdux_failed_actions", force: :cascade do |t|
     t.string "name", null: false
     t.text "up_payload", null: false
-    t.boolean "up_payload_sanitized", default: false
+    t.boolean "up_payload_sanitized", default: false, null: false
     t.text "up_result"
     t.text "meta"
     t.string "stream_hash"
