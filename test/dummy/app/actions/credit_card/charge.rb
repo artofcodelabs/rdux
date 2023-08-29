@@ -16,16 +16,16 @@ class CreditCard
         res = Rdux.perform(Create, payload, opts)
         return res if res.ok
 
-        Rdux::Result.new(ok: false, resp: { errors: res.payload[:errors] }, save: true, nested: [res])
+        Rdux::Result[ok: false, resp: { errors: res.payload[:errors] }, save: true, nested: [res]]
       end
 
       def charge(token, amount, create_res)
         res = PaymentGateway.charge(token, amount)
         if res[:id].nil?
-          Rdux::Result.new(ok: false, resp: { errors: { base: 'Invalid credit card' } }, save: true,
-                           nested: [create_res])
+          Rdux::Result[ok: false, resp: { errors: { base: 'Invalid credit card' } }, save: true,
+                       nested: [create_res]]
         else
-          Rdux::Result.new(ok: true, resp: { charge_id: res[:id] }, nested: [create_res])
+          Rdux::Result[ok: true, resp: { charge_id: res[:id] }, nested: [create_res]]
         end
       end
     end
