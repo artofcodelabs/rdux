@@ -26,7 +26,7 @@ Rdux.perform(
 #### Return
 
 ```ruby
-Rdux::Result.new(true, { activity: activity })
+Rdux::Result[true, { activity: activity }]
 ```
 
 ## Installation

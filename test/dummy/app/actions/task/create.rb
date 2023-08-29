@@ -5,9 +5,9 @@ class Task
     def up(payload, opts = {})
       task = opts[:ars][:user].tasks.new(payload['task'])
       if task.save
-        Rdux::Result.new(true, { task_id: task.id }, { id: task.id })
+        Rdux::Result[true, { task_id: task.id }, { id: task.id }]
       else
-        Rdux::Result.new(false, { errors: task.errors })
+        Rdux::Result[false, { errors: task.errors }]
       end
     end
 
