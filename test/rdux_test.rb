@@ -8,7 +8,7 @@ module Rdux
 
     describe '#dispatch' do
       it 'persists an action' do
-        puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash["up_payload"].type}"
+        puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash['up_payload'].type}"
         create_task
         assert_equal 1, Rdux::Action.count
       end
