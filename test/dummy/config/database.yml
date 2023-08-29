@@ -21,17 +21,19 @@ development:
     database: dev_postgres
 
 test:
-  <% if ENV["DB"] == "sqlite" %>
+  <% if ENV["DB"] == 'all' %>
+  primary:
     <<: *sqlite
     database: db/test.sqlite3
-  <% elsif ENV["DB"] == "postgres" %>
+  secondary:
     <<: *postgres
     database: test_postgres
-  <% else %>
-    primary:
-      <<: *sqlite
-      database: db/test.sqlite3
-    secondary:
-      <<: *postgres
-      database: test_postgres
+  <% elsif ENV["DB"] == 'sqlite' %>
+  primary:
+    <<: *sqlite
+    database: db/test.sqlite3
+  <% elsif ENV["DB"] == 'postgres' %>
+  primary:
+    <<: *postgres
+    database: test_postgres
   <% end %>

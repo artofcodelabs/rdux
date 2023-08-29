@@ -10,7 +10,7 @@ $ bin/rails db:migrate
 
 ### Code structure
 
-### Dispatch action
+#### Dispatch action
 
 ```ruby
 Rdux.perform(
@@ -21,6 +21,12 @@ Rdux.perform(
     stream: { user_id: 123, context: 'foo' }, bar: 'baz'
   }
 )
+```
+
+#### Return
+
+```ruby
+Rdux::Result.new(true, { activity: activity })
 ```
 
 ## Installation
@@ -42,9 +48,20 @@ $ gem install rdux
 
 ## Test
 
+### Setup
+
 ```bash
-$ DB=postgres bin/test
-$ DB=sqlite bin/test
+$ cd test/dummy
+$ DB=all bin/rails db:create
+$ DB=all bin/rails db:prepare
+$ cd ../..
+```
+
+### Run tests
+
+```bash
+$ DB=postgres bin/rails test
+$ DB=sqlite bin/rails test
 ```
 
 ## License

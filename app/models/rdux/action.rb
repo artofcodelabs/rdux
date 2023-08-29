@@ -8,7 +8,7 @@ module Rdux
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
-    serialize :down_payload, JSON
+    serialize :down_payload, JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
@@ -47,7 +47,7 @@ module Rdux
       !q.count.positive?
     end
 
-    def action_creator(meth)
+    def action_performer(meth)
       name_const = name.to_s.classify.constantize
       return name_const if name_const.respond_to?(meth)
       return unless name_const.is_a?(Class)
@@ -57,7 +57,7 @@ module Rdux
     end
 
     def perform_action(meth, payload, opts)
-      responder = action_creator(meth)
+      responder = action_performer(meth)
       return if responder.nil?
 
       if opts.any?
