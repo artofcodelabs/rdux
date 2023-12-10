@@ -48,7 +48,7 @@ module Rdux
     end
 
     def action_performer(meth)
-      name_const = name.to_s.classify.constantize
+      name_const = name.to_s.constantize
       return name_const if name_const.respond_to?(meth)
       return unless name_const.is_a?(Class)
 
