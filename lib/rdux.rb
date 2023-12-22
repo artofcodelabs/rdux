@@ -49,7 +49,7 @@ module Rdux
     def assign_and_persist_for_failed(res, action)
       action.up_result = res.up_result || res.resp
       res.action = action.to_failed_action.tap(&:save!)
-      assign_nested_responses_to_failed_action(res.action, res.nested) unless res.nested.nil?
+      assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
     end
 
     def assign_nested_responses_to_failed_action(failed_action, nested)
