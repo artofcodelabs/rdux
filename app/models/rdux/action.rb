@@ -44,7 +44,7 @@ module Rdux
     def can_down?
       q = self.class.where('created_at > ?', created_at)
               .where(down_at: nil)
-              .where('id != ?', rdux_action_id.to_i)
+              .where('rdux_action_id IS NULL OR rdux_action_id != ?', id)
       q = q.where(stream_hash: stream_hash) unless stream_hash.nil?
       !q.count.positive?
     end

@@ -9,7 +9,7 @@ module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(name: action_name, up_payload: payload, meta: meta)
+      action = Action.create!(name: action_name, up_payload: payload, meta: meta)
       sanitize(action)
       call_call_or_up_on_action(action, opts)
     end
@@ -35,6 +35,8 @@ module Rdux
         assign_and_persist_for_ok(res, action)
       elsif res.save_failed?
         assign_and_persist_for_failed(res, action)
+      else
+        action.destroy
       end
       res
     end
@@ -48,6 +50,7 @@ module Rdux
     def assign_and_persist_for_failed(res, action)
       action.up_result = res.up_result
       res.action = action.to_failed_action.tap(&:save!)
+      action.destroy
       assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
     end
 
