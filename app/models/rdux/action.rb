@@ -4,6 +4,8 @@ module Rdux
   class Action < ApplicationRecord
     include Actionable
 
+    attr_accessor :up_payload_unsanitized
+
     belongs_to :rdux_failed_action, optional: true, class_name: 'Rdux::FailedAction'
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
@@ -14,14 +16,14 @@ module Rdux
     scope :down, -> { where.not(down_at: nil) }
 
     def call(opts = {})
-      perform_action(:call, up_payload, opts)
+      perform_action(:call, up_payload_unsanitized || up_payload, opts)
     end
 
     def up(opts = {})
-      return false if up_payload_sanitized
+      return false if up_payload_sanitized && up_payload_unsanitized.nil?
       return false unless down_at.nil?
 
-      perform_action(:up, up_payload, opts)
+      perform_action(:up, up_payload_unsanitized || up_payload, opts)
     end
 
     def down
@@ -57,13 +59,13 @@ module Rdux
     end
 
     def perform_action(meth, payload, opts)
-      responder = action_performer(meth)
-      return if responder.nil?
+      performer = action_performer(meth)
+      return if performer.nil?
 
       if opts.any?
-        responder.public_send(meth, payload, opts)
+        performer.public_send(meth, payload, opts)
       else
-        responder.public_send(meth, payload)
+        performer.public_send(meth, payload)
       end
     end
 
