@@ -21,7 +21,7 @@ module Rdux
 
       it 'prevents going up again in general' do
         res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
-        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.payload['activity'].id })
+        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.payload[:activity].id })
         assert_equal false, res1.action.down
         assert res2.action.down
         assert res1.action.down

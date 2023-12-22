@@ -9,58 +9,49 @@ module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(name: action_name, up_payload: payload, meta: meta)
-      call_call_meth_on_action(action, opts)
+      action = Action.create!(name: action_name, up_payload: payload, meta: meta)
+      sanitize(action)
+      call_call_or_up_on_action(action, opts)
     end
 
     alias perform dispatch
 
     private
 
-    def call_call_meth_on_action(action, opts)
+    def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
-      return call_up_meth_on_action(action, opts) if res.nil?
-
-      unless res.down_payload.nil?
-        res.resp = res.down_payload.deep_stringify_keys
+      if res
+        res.resp ||= res.down_payload
         res.down_payload = nil
+      else
+        res = action.up(opts)
       end
-      assign_and_persist(res, action)
-    end
-
-    def call_up_meth_on_action(action, opts)
-      res = action.up(opts)
-      res.down_payload&.deep_stringify_keys!
-      action.down_payload = res.down_payload
       assign_and_persist(res, action)
     end
 
     def assign_and_persist(res, action)
+      action.down_payload = res.down_payload&.deep_stringify_keys!
       if res.ok
         assign_and_persist_for_ok(res, action)
       elsif res.save_failed?
         assign_and_persist_for_failed(res, action)
+      else
+        action.destroy
       end
-      res.action ||= action
       res
     end
 
-    def assign_and_persist_common(res, action)
-      sanitize(action)
-      action.up_result = res.up_result
-    end
-
     def assign_and_persist_for_ok(res, action)
-      assign_and_persist_common(res, action)
+      action.up_result = res.up_result
+      res.action = action.tap(&:save!)
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
-      action.save!
     end
 
     def assign_and_persist_for_failed(res, action)
-      assign_and_persist_common(res, action)
-      action.up_result ||= res.resp
+      action.up_result = res.up_result
       res.action = action.to_failed_action.tap(&:save!)
-      assign_nested_responses_to_failed_action(res.action, res.nested) unless res.nested.nil?
+      action.destroy
+      assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
     end
 
     def assign_nested_responses_to_failed_action(failed_action, nested)
@@ -76,6 +67,7 @@ module Rdux
     def sanitize(action)
       up_payload_sanitized = Sanitize.call(action.up_payload)
       action.up_payload_sanitized = action.up_payload != up_payload_sanitized
+      action.up_payload_unsanitized = action.up_payload if action.up_payload_sanitized
       action.up_payload = up_payload_sanitized
     end
   end
