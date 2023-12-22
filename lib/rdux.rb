@@ -10,32 +10,26 @@ module Rdux
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
       action = Action.new(name: action_name, up_payload: payload, meta: meta)
-      call_call_meth_on_action(action, opts)
+      call_call_or_up_on_action(action, opts)
     end
 
     alias perform dispatch
 
     private
 
-    def call_call_meth_on_action(action, opts)
+    def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
-      return call_up_meth_on_action(action, opts) if res.nil?
-
-      unless res.down_payload.nil?
-        res.resp = res.down_payload.deep_stringify_keys
+      if res
+        res.resp ||= res.down_payload&.deep_stringify_keys!
         res.down_payload = nil
+      else
+        res = action.up(opts)
       end
       assign_and_persist(res, action)
     end
 
-    def call_up_meth_on_action(action, opts)
-      res = action.up(opts)
-      res.down_payload&.deep_stringify_keys!
-      action.down_payload = res.down_payload
-      assign_and_persist(res, action)
-    end
-
     def assign_and_persist(res, action)
+      action.down_payload = res.down_payload&.deep_stringify_keys!
       if res.ok
         assign_and_persist_for_ok(res, action)
       elsif res.save_failed?
