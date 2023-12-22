@@ -41,13 +41,12 @@ module Rdux
 
     def assign_and_persist_for_ok(res, action)
       action.up_result = res.up_result
+      res.action = action.tap(&:save!)
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
-      action.save!
-      res.action = action
     end
 
     def assign_and_persist_for_failed(res, action)
-      action.up_result = res.up_result || res.resp
+      action.up_result = res.up_result
       res.action = action.to_failed_action.tap(&:save!)
       assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
     end
