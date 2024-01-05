@@ -27,6 +27,7 @@ module Rdux
         res = action.up(opts)
       end
       assign_and_persist(res, action)
+      res
     end
 
     def assign_and_persist(res, action)
@@ -38,7 +39,6 @@ module Rdux
       else
         action.destroy
       end
-      res
     end
 
     def assign_and_persist_for_ok(res, action)
