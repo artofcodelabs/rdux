@@ -6,9 +6,9 @@ module Rdux
 
     included do
       if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
-        serialize :up_payload, JSON
-        serialize :up_result, JSON
-        serialize :meta, JSON
+        serialize :up_payload, coder: JSON
+        serialize :up_result, coder: JSON
+        serialize :meta, coder: JSON
       end
 
       validates :name, presence: true

@@ -63,7 +63,7 @@ module Rdux
         res = create_task
         res.action.down
         assert_equal 1, Action.count
-        assert_equal 1, Task.count  # fixtures
+        assert_equal 1, Task.count # fixtures
       end
 
       it 'returns a response from an action performer' do

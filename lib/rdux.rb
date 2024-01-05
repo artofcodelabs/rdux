@@ -9,7 +9,7 @@ module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.create!(name: action_name, up_payload: payload, meta: meta)
+      action = Action.create!(name: action_name, up_payload: payload, meta:)
       sanitize(action)
       call_call_or_up_on_action(action, opts)
     end
