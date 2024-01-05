@@ -90,6 +90,11 @@ module Rdux
         assert_equal ['CreditCard::Charge'], res.action.rdux_failed_actions.map(&:name)
         assert_equal ['CreditCard::Create'], res.action.rdux_failed_actions[0].rdux_actions.map(&:name)
       end
+
+      it 'calls after_save callback' do
+        res = create_task(meta: { inc: 1 })
+        assert_equal 2, res.action.meta['inc']
+      end
     end
   end
 end

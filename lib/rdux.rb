@@ -27,6 +27,7 @@ module Rdux
         res = action.up(opts)
       end
       assign_and_persist(res, action)
+      res.after_save.call(res.action) if res.after_save && res.action
       res
     end
 
