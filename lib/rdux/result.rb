@@ -5,6 +5,7 @@ module Rdux
     def payload
       resp || down_payload
     end
+    alias_method :val, :payload
 
     def save_failed?
       ok == false && save
