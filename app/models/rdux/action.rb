@@ -10,7 +10,7 @@ module Rdux
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
-    serialize :down_payload, JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+    serialize :down_payload, coder: JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
 
     scope :up, -> { where(down_at: nil) }
     scope :down, -> { where.not(down_at: nil) }
@@ -45,7 +45,7 @@ module Rdux
       q = self.class.where('created_at > ?', created_at)
               .where(down_at: nil)
               .where('rdux_action_id IS NULL OR rdux_action_id != ?', id)
-      q = q.where(stream_hash: stream_hash) unless stream_hash.nil?
+      q = q.where(stream_hash:) unless stream_hash.nil?
       !q.count.positive?
     end
 

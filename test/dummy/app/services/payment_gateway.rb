@@ -15,6 +15,6 @@ module PaymentGateway
     return false unless token.match?(/\A\w{8}\z/)
 
     failure = (amount * 100).to_i == 9999
-    { id: failure ? nil : rand(1000), token: token, amount: amount }
+    { id: failure ? nil : rand(1000), token:, amount: }
   end
 end

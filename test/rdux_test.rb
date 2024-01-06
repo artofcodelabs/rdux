@@ -34,24 +34,24 @@ module Rdux
 
       it 'assigns nested actions' do
         create_activity
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
         assert_equal 2, res.action.rdux_actions.count
       end
 
       it 'reverts nested actions' do
         create_activity
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
         res.action.down
         assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
       end
 
       it 'sets meta' do
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] }, meta: { foo: 'bar' })
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] }, meta: { foo: 'bar' })
         assert_equal({ 'foo' => 'bar' }, res.action.meta)
       end
 
       it 'sets up_result on action' do
-        res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.payload[:id] })
+        res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
         res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.payload[:activity].id })
         res2.action.up_result.tap do |up_result|
           assert_nil up_result['end_at'][0]
@@ -89,6 +89,11 @@ module Rdux
         assert_equal 'Plan::Create', res.action.name
         assert_equal ['CreditCard::Charge'], res.action.rdux_failed_actions.map(&:name)
         assert_equal ['CreditCard::Create'], res.action.rdux_failed_actions[0].rdux_actions.map(&:name)
+      end
+
+      it 'calls after_save callback' do
+        res = create_task(meta: { inc: 1 })
+        assert_equal 2, res.action.meta['inc']
       end
     end
   end

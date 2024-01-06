@@ -9,7 +9,7 @@ module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.create!(name: action_name, up_payload: payload, meta: meta)
+      action = Action.create!(name: action_name, up_payload: payload, meta:)
       sanitize(action)
       call_call_or_up_on_action(action, opts)
     end
@@ -27,6 +27,8 @@ module Rdux
         res = action.up(opts)
       end
       assign_and_persist(res, action)
+      res.after_save.call(res.action) if res.after_save && res.action
+      res
     end
 
     def assign_and_persist(res, action)
@@ -38,7 +40,6 @@ module Rdux
       else
         action.destroy
       end
-      res
     end
 
     def assign_and_persist_for_ok(res, action)
