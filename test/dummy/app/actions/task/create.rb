@@ -10,7 +10,8 @@ class Task
     }
 
     def up(payload, opts = {})
-      task = opts[:ars][:user].tasks.new(payload['task'])
+      user = opts.dig(:ars, :user) || User.find(payload['user_id'])
+      task = user.tasks.new(payload['task'])
       if task.save
         Rdux::Result[ok: true, down_payload: { task_id: task.id }, resp: { id: task.id }, after_save: AFTER_SAVE]
       else
