@@ -1,11 +1,10 @@
 # frozen_string_literal: true
 
 module Rdux
-  Result = Struct.new(:ok, :down_payload, :resp, :up_result, :save, :after_save, :nested, :action) do
-    def payload
-      resp || down_payload
+  Result = Struct.new(:ok, :down_payload, :val, :up_result, :save, :after_save, :nested, :action) do
+    def val
+      self[:val] || down_payload
     end
-    alias_method :val, :payload
 
     def save_failed?
       ok == false && save
