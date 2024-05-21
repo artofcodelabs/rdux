@@ -21,7 +21,7 @@ module Rdux
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
       if res
-        res.resp ||= res.down_payload
+        res[:val] ||= res.down_payload
         res.down_payload = nil
       else
         res = action.up(opts)

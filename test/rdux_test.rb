@@ -20,7 +20,7 @@ module Rdux
       it 'uses self.call unless up/down and does not store down_payload' do
         res = create_activity
         assert res.ok
-        assert_equal users(:zbig).activities.last.id, res.payload[:activity].id
+        assert_equal users(:zbig).activities.last.id, res.val[:activity].id
         assert_nil res.down_payload
         assert_nil res.action.down_payload
       end
@@ -28,7 +28,7 @@ module Rdux
       it 'uses self.up/self.down and filters defined params' do
         res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
         assert res.ok
-        assert_equal '4242', res.payload[:credit_card].last_four
+        assert_equal '4242', res.val[:credit_card].last_four
         assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
       end
 
@@ -52,7 +52,7 @@ module Rdux
 
       it 'sets up_result on action' do
         res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
-        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.payload[:activity].id })
+        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.val[:activity].id })
         res2.action.up_result.tap do |up_result|
           assert_nil up_result['end_at'][0]
           assert_not_nil up_result['end_at'][1]
