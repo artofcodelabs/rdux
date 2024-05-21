@@ -62,8 +62,8 @@ module Rdux
       performer = action_performer(meth)
       return if performer.nil?
 
-      if opts.any?
-        performer.public_send(meth, payload, opts)
+      if opts.any? || performer.method(meth).arity.abs == 2
+        performer.public_send(meth, payload, opts.merge(action: self))
       else
         performer.public_send(meth, payload)
       end
