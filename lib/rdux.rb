@@ -22,14 +22,20 @@ module Rdux
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
       if res
-        res[:val] ||= res.down_payload
-        res.down_payload = nil
+        no_down(res)
       else
         res = action.up(opts)
       end
       assign_and_persist(res, action)
-      res.after_save.call(res.action) if res.after_save && res.action
+      return res unless res.ok
+
+      res.after_save&.call(res.action)
       res
+    end
+
+    def no_down(res)
+      res[:val] ||= res.down_payload
+      res.down_payload = nil
     end
 
     def assign_and_persist(res, action)
