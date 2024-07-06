@@ -100,6 +100,17 @@ module Rdux
         res = create_task(meta: { inc: 1 })
         assert_equal 2, res.action.meta['inc']
       end
+
+      it 'allows for recognizing failed actions caused by exception' do
+        assert_raises(ActiveRecord::RecordNotFound) do
+          Rdux.dispatch(Task::Create, { user_id: 0 })
+        end
+        assert_equal 0, Rdux::Action.count
+        assert_equal 1, Rdux::FailedAction.count
+        up_result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
+                                       'message' => "Couldn't find User with 'id'=0" } }
+        assert_equal up_result, Rdux::FailedAction.last.up_result
+      end
     end
   end
 end

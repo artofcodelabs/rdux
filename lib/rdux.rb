@@ -12,7 +12,12 @@ module Rdux
       action = Action.new(name: action_name, up_payload: payload, meta:)
       sanitize(action)
       action.save!
-      call_call_or_up_on_action(action, opts)
+      res = call_call_or_up_on_action(action, opts)
+      assign_and_persist(res, action)
+      return res if res.ok == false
+
+      res.after_save&.call(res.action)
+      res
     end
 
     alias perform dispatch
@@ -23,14 +28,12 @@ module Rdux
       res = action.call(opts)
       if res
         no_down(res)
-      else
-        res = action.up(opts)
+        return res
       end
-      assign_and_persist(res, action)
-      return res unless res.ok
 
-      res.after_save&.call(res.action)
-      res
+      action.up(opts)
+    rescue StandardError => e
+      handle_exception(e, action)
     end
 
     def no_down(res)
@@ -77,6 +80,19 @@ module Rdux
       action.up_payload_sanitized = action.up_payload != up_payload_sanitized
       action.up_payload_unsanitized = action.up_payload if action.up_payload_sanitized
       action.up_payload = up_payload_sanitized
+    end
+
+    def handle_exception(exc, action)
+      failed_action = action.to_failed_action
+      failed_action.up_result = {
+        'Exception' => {
+          class: exc.class.name,
+          message: exc.message
+        }
+      }
+      failed_action.save!
+      action.destroy
+      raise exc
     end
   end
 end
