@@ -3,11 +3,21 @@
 class Activity
   module Common
     module Fetch
-      def self.call(payload, opts = {})
-        user = opts[:user] || (payload['user_id'] && User.find(payload['user_id']))
-        task = opts[:task] || (payload['task_id'] && user.tasks.find_by(id: payload['task_id']))
-        activity = opts[:activity] || (payload['activity_id'] && user.activities.find_by(id: payload['activity_id']))
-        { user:, task:, activity: }
+      class << self
+        def call(payload, opts = {})
+          user = opts[:user] || (payload['user_id'] && User.find(payload['user_id']))
+          task = fetch(:tasks, user, opts[:task], payload['task_id'])
+          activity = fetch(:activities, user, opts[:activity], payload['activity_id'])
+          { user:, task:, activity: }
+        end
+
+        private
+
+        def fetch(assoc, user, record, record_id)
+          record ||= record_id && user.public_send(assoc).find_by(id: record_id)
+          record = nil if record&.user_id != user.id
+          record
+        end
       end
     end
   end

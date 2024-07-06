@@ -4,7 +4,7 @@ class Activity
   module Switch
     def self.up(payload, opts = {})
       user, task = Common::Fetch.call(payload, opts).values_at(:user, :task)
-      return Rdux::Result[false] if task&.user_id != user.id
+      return Rdux::Result[false] if task.nil?
 
       activity = user.activities.current
       stop_res = Rdux.perform(Activity::Stop, {}, { ars: { activity:, user: } }) if activity

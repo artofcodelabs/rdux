@@ -4,8 +4,7 @@ class Activity
   module Create
     def self.call(payload, opts = {})
       user, task = Common::Fetch.call(payload, opts).values_at(:user, :task)
-      return Rdux::Result[false] if user.nil? || task.nil?
-      return Rdux::Result[false] if task&.user_id != user.id
+      return Rdux::Result[false] if task.nil?
 
       activity = user.activities.create(task:)
       if activity.persisted?
