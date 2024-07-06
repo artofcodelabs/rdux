@@ -49,7 +49,8 @@ module Rdux
 
       it 'sets meta' do
         user = users(:zbig)
-        res = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id }, meta: { foo: 'bar' })
+        res = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id },
+                            meta: { foo: 'bar' })
         assert_equal({ 'foo' => 'bar' }, res.action.meta)
       end
 

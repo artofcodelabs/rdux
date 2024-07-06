@@ -3,8 +3,8 @@
 class Activity
   module Create
     def self.call(payload, opts = {})
-      user = opts[:user] || User.find(payload['user_id'])
-      task = opts[:task] || user.tasks.find_by(id: payload['task_id'])
+      user, task = Common::Fetch.call(payload, opts).values_at(:user, :task)
+      return Rdux::Result[false] if user.nil? || task.nil?
       return Rdux::Result[false] if task&.user_id != user.id
 
       activity = user.activities.create(task:)

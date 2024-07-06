@@ -3,8 +3,7 @@
 class Activity
   module Stop
     def self.up(payload, opts = {})
-      user = opts[:user] || User.find(payload['user_id'])
-      activity = opts[:activity] || user.activities.find_by(id: payload['activity_id'])
+      user, activity = Common::Fetch.call(payload, opts).values_at(:user, :activity)
       return Rdux::Result[false] if activity&.user_id != user.id || !activity.end_at.nil?
 
       activity.end_at = Time.current
