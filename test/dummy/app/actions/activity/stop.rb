@@ -3,8 +3,9 @@
 class Activity
   module Stop
     def self.up(payload, opts = {})
-      activity = opts[:activity] || Activity.find(payload['activity_id'])
-      return Rdux::Result[false] unless activity.end_at.nil?
+      user = opts[:user] || User.find(payload['user_id'])
+      activity = opts[:activity] || user.activities.find_by(id: payload['activity_id'])
+      return Rdux::Result[false] if activity&.user_id != user.id || !activity.end_at.nil?
 
       activity.end_at = Time.current
       activity.save!
