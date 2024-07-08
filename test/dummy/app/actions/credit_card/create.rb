@@ -2,12 +2,19 @@
 
 class CreditCard
   class Create
+    AFTER_SAVE = lambda { |failed_action|
+      if failed_action.meta['inc']
+        failed_action.meta['inc'] += 10
+        failed_action.save!
+      end
+    }
+
     class << self
       def up(payload, opts = {})
         user = opts[:user] || User.find(payload['user_id'])
         card = user.credit_cards.new(payload['credit_card'])
         if card.invalid?(context: :before_request_gateway)
-          return Rdux::Result[ok: false, val: { errors: card.errors }, save: true]
+          return Rdux::Result[ok: false, val: { errors: card.errors }, save: true, after_save: AFTER_SAVE]
         end
 
         token = PaymentGateway.tokenize(card)
