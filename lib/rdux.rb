@@ -9,9 +9,15 @@ module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.create!(name: action_name, up_payload: payload, meta:)
+      action = Action.new(name: action_name, up_payload: payload, meta:)
       sanitize(action)
-      call_call_or_up_on_action(action, opts)
+      action.save!
+      res = call_call_or_up_on_action(action, opts)
+      assign_and_persist(res, action)
+      return res if res.ok == false
+
+      res.after_save&.call(res.action)
+      res
     end
 
     alias perform dispatch
@@ -21,14 +27,18 @@ module Rdux
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
       if res
-        res[:val] ||= res.down_payload
-        res.down_payload = nil
-      else
-        res = action.up(opts)
+        no_down(res)
+        return res
       end
-      assign_and_persist(res, action)
-      res.after_save.call(res.action) if res.after_save && res.action
-      res
+
+      action.up(opts)
+    rescue StandardError => e
+      handle_exception(e, action)
+    end
+
+    def no_down(res)
+      res[:val] ||= res.down_payload
+      res.down_payload = nil
     end
 
     def assign_and_persist(res, action)
@@ -70,6 +80,19 @@ module Rdux
       action.up_payload_sanitized = action.up_payload != up_payload_sanitized
       action.up_payload_unsanitized = action.up_payload if action.up_payload_sanitized
       action.up_payload = up_payload_sanitized
+    end
+
+    def handle_exception(exc, action)
+      failed_action = action.to_failed_action
+      failed_action.up_result = {
+        'Exception' => {
+          class: exc.class.name,
+          message: exc.message
+        }
+      }
+      failed_action.save!
+      action.destroy
+      raise exc
     end
   end
 end

@@ -20,8 +20,9 @@ module Rdux
       end
 
       it 'prevents going up again in general' do
-        res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
-        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.val[:activity].id })
+        user = users(:zbig)
+        res1 = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id })
+        res2 = Rdux.dispatch(Activity::Stop, { user_id: user.id, activity_id: res1.val[:activity].id })
         assert_equal false, res1.action.down
         assert res2.action.down
         assert res1.action.down
@@ -40,13 +41,13 @@ module Rdux
 
       it 'prevents down if not the last action' do
         res = create_task
-        Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: res.val[:id] })
+        Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: res.val[:task].id })
         assert_equal false, Action.first.down
       end
 
       it 'prevents down if not the last action in a given stream' do
         res_t1 = create_task(users(:zbig), meta: { stream: { user_id: users(:zbig).id } })
-        res_a1 = create_activity(task_id: res_t1.val[:id], meta: { stream: { user_id: users(:zbig).id } })
+        res_a1 = create_activity(task: res_t1.val[:task], meta: { stream: { user_id: users(:zbig).id } })
         create_task(users(:joe), meta: { stream: { user_id: users(:joe).id } })
         assert_equal false, res_t1.action.down
         assert_nil res_a1.action.down

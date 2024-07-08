@@ -3,8 +3,8 @@
 class Activity
   module Stop
     def self.up(payload, opts = {})
-      activity = opts[:activity] || Activity.find(payload['activity_id'])
-      return Rdux::Result[false] unless activity.end_at.nil?
+      activity = Common::Fetch.call(payload, opts)[:activity]
+      return Rdux::Result[false] if activity.nil? || activity.end_at
 
       activity.end_at = Time.current
       activity.save!

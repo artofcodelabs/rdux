@@ -15,9 +15,6 @@ Gem::Specification.new do |spec|
   spec.summary     = 'Rdux adds a new layer to Rails apps - actions.'
   spec.description = <<~DESC
     Write apps that are easy to test.
-    Rdux gives you a possibility to centralize your app's state modification logic (DB changes).
-    It does it via introducing a new architectural layer - actions.
-    Rdux enables powerful capabilities like undo/redo.
     It makes it easy to trace when, where, why, and how your application's state changed.
   DESC
   spec.license = 'MIT'

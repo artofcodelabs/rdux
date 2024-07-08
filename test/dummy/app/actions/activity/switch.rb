@@ -3,12 +3,12 @@
 class Activity
   module Switch
     def self.up(payload, opts = {})
-      task = opts[:task] || Task.find(payload['task_id'])
-      current_activity = task.user.activities.current
-      if current_activity
-        stop_res = Rdux.perform(Activity::Stop, { activity_id: current_activity.id }, { activity: current_activity })
-      end
-      create_res = Rdux.perform(Activity::Create, { task_id: task.id })
+      user, task = Common::Fetch.call(payload, opts).values_at(:user, :task)
+      return Rdux::Result[false] if task.nil?
+
+      activity = user.activities.current
+      stop_res = Rdux.perform(Activity::Stop, {}, { ars: { activity:, user: } }) if activity
+      create_res = Rdux.perform(Activity::Create, {}, { ars: { user:, task: } })
       Rdux::Result[ok: true, nested: [stop_res, create_res].compact, val: create_res.val]
     end
 

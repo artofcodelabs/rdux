@@ -33,26 +33,31 @@ module Rdux
       end
 
       it 'assigns nested actions' do
-        create_activity
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
+        task = tasks(:homework)
+        create_activity(task:)
+        res = Rdux.dispatch(Activity::Switch, { task_id: create_task(task.user).val[:task].id, user_id: task.user_id })
         assert_equal 2, res.action.rdux_actions.count
       end
 
       it 'reverts nested actions' do
-        create_activity
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
+        task = tasks(:homework)
+        create_activity(task:)
+        res = Rdux.dispatch(Activity::Switch, { user_id: task.user_id, task_id: create_task(task.user).val[:task].id })
         res.action.down
         assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
       end
 
       it 'sets meta' do
-        res = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] }, meta: { foo: 'bar' })
+        user = users(:zbig)
+        res = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id },
+                            meta: { foo: 'bar' })
         assert_equal({ 'foo' => 'bar' }, res.action.meta)
       end
 
       it 'sets up_result on action' do
-        res1 = Rdux.dispatch(Activity::Switch, { task_id: create_task.val[:id] })
-        res2 = Rdux.dispatch(Activity::Stop, { activity_id: res1.val[:activity].id })
+        user = users(:zbig)
+        res1 = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id })
+        res2 = Rdux.dispatch(Activity::Stop, { user_id: user.id, activity_id: res1.val[:activity].id })
         res2.action.up_result.tap do |up_result|
           assert_nil up_result['end_at'][0]
           assert_not_nil up_result['end_at'][1]
@@ -94,6 +99,17 @@ module Rdux
       it 'calls after_save callback' do
         res = create_task(meta: { inc: 1 })
         assert_equal 2, res.action.meta['inc']
+      end
+
+      it 'allows for recognizing failed actions caused by exception' do
+        assert_raises(ActiveRecord::RecordNotFound) do
+          Rdux.dispatch(Task::Create, { user_id: 0 })
+        end
+        assert_equal 0, Rdux::Action.count
+        assert_equal 1, Rdux::FailedAction.count
+        up_result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
+                                       'message' => "Couldn't find User with 'id'=0" } }
+        assert_equal up_result, Rdux::FailedAction.last.up_result
       end
     end
   end

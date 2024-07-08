@@ -6,7 +6,7 @@ module TestHelpers
     Rdux.dispatch(Task::Create, TestData::Payloads.task, opts, meta:)
   end
 
-  def create_activity(task_id: tasks(:homework).id, meta: {})
-    Rdux.dispatch(Activity::Create, { task_id: }, meta:)
+  def create_activity(task: tasks(:homework), meta: {})
+    Rdux.dispatch(Activity::Create, { user_id: task.user_id, task_id: task.id }, meta:)
   end
 end

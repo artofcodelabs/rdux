@@ -3,7 +3,8 @@
 class Task
   module Delete
     def self.up(payload)
-      task = Task.find(payload['task_id'])
+      user = User.find(payload['user_id'])
+      task = user.tasks.find(payload['task_id'])
       task.destroy
       Rdux::Result[true, { task: task.attributes }]
     end
