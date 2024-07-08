@@ -14,8 +14,6 @@ module Rdux
       action.save!
       res = call_call_or_up_on_action(action, opts)
       assign_and_persist(res, action)
-      return res if res.ok == false
-
       res.after_save&.call(res.action)
       res
     end
