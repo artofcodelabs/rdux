@@ -1,5 +1,7 @@
 # Rdux
 
+![Logo](docs/logo.webp)
+
 Rdux is a Rails plugin.  
 
 This library provides your application with audit logs.  
@@ -19,10 +21,6 @@ unifies the type of payload 👉 no more with_indifferent_access
 saves failed and nested actions  
 
 ~It makes it easy to trace when, where, why, and how your application's state changed.
-
-## 📈 Flow diagram
-
-![Flow Diagram](docs/flow.png)
 
 ## 📲 Instalation
 
@@ -51,7 +49,7 @@ $ bin/rails db:migrate
 
 ## 🎮 Usage
 
-### Dispatching an action
+### 🚛 Dispatching an action
 
 Definition:
 
@@ -60,10 +58,10 @@ def dispatch(action_name, payload, opts = {}, meta: nil)
 ```
 
 Arguments:
-* action_name -
-* payload -
-* opts -
-* meta -
+* `action_name` -
+* `payload` -
+* `opts` -
+* `meta` -
 
 
 Example:
@@ -79,11 +77,42 @@ Rdux.perform(
 )
 ```
 
-### Returned struct
+### Action
+
+...
+
+
+### Returned `struct`
+
+Definition:
+
+```ruby
+module Rdux
+  Result = Struct.new(:ok, :down_payload, :val, :up_result, :save, :after_save, :nested, :action) do
+    def val
+      self[:val] || down_payload
+    end
+
+    def save_failed?
+      ok == false && save
+    end
+  end
+end
+```
+
+Arguments:
+* `ok` - 
+* ...
+
+Example:
 
 ```ruby
 Rdux::Result[true, { activity: activity }]
 ```
+
+## 📈 Flow diagram
+
+![Flow Diagram](docs/flow.png)
 
 
 ## Test
