@@ -14,8 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://artofcode.co'
   spec.summary     = 'Rdux adds a new layer to Rails apps - actions.'
   spec.description = <<~DESC
-    Write apps that are easy to test.
-    It makes it easy to trace when, where, why, and how your application's state changed.
+    ...
   DESC
   spec.license = 'MIT'
 

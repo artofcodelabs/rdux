@@ -1,35 +1,31 @@
 # Rdux
-Minimal take on event sourcing.
 
-## Usage
+Rdux is a Rails plugin.  
 
-```bash
-$ bin/rails rdux:install:migrations
-$ bin/rails db:migrate
-```
+This library provides your application with audit logs.  
+Rdux gives the Rails app an ability to store in the database sanitized input data (**action name** ➕ **payload**) as the `Rdux::Action`.  
+**Action** is a PORO whose `call` or `up` method takes the **payload** as the argument.   
+Use `meta` to save additional data like `current_user.id`, etc.  
+Use `up_result` to store DB changes, IDs of created records, responses from 3rd parties etc.  
 
-### Code structure
+Rdux is a minimal take on event sourcing.
 
-#### Dispatch action
+Rdux provides support for reverting actions 👉 down  
 
-```ruby
-Rdux.perform(
-  Activity::Stop,
-  { activity_id: current_activity.id },
-  { activity: current_activity },
-  meta: {
-    stream: { user_id: 123, context: 'foo' }, bar: 'baz'
-  }
-)
-```
+organically introduces 2 layers: actions and queries  
 
-#### Return
+unifies the type of payload 👉 no more with_indifferent_access  
 
-```ruby
-Rdux::Result[true, { activity: activity }]
-```
+saves failed and nested actions  
 
-## Installation
+~It makes it easy to trace when, where, why, and how your application's state changed.
+
+## 📈 Flow diagram
+
+![Flow Diagram](docs/flow.png)
+
+## 📲 Instalation
+
 Add this line to your application's Gemfile:
 
 ```ruby
@@ -45,6 +41,50 @@ Or install it yourself as:
 ```bash
 $ gem install rdux
 ```
+
+Then instal and run migrations:
+
+```bash
+$ bin/rails rdux:install:migrations
+$ bin/rails db:migrate
+```
+
+## 🎮 Usage
+
+### Dispatching an action
+
+Definition:
+
+```ruby
+def dispatch(action_name, payload, opts = {}, meta: nil)
+```
+
+Arguments:
+* action_name -
+* payload -
+* opts -
+* meta -
+
+
+Example:
+
+```ruby
+Rdux.perform(
+  Activity::Stop,
+  { activity_id: current_activity.id },
+  { activity: current_activity },
+  meta: {
+    stream: { user_id: 123, context: 'foo' }, bar: 'baz'
+  }
+)
+```
+
+### Returned struct
+
+```ruby
+Rdux::Result[true, { activity: activity }]
+```
+
 
 ## Test
 
