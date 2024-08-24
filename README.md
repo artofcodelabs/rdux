@@ -62,10 +62,10 @@ alias perform dispatch
 ```
 
 Arguments:
-* `action_name` (String) - the name of the service or just the name of the `class` or `module` that implements class or instance `call` or `up` method. Let's call this class/module an **action**.
+* `action_name` - the name of the service or just the name of the `class` or `module` that implements class or instance method `call` or `up`. Let's call this class/module an **action**.
 * `payload` (Hash) - the above mentioned `call` or `up` method receives sanitized `payload` as the first argument. It is saved in DB before `call` or `up` is called. `payload` gets deserialized, hence hash keys get stringified.
-* `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. 👆
-* `meta` (Hash) - ...
+* `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. `opts` is useful if you already have a given ActiveRecord object fetched from DB in the controller and you don't want to `find(resource_id)` again in the action. Remember that `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization. There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. `opts` are not saved in the DB.
+* `meta` (Hash) - additional data saved in the DB along with the `action_name`, `payload`, etc.
 
 
 Example:
