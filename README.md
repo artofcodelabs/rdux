@@ -47,6 +47,8 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
+‼️ JSONB
+
 ## 🎮 Usage
 
 ### 🚛 Dispatching an action
@@ -55,13 +57,15 @@ Definition:
 
 ```ruby
 def dispatch(action_name, payload, opts = {}, meta: nil)
+
+alias perform dispatch
 ```
 
 Arguments:
-* `action_name` -
-* `payload` -
-* `opts` -
-* `meta` -
+* `action_name` (String) - the name of the service or just the name of the `class` or `module` that implements class or instance `call` or `up` method. Let's call this class/module an **action**.
+* `payload` (Hash) - the above mentioned `call` or `up` method receives sanitized `payload` as the first argument. It is saved in DB before `call` or `up` is called. `payload` gets deserialized, hence hash keys get stringified.
+* `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. 👆
+* `meta` (Hash) - ...
 
 
 Example:
@@ -77,9 +81,43 @@ Rdux.perform(
 )
 ```
 
-### Action
+### 💪 Action
 
-...
+Example:
+
+```ruby
+class Task
+  class Create
+    def up(payload, opts = {})
+      user = opts.dig(:ars, :user) || User.find(payload['user_id'])
+      task = user.tasks.new(payload['task'])
+      if task.save
+        Rdux::Result[ok: true, down_payload: { user_id: user.id, task_id: task.id }, val: { task: }]
+      else
+        Rdux::Result[false, { errors: task.errors }]
+      end
+    end
+
+    def down(payload)
+      Delete.up(payload)
+    end
+  end
+end
+
+```
+
+```ruby
+class Task
+  module Delete
+    def self.up(payload)
+      user = User.find(payload['user_id'])
+      task = user.tasks.find(payload['task_id'])
+      task.destroy
+      Rdux::Result[true, { task: task.attributes }]
+    end
+  end
+end
+```
 
 
 ### Returned `struct`
