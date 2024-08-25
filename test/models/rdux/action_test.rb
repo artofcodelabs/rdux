@@ -8,7 +8,7 @@ module Rdux
 
     it 'serializes payload' do
       user = users(:zbig)
-      up_payload = { user_id: user.id }.merge(TestData::Payloads.task).stringify_keys
+      up_payload = { user_id: user.id }.merge(TestData::Payloads.task).deep_stringify_keys
       assert_equal up_payload, create_task(user).action.up_payload
     end
 
