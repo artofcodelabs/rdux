@@ -83,9 +83,20 @@ Rdux.perform(
 
 ### 💪 Action
 
-Example:
+Action is a PORO.  
+Action is a `class` or `module` that implements class or instance method `call` or `up`.  
+Action can optionally implement class or instance method `down` to specify how to revert it.   
+
+`call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
+See *🚛 Dispatching an action* section.  
+
+`down` method accepts single deserialized `down_payload` argument which is the argument of the `Rdux::Result` struct returned from the `up` method on success and saved in DB.
+
+Examples:
 
 ```ruby
+# app/actions/task/create.rb
+
 class Task
   class Create
     def up(payload, opts = {})
@@ -107,6 +118,8 @@ end
 ```
 
 ```ruby
+# app/actions/task/delete.rb
+
 class Task
   module Delete
     def self.up(payload)
@@ -118,6 +131,8 @@ class Task
   end
 end
 ```
+
+‼️ services
 
 
 ### Returned `struct`
