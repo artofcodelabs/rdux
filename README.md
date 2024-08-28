@@ -47,7 +47,7 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
-‼️ JSONB
+Rdux uses `JSONB` datatype instead of `text` for Postgres.
 
 ## 🎮 Usage
 
@@ -90,7 +90,7 @@ Action can optionally implement class or instance method `down` to specify how t
 `call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
 See *🚛 Dispatching an action* section.  
 
-`down` method accepts single deserialized `down_payload` argument which is the argument of the `Rdux::Result` struct returned from the `up` method on success and saved in DB.
+`down` method accepts single deserialized `down_payload` argument which is one of arguments of the `Rdux::Result` struct returned from the `up` method on success and saved in DB.
 
 Examples:
 
@@ -132,7 +132,34 @@ class Task
 end
 ```
 
-‼️ services
+The location that is often used for entities like these accross code bases is `app/services`.  
+Which is de facto the bag of random objects.  
+I'd recomment to keep actions inside `app/actions`.
+Actions are consistent in terms of structure, input and output data. 
+They are good canditates to create a new layer in Rails apps.
+
+Structure:
+```
+.
+└── app/actions/
+    ├── activity/
+    │   ├── common/
+    │   │   └── fetch.rb
+    │   ├── create.rb
+    │   ├── stop.rb
+    │   └── switch.rb
+    ├── task/
+    │   ├── create.rb
+    │   └── delete.rb
+    └── misc/
+        └── create_attachment.rb
+```
+
+The [dedicated page about actions](docs/ACTIONS.md) contains more arguments in favor of actions.
+
+‼️ down
+
+‼️ indices
 
 
 ### Returned `struct`
@@ -157,11 +184,6 @@ Arguments:
 * `ok` - 
 * ...
 
-Example:
-
-```ruby
-Rdux::Result[true, { activity: activity }]
-```
 
 ## 📈 Flow diagram
 
