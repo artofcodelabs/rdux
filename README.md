@@ -90,7 +90,7 @@ Action can optionally implement class or instance method `down` to specify how t
 `call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
 See *🚛 Dispatching an action* section.  
 
-`down` method accepts single deserialized `down_payload` argument which is one of arguments of the `Rdux::Result` struct returned from the `up` method on success and saved in DB.
+`down` method accepts deserialized `down_payload` as the 1st argument which is one of arguments of the `Rdux::Result` `struct` returned from the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Actions`
 
 Examples:
 
@@ -161,8 +161,12 @@ The [dedicated page about actions](docs/ACTIONS.md) contains more arguments in f
 
 ‼️ indices
 
+‼️ queries
 
-### Returned `struct`
+‼️ usage - perform
+
+
+### ⛩️ Returned `struct`
 
 Definition:
 
@@ -181,8 +185,16 @@ end
 ```
 
 Arguments:
-* `ok` - 
-* ...
+* `ok` (Boolean) - `Rdux::Action` is persisted in DB if `true`
+* `down_payload` (Hash) - is saved in DB and passed to the action's `down` method as the 1st argument if an `Rdux::Action` is reverted (`down` method is called on `Rdux::Action`)
+* `val` (Hash) - use `val` if you need to return other data than `down_payload`
+* `up_result` (Hash) - use if you want to store data related to the performing of the action like IDs of created DB records, responses from 3rd parties, etc.
+* `save` (Boolean) - `Rdux::FailedAction` is persisted in DB if `save` is `true` and `ok` is `false`
+* `after_save` (Proc) - is called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument
+* `nested` (Array of `Rdux::Result`) - `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by `dispatch` value (`Rdux::Result`) to the `:nested` array
+* `action` - Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
+
+Methods:
 
 
 ## 📈 Flow diagram

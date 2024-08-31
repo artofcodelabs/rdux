@@ -70,8 +70,8 @@ module Rdux
     end
 
     def build_opts
+      nested = rdux_actions.order(:created_at)
       {}.tap do |h|
-        nested = rdux_actions.order(:created_at)
         h[:nested] = nested if nested.any?
       end
     end
