@@ -65,7 +65,7 @@ Arguments:
 * `action_name` - The `dispatch` method persists an instance of `Rdux::Action` in the DB which attribute `name` is set to the `action_name`. The `action_name` must be the name of the service or simply the name of the `class` or `module` that implements class or instance method `call` or `up`. Let's call this class/module an **action** or action performer.
 * `payload` (Hash) - the above mentioned `call` or `up` method receives sanitized `payload` as the first argument. It is saved in DB before `call` or `up` is called. `payload` gets deserialized, hence hash keys get stringified.
 * `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. `opts` is useful if you already have a given ActiveRecord object fetched from DB in the controller and you don't want to `find(resource_id)` again in the action. Remember that `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization. There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. `opts` are not saved in the DB.
-* `meta` (Hash) - additional data saved in the DB along the `action_name`, `payload`, etc. The significant key is the `stream`. It allows to scope a given action to a given stream. It matters when an action is reverted. You can construct a stream based on who owns actions.
+* `meta` (Hash) - additional data saved in the DB along the `action_name`, `payload`, etc. The significant key is the `stream`. It allows to scope a given action to a given stream. It matters when an action is reverted. You can construct a stream based on who owns actions for example.
 
 
 Example:
@@ -199,7 +199,7 @@ It must have the `down_payload` defined and the action (action performer) must h
 
 THe `down_at` attribute of `Rdux::Action` is set and persisted after the successful reversal.
 
-‼️ streams
+It is not possible to revert a `Rdux::Action` if there are newer, not reversed `Rdux::Action`s in a given stream if defined or in general. See `meta` in [🚛 Dispatching an action](#🚛-Dispatching-an-action) section.
 
 ‼️ def down - args
 
