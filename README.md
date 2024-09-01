@@ -40,7 +40,7 @@ Or install it yourself as:
 $ gem install rdux
 ```
 
-Then instal and run migrations:
+Then install and run migrations:
 
 ```bash
 $ bin/rails rdux:install:migrations
@@ -62,7 +62,7 @@ alias perform dispatch
 ```
 
 Arguments:
-* `action_name` - the name of the service or just the name of the `class` or `module` that implements class or instance method `call` or `up`. Let's call this class/module an **action**.
+* `action_name` - The `dispatch` method persists an instance of `Rdux::Action` in the DB which attribute `name` is set to the `action_name`. The `action_name` must be the name of the service or simply the name of the `class` or `module` that implements class or instance method `call` or `up`. Let's call this class/module an **action** or action performer.
 * `payload` (Hash) - the above mentioned `call` or `up` method receives sanitized `payload` as the first argument. It is saved in DB before `call` or `up` is called. `payload` gets deserialized, hence hash keys get stringified.
 * `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. `opts` is useful if you already have a given ActiveRecord object fetched from DB in the controller and you don't want to `find(resource_id)` again in the action. Remember that `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization. There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. `opts` are not saved in the DB.
 * `meta` (Hash) - additional data saved in the DB along the `action_name`, `payload`, etc. The significant key is the `stream`. It allows to scope a given action to a given stream. It matters when an action is reverted. You can construct a stream based on who owns actions.
@@ -81,14 +81,19 @@ Rdux.perform(
 )
 ```
 
+### 📈 Flow diagram
+
+![Flow Diagram](docs/flow.png)
+
 ### 💪 Action
 
 Action is a PORO.  
 Action is a `class` or `module` that implements class or instance method `call` or `up`.  
+This method must return `Rdux::Result` `struct`.   
 Action can optionally implement class or instance method `down` to specify how to revert it.   
 
 `call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
-See *🚛 Dispatching an action* section.  
+See [🚛 Dispatching an action](#🚛-Dispatching-an-action) section.  
 
 `down` method accepts deserialized `down_payload` as the 1st argument which is one of arguments of the `Rdux::Result` `struct` returned from the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Actions`
 
@@ -157,15 +162,6 @@ Structure:
 
 The [dedicated page about actions](docs/ACTIONS.md) contains more arguments in favor of actions.
 
-‼️ down
-
-‼️ indices
-
-‼️ queries
-
-‼️ usage - perform
-
-
 ### ⛩️ Returned `struct`
 
 Definition:
@@ -194,17 +190,58 @@ Arguments:
 * `nested` (Array of `Rdux::Result`) - `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by `dispatch` value (`Rdux::Result`) to the `:nested` array
 * `action` - Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
 
-Methods:
+### ⏮️ Revert action
+
+To revert an action it's required to call the `down` method on the persisted in DB instance of `Rdux::Action`.  
+It must have the `down_payload` defined and the action (action performer) must have the `down` method implemented. 
+
+![Revert action](docs/down.png)
+
+THe `down_at` attribute of `Rdux::Action` is set and persisted after the successful reversal.
+
+‼️ streams
+
+‼️ def down - args
+
+### 🗿 Data model
+
+```ruby
+payload = { 
+  task: { 'name' => 'Foo bar baz' },
+  user_id: 159163583
+}
+
+res = Rdux.dispatch(Task::Create, payload)
+
+res.action
+# #<Rdux::Action:0x000000011c4d8e98
+#   id: 1,
+#   name: "Task::Create",
+#   up_payload: {"task"=>{"name"=>"Foo bar baz"}, "user_id"=>159163583},
+#   down_payload: {"task_id"=>207620945},
+#   down_at: nil,
+#   up_payload_sanitized: false,
+#   up_result: nil,
+#   meta: {},
+#   stream_hash: nil,
+#   rdux_action_id: nil,
+#   rdux_failed_action_id: nil,
+#   created_at: Fri, 28 Jun 2024 21:35:36.838898000 UTC +00:00,
+#   updated_at: Fri, 28 Jun 2024 21:35:36.839728000 UTC +00:00>>
+
+res.action.down
+```
+
+‼️ indices
+
+‼️ queries
+
+‼️ usage - perform
 
 
-## 📈 Flow diagram
+## 👩🏽‍🔬 Test
 
-![Flow Diagram](docs/flow.png)
-
-
-## Test
-
-### Setup
+### 💉 Setup
 
 ```bash
 $ cd test/dummy
@@ -213,12 +250,17 @@ $ DB=all bin/rails db:prepare
 $ cd ../..
 ```
 
-### Run tests
+### 🧪 Run tests
 
 ```bash
 $ DB=postgres bin/rails test
 $ DB=sqlite bin/rails test
 ```
 
-## License
+## 📄 License
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## 👨‍🏭 Author
+
+Zbigniew Humeniuk from [Art of Code](http://artofcode.co)
+
