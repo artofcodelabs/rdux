@@ -93,7 +93,7 @@ This method must return `Rdux::Result` `struct`.
 Action can optionally implement class or instance method `down` to specify how to revert it.   
 
 `call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
-See [🚛 Dispatching an action](#🚛-Dispatching-an-action) section.  
+See [🚛 Dispatching an action](#-dispatching-an-action) section.  
 
 `down` method accepts deserialized `down_payload` as the 1st argument which is one of arguments of the `Rdux::Result` `struct` returned from the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Actions`
 
@@ -197,11 +197,9 @@ It must have the `down_payload` defined and the action (action performer) must h
 
 ![Revert action](docs/down.png)
 
-THe `down_at` attribute of `Rdux::Action` is set and persisted after the successful reversal.
+The `down_at` attribute of `Rdux::Action` is set and persisted after the successful reversal.
 
-It is not possible to revert a `Rdux::Action` if there are newer, not reversed `Rdux::Action`s in a given stream if defined or in general. See `meta` in [🚛 Dispatching an action](#🚛-Dispatching-an-action) section.
-
-‼️ def down - args
+It is not possible to revert a `Rdux::Action` if there are newer, not reversed `Rdux::Action`s in a given stream if a stream is defined or in general. See `meta` in [🚛 Dispatching an action](#-dispatching-an-action) section.
 
 ### 🗿 Data model
 
@@ -232,12 +230,53 @@ res.action
 res.action.down
 ```
 
-‼️ indices
+### 😷 Sanitization
 
-‼️ queries
+When `Rdux.perform` is called the `up_payload` gets sanitized using `Rails.application.config.filter_parameters` before it is saved in DB.  
+The action's `up` or `call` method receives the unsanitized version.  
+It's not possible to retry the `Rdux::Action` via calling the `#up` method if the `up_payload` got sanitized. 
 
-‼️ usage - perform
+### 🗣️ Queries
 
+Most likely, it won't be needed to save `Rdux::Action` for every request a Rails app receives.  
+The suggested approach is to save `Rdux::Action`s for CUD from CRUD and to not save for Reads.  
+This approach organically creates a new layer - queries in addition to actions.  
+Thus, it is required to call `Rdux.perform` only for actions.
+
+It is suggested to create the `perform` method that calls out `Rdux.perform` or query depending on the presence of `action` or `query` keywords.  
+This method can set `meta` attributes, fulfill params validation, etc.
+
+Example:
+```ruby
+class TasksController < ApiController
+  def show
+    perform(
+      query: Task::Show,
+      payload: { id: params[:id] }
+    )
+  end
+
+  def create
+    perform(
+      action: Task::Create,
+      payload: create_task_params
+    )
+  end
+end
+```
+
+### 🕵️ Indices
+
+Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
+You can inherit from them and extend.  
+Remember to create indices depending on your use cases.  
+
+Example:
+```ruby
+class Action < Rdux::Action
+  include Actionable
+end
+```
 
 ## 👩🏽‍🔬 Test
 
