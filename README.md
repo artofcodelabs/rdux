@@ -22,6 +22,8 @@ saves failed and nested actions
 
 ~It makes it easy to trace when, where, why, and how your application's state changed.
 
+Retry action.
+
 ## 📲 Instalation
 
 Add this line to your application's Gemfile:
@@ -182,9 +184,9 @@ end
 
 Arguments:
 * `ok` (Boolean) - `Rdux::Action` is persisted in DB if `true`
-* `down_payload` (Hash) - is saved in DB and passed to the action's `down` method as the 1st argument if an `Rdux::Action` is reverted (`down` method is called on `Rdux::Action`)
+* `down_payload` (Hash) - is saved in DB and passed to the action's `down` method as the 1st argument if an `Rdux::Action` is reverted (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method.
 * `val` (Hash) - use `val` if you need to return other data than `down_payload`
-* `up_result` (Hash) - use if you want to store data related to the performing of the action like IDs of created DB records, responses from 3rd parties, etc.
+* `up_result` (Hash) - use if you want to store data related to the performing of the action like IDs of created DB records, their changes, responses from 3rd parties, etc.
 * `save` (Boolean) - `Rdux::FailedAction` is persisted in DB if `save` is `true` and `ok` is `false`
 * `after_save` (Proc) - is called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument
 * `nested` (Array of `Rdux::Result`) - `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by `dispatch` value (`Rdux::Result`) to the `:nested` array
@@ -269,7 +271,8 @@ end
 
 Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
 You can inherit from them and extend.  
-Remember to create indices depending on your use cases.  
+Remember to create indices depending on your use cases. 
+Especially is you use Postgres and make queries based on `JSONB` columns.
 
 Example:
 ```ruby
@@ -301,5 +304,5 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## 👨‍🏭 Author
 
-Zbigniew Humeniuk from [Art of Code](http://artofcode.co)
+Zbigniew Humeniuk from [Art of Code](https://artofcode.co)
 
