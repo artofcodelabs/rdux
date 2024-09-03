@@ -1,12 +1,17 @@
-# Rdux
+# Rdux - A Minimal Event Sourcing Plugin for Rails
 
 ![Logo](docs/logo.webp)
 
-Rdux is a minimal take on event sourcing.  
-Rdux is a Rails plugin that provides your application with audit logs.  
-Rdux gives the Rails app an ability to store in the database sanitized input data, the name of module/class (an action) responsible for processing them, processing result and metadata.  
-Rdux represents database data using `Rdux::Action` and `Rdux::FailedAction` models which can be nested.  
-`Rdux::Action`s can be reverted and retried.
+Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application. With Rdux, you can efficiently track and store the history of actions performed within your app, offering transparency and traceability for key processes.
+
+**Key Features**
+
+* Audit Logging 👉 Rdux stores sanitized input data, the name of module or class (action) responsible for processing them, processing results, and additional metadata in the database.
+* Model Representation 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
+* Revert and Retry 👉 `Rdux::Action` can be reverted or retried.
+
+Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
+
 
 
 ## 📲 Instalation
