@@ -12,8 +12,6 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
 
-
-
 ## 📲 Instalation
 
 Add this line to your application's Gemfile:
@@ -39,11 +37,13 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
-Rdux uses `JSONB` datatype instead of `text` for Postgres.
+⚠️ Note: Rdux uses `JSONB` datatype instead of `text` for Postgres.
 
 ## 🎮 Usage
 
 ### 🚛 Dispatching an action
+
+To dispatch an action using Rdux, use the `dispatch` method (aliased as `perform`).
 
 Definition:
 
@@ -54,11 +54,10 @@ alias perform dispatch
 ```
 
 Arguments:
-* `action_name` - The `dispatch` method persists an instance of `Rdux::Action` in the DB which attribute `name` is set to the `action_name`. The `action_name` must be the name of the service or simply the name of the `class` or `module` that implements class or instance method `call` or `up`. Let's call this class/module an **action** or action performer.
-* `payload` (Hash) - the above mentioned `call` or `up` method receives sanitized `payload` as the first argument. It is saved in DB before `call` or `up` is called. `payload` gets deserialized, hence hash keys get stringified.
-* `opts` (Hash) - `call` or `up` method can accept the 2nd argument. `opts` is passed if the 2nd argument is defined. `opts` is useful if you already have a given ActiveRecord object fetched from DB in the controller and you don't want to `find(resource_id)` again in the action. Remember that `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization. There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. `opts` are not saved in the DB.
-* `meta` (Hash) - additional data saved in the DB along the `action_name`, `payload`, etc. The significant key is the `stream`. It allows to scope a given action to a given stream. It matters when an action is reverted. You can construct a stream based on who owns actions for example.
-
+* `action_name`: The name of the service, class, or module that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
+* `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. This is sanitized and stored in the database before being processed. The keys in the `payload` are stringified during deserialization.
+* `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This is useful when you want to avoid redundant database queries (e.g., if you already have an ActiveRecord object available). There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. Note that `opts` is not stored in the database and `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
+* `meta` (Hash): Additional metadata stored in the database alongside the `action_name` and `payload`. The `stream` key is particularly useful for scoping actions during reversions. For example, you can construct a `stream` based on the owner of action.
 
 Example:
 
@@ -68,7 +67,8 @@ Rdux.perform(
   { task: { name: 'Foo bar baz' } }, 
   { ars: { user: current_user } }, 
   meta: {
-    stream: { user_id: current_user.id, context: 'foo' }, bar: 'baz'
+    stream: { user_id: current_user.id, context: 'foo' }, 
+    bar: 'baz'
   }
 )
 ```
