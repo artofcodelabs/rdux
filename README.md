@@ -158,7 +158,7 @@ Structure:
 
 The [dedicated page about actions](docs/ACTIONS.md) contains more arguments in favor of actions.
 
-### ⛩️ Returned `struct`
+### ⛩️ Returned `struct` `Rdux::Result`
 
 Definition:
 
@@ -177,14 +177,14 @@ end
 ```
 
 Arguments:
-* `ok` (Boolean) - `Rdux::Action` is persisted in DB if `true`
-* `down_payload` (Hash) - is saved in DB and passed to the action's `down` method as the 1st argument if an `Rdux::Action` is reverted (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method.
-* `val` (Hash) - use `val` if you need to return other data than `down_payload`
-* `up_result` (Hash) - use if you want to store data related to the performing of the action like IDs of created DB records, their changes, responses from 3rd parties, etc.
-* `save` (Boolean) - `Rdux::FailedAction` is persisted in DB if `save` is `true` and `ok` is `false`
-* `after_save` (Proc) - is called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument
-* `nested` (Array of `Rdux::Result`) - `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by `dispatch` value (`Rdux::Result`) to the `:nested` array
-* `action` - Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
+* `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
+* `down_payload` (Hash): Passed to the action’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method. `down_payload` is saved in the DB.
+* `val` (Hash): Contains any additional data to return besides down_payload.
+* `up_result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
+* `save` (Boolean): If `true` and `ok` is `false`, the action is saved as a `Rdux::FailedAction`.
+* `after_save` (Proc): Called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument.
+* `nested` (Array of `Rdux::Result`): `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by the `dispatch` value (`Rdux::Result`) to the `:nested` array
+* `action`: Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
 
 ### ⏮️ Revert action
 
