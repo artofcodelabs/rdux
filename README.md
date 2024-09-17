@@ -6,9 +6,9 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 
 **Key Features**
 
-* Audit Logging 👉 Rdux stores sanitized input data, the name of module or class (action) responsible for processing them, processing results, and additional metadata in the database.
-* Model Representation 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
-* Revert and Retry 👉 `Rdux::Action` can be reverted or retried.
+* **Audit Logging** 👉 Rdux stores sanitized input data, the name of module or class (action) responsible for processing them, processing results, and additional metadata in the database.
+* **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
+* **Revert and Retry** 👉 `Rdux::Action` can be reverted or retried.
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
 
@@ -79,15 +79,17 @@ Rdux.perform(
 
 ### 💪 Action
 
-Action is a PORO.  
-Action is a `class` or `module` that implements class or instance method `call` or `up`.  
-This method must return `Rdux::Result` `struct`.   
-Action can optionally implement class or instance method `down` to specify how to revert it.   
+An action in Rdux is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
+This method must return an `Rdux::Result` `struct`.  
+Optionally, an action can implement a class or instance method `down` to specify how to revert it.
 
-`call` or `up` method accepts 2 arguments: required `payload` and optional `opts`.  
+#### Action Structure:
+
+* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns an `Rdux::Result`.
+* `down` method: Accepts the deserialized `down_payload` which is one of arguments of the `Rdux::Result` `struct` returned by the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Action`s
+
+
 See [🚛 Dispatching an action](#-dispatching-an-action) section.  
-
-`down` method accepts deserialized `down_payload` as the 1st argument which is one of arguments of the `Rdux::Result` `struct` returned from the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Actions`
 
 Examples:
 
@@ -129,10 +131,12 @@ class Task
 end
 ```
 
-The location that is often used for entities like these accross code bases is `app/services`.  
-Which is de facto the bag of random objects.  
-I'd recomment to keep actions inside `app/actions`.
-Actions are consistent in terms of structure, input and output data. 
+#### Suggested Directory Structure:
+
+The location that is often used for entities like actions accross code bases is `app/services`.  
+This directory is de facto the bag of random objects.  
+I'd recomment to place actions inside `app/actions` for better organization and consistency.  
+Actions are consistent in terms of structure, input and output data.  
 They are good canditates to create a new layer in Rails apps.
 
 Structure:
