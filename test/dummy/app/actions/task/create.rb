@@ -9,6 +9,12 @@ class Task
       end
     }
 
+    attr_reader :up_result
+
+    def initialize
+      @up_result = { 'Foo' => 'Bar' }
+    end
+
     def up(payload, opts = {})
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])

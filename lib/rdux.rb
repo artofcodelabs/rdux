@@ -82,12 +82,11 @@ module Rdux
 
     def handle_exception(exc, action)
       failed_action = action.to_failed_action
-      failed_action.up_result = {
-        'Exception' => {
-          class: exc.class.name,
-          message: exc.message
-        }
-      }
+      failed_action.up_result ||= {}
+      failed_action.up_result.merge!({ 'Exception' => {
+                                       class: exc.class.name,
+                                       message: exc.message
+                                     } })
       failed_action.save!
       action.destroy
       raise exc

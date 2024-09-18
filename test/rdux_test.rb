@@ -113,7 +113,8 @@ module Rdux
         end
         assert_equal 0, Rdux::Action.count
         assert_equal 1, Rdux::FailedAction.count
-        up_result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
+        up_result = { 'Foo' => 'Bar',
+                      'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
                                        'message' => "Couldn't find User with 'id'=0" } }
         assert_equal up_result, Rdux::FailedAction.last.up_result
       end
