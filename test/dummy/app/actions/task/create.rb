@@ -10,7 +10,7 @@ class Task
     }
 
     def up(payload, opts = {})
-      opts[:action].up_result = { 'Foo' => 'Bar'}
+      opts[:action].up_result = { 'Foo' => 'Bar' }
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save
