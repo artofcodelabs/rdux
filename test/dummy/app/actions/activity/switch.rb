@@ -2,7 +2,7 @@
 
 class Activity
   module Switch
-    def self.up(payload, opts = {})
+    def self.up(payload, opts)
       user, task = Common::Fetch.call(payload, opts).values_at(:user, :task)
       return Rdux::Result[false] if task.nil?
 

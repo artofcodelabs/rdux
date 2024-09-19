@@ -3,7 +3,7 @@
 class CreditCard
   class Charge
     class << self
-      def call(payload, opts = {})
+      def call(payload, opts)
         create_res = create(payload.slice('user_id', 'credit_card'), opts.slice(:user))
         return create_res unless create_res.ok
 

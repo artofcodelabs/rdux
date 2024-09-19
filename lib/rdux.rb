@@ -31,7 +31,7 @@ module Rdux
 
       action.up(opts)
     rescue StandardError => e
-      handle_exception(e, action)
+      handle_exception(e, action, opts[:up_result])
     end
 
     def no_down(res)
@@ -80,9 +80,9 @@ module Rdux
       action.up_payload = up_payload_sanitized
     end
 
-    def handle_exception(exc, action)
+    def handle_exception(exc, action, up_result)
       failed_action = action.to_failed_action
-      failed_action.up_result ||= {}
+      failed_action.up_result ||= (up_result || {})
       failed_action.up_result.merge!({ 'Exception' => {
                                        class: exc.class.name,
                                        message: exc.message

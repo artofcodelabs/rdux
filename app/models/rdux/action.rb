@@ -63,7 +63,7 @@ module Rdux
       return if performer.nil?
 
       if opts.any? || performer.method(meth).arity.abs == 2
-        performer.public_send(meth, payload, opts.merge(action: self))
+        performer.public_send(meth, payload, opts.merge!(action: self))
       else
         performer.public_send(meth, payload)
       end

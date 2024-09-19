@@ -10,7 +10,7 @@ class CreditCard
     }
 
     class << self
-      def up(payload, opts = {})
+      def up(payload, opts)
         user = opts[:user] || User.find(payload['user_id'])
         card = user.credit_cards.new(payload['credit_card'])
         if card.invalid?(context: :before_request_gateway)
