@@ -118,6 +118,12 @@ module Rdux
                                        'message' => "Couldn't find User with 'id'=0" } }
         assert_equal up_result, Rdux::FailedAction.last.up_result
       end
+
+      it 'sets up_result via opts[:up_result]' do
+        res = create_task
+        assert_equal({ 'Foo' => 'Bar', task_id: res.val[:task].id }, res.up_result)
+        assert_equal({ 'Foo' => 'Bar', 'task_id' => res.val[:task].id }, res.action.up_result)
+      end
     end
   end
 end

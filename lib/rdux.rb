@@ -13,6 +13,7 @@ module Rdux
       sanitize(action)
       action.save!
       res = call_call_or_up_on_action(action, opts)
+      res.up_result ||= opts[:up_result]
       assign_and_persist(res, action)
       res.after_save&.call(res.action)
       res
