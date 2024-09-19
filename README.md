@@ -21,11 +21,13 @@ gem 'rdux'
 ```
 
 And then execute:
+
 ```bash
 $ bundle
 ```
 
 Or install it yourself as:
+
 ```bash
 $ gem install rdux
 ```
@@ -54,6 +56,7 @@ alias perform dispatch
 ```
 
 Arguments:
+
 * `action_name`: The name of the service, class, or module that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
 * `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. This is sanitized and stored in the database before being processed. The keys in the `payload` are stringified during deserialization.
 * `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This is useful when you want to avoid redundant database queries (e.g., if you already have an ActiveRecord object available). There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. Note that `opts` is not stored in the database and `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
@@ -63,11 +66,11 @@ Example:
 
 ```ruby
 Rdux.perform(
-  Task::Create, 
-  { task: { name: 'Foo bar baz' } }, 
-  { ars: { user: current_user } }, 
+  Task::Create,
+  { task: { name: 'Foo bar baz' } },
+  { ars: { user: current_user } },
   meta: {
-    stream: { user_id: current_user.id, context: 'foo' }, 
+    stream: { user_id: current_user.id, context: 'foo' },
     bar: 'baz'
   }
 )
@@ -88,8 +91,7 @@ Optionally, an action can implement a class or instance method `down` to specify
 * `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns an `Rdux::Result`.
 * `down` method: Accepts the deserialized `down_payload` which is one of arguments of the `Rdux::Result` `struct` returned by the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Action`s
 
-
-See [🚛 Dispatching an action](#-dispatching-an-action) section.  
+See [🚛 Dispatching an action](#-dispatching-an-action) section.
 
 Examples:
 
@@ -98,7 +100,7 @@ Examples:
 
 class Task
   class Create
-    def up(payload, opts = {})
+    def up(payload, opts)
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save
@@ -113,7 +115,6 @@ class Task
     end
   end
 end
-
 ```
 
 ```ruby
@@ -140,6 +141,7 @@ Actions are consistent in terms of structure, input and output data.
 They are good canditates to create a new layer in Rails apps.
 
 Structure:
+
 ```
 .
 └── app/actions/
@@ -177,6 +179,7 @@ end
 ```
 
 Arguments:
+
 * `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
 * `down_payload` (Hash): Passed to the action’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method. `down_payload` is saved in the DB.
 * `val` (Hash): Contains any additional data to return besides down_payload.
@@ -200,7 +203,7 @@ It is not possible to revert a `Rdux::Action` if there are newer, not reversed `
 ### 🗿 Data model
 
 ```ruby
-payload = { 
+payload = {
   task: { 'name' => 'Foo bar baz' },
   user_id: 159163583
 }
@@ -243,6 +246,7 @@ It is suggested to create the `perform` method that calls out `Rdux.perform` or 
 This method can set `meta` attributes, fulfill params validation, etc.
 
 Example:
+
 ```ruby
 class TasksController < ApiController
   def show
@@ -294,9 +298,9 @@ $ DB=sqlite bin/rails test
 ```
 
 ## 📄 License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## 👨‍🏭 Author
 
 Zbigniew Humeniuk from [Art of Code](https://artofcode.co)
-
