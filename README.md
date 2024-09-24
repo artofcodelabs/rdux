@@ -235,12 +235,12 @@ Note that if the `up_payload` is sanitized, the `Rdux::Action` cannot be retried
 
 ### 🗣️ Queries
 
-Most likely, it won't be needed to save `Rdux::Action` for every request a Rails app receives.  
-The suggested approach is to save `Rdux::Action`s for CUD from CRUD and to not save for Reads.  
+Most likely, it won't be needed to save a `Rdux::Action` for every request a Rails app receives.  
+The suggested approach is to save `Rdux::Action`s for Create, Update, and Delete (CUD) operations.  
 This approach organically creates a new layer - queries in addition to actions.  
 Thus, it is required to call `Rdux.perform` only for actions.
 
-It is suggested to create the `perform` method that calls out `Rdux.perform` or query depending on the presence of `action` or `query` keywords.  
+An example approach is to create the `perform` method that calls `Rdux.perform` or a query depending on the presence of `action` or `query` keywords.  
 This method can set `meta` attributes, fulfill params validation, etc.
 
 Example:
@@ -263,12 +263,12 @@ class TasksController < ApiController
 end
 ```
 
-### 🕵️ Indices
+### 🕵️ Indexing
 
+ Depending on your use case, create indices, especially when using PostgreSQL and querying based on JSONB columns.  
 Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
 You can inherit from them and extend.  
-Remember to create indices depending on your use cases. 
-Especially is you use Postgres and make queries based on `JSONB` columns.
+Depending on your use case, create indices, especially when using PostgreSQL and querying based on `JSONB` columns.  
 
 Example:
 ```ruby
@@ -277,7 +277,7 @@ class Action < Rdux::Action
 end
 ```
 
-## 👩🏽‍🔬 Test
+## 👩🏽‍🔬 Testing
 
 ### 💉 Setup
 
