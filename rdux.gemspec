@@ -14,7 +14,8 @@ Gem::Specification.new do |spec|
   spec.homepage    = 'https://artofcode.co'
   spec.summary     = 'Rdux adds a new layer to Rails apps - actions.'
   spec.description = <<~DESC
-    ...
+    Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application.#{' '}
+    With Rdux, you can efficiently track and store the history of actions performed within your app, offering transparency and traceability for key processes.
   DESC
   spec.license = 'MIT'
 
