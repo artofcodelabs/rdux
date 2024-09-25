@@ -4,7 +4,7 @@ class Activity
   module Common
     module Fetch
       class << self
-        def call(payload, opts = {})
+        def call(payload, opts)
           user = opts[:user] || (payload['user_id'] && User.find(payload['user_id']))
           task = fetch(:tasks, user, opts[:task], payload['task_id'])
           activity = fetch(:activities, user, opts[:activity], payload['activity_id'])

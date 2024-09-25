@@ -2,7 +2,7 @@
 
 class Activity
   module Stop
-    def self.up(payload, opts = {})
+    def self.up(payload, opts)
       activity = Common::Fetch.call(payload, opts)[:activity]
       return Rdux::Result[false] if activity.nil? || activity.end_at
 

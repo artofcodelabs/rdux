@@ -12,7 +12,7 @@ module TestData
   module Payloads
     class << self
       def task
-        { task: { 'name' => 'Foo bar baz' } }
+        { task: { name: 'Foo bar baz' } }
       end
 
       def credit_card_create(user)
