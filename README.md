@@ -1,6 +1,15 @@
 # Rdux - A Minimal Event Sourcing Plugin for Rails
 
-![Logo](docs/logo.webp)
+<div align="center">
+
+  <div>
+    <img width="500px" src="docs/logo.webp">
+  </div>
+
+![GitHub](https://img.shields.io/github/license/artofcodelabs/rdux)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/artofcodelabs/rdux)
+
+</div>
 
 Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application. With Rdux, you can efficiently track and store the history of actions performed within your app, offering transparency and traceability for key processes.
 
