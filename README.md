@@ -1,6 +1,15 @@
 # Rdux - A Minimal Event Sourcing Plugin for Rails
 
-![Logo](docs/logo.webp)
+<div align="center">
+
+  <div>
+    <img width="500px" src="docs/logo.webp">
+  </div>
+
+![GitHub](https://img.shields.io/github/license/artofcodelabs/rdux)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/artofcodelabs/rdux)
+
+</div>
 
 Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application. With Rdux, you can efficiently track and store the history of actions performed within your app, offering transparency and traceability for key processes.
 
@@ -8,7 +17,7 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 
 * **Audit Logging** 👉 Rdux stores sanitized input data, the name of module or class (action performer) responsible for processing them, processing results, and additional metadata in the database.
 * **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
-* **Revert and Retry** 👉 `Rdux::Action` can be reverted or retried.
+* **Revert and Retry** 👉 `Rdux::Action` can be reverted. `Rdux::FailedAction` retains the input data and processing results necessary for implementing custom mechanisms to retry failed actions.
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
 
@@ -57,7 +66,7 @@ alias perform dispatch
 
 Arguments:
 
-* `action_name`: The name of the service, class, or module that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
+* `action_name`: The name of the service (class or module) that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
 * `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. This is sanitized and stored in the database before being processed. The keys in the `payload` are stringified during deserialization.
 * `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This is useful when you want to avoid redundant database queries (e.g., if you already have an ActiveRecord object available). There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. Note that `opts` is not stored in the database and `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
 * `meta` (Hash): Additional metadata stored in the database alongside the `action_name` and `payload`. The `stream` key is particularly useful for scoping actions during reversions. For example, you can construct a `stream` based on the owner of action.
