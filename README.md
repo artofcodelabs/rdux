@@ -61,17 +61,17 @@ To dispatch an action using Rdux, use the `dispatch` method (aliased as `perform
 Definition:
 
 ```ruby
-def dispatch(action_name, payload, opts = {}, meta: nil)
+def dispatch(action, payload, opts = {}, meta: nil)
 
 alias perform dispatch
 ```
 
 Arguments:
 
-* `action_name`: The name of the service (class or module) that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
-* `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. This is sanitized and stored in the database before being processed. The keys in the `payload` are stringified during deserialization.
-* `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This is useful when you want to avoid redundant database queries (e.g., if you already have an ActiveRecord object available). There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. Note that `opts` is not stored in the database and `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
-* `meta` (Hash): Additional metadata stored in the database alongside the `action_name` and `payload`. The `stream` key is particularly useful for scoping actions during reversions. For example, you can construct a `stream` based on the owner of action.
+* `action`: The name of the module or class (action performer) that processes the action. This is stored in the database as an instance of `Rdux::Action`, with its `name` attribute set to `action` (e.g., `Task::Create`).
+* `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. The data is sanitized and stored in the database before being processed by the action performer. During deserialization, the keys in the `payload` are converted to strings.
+* `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This can help avoid redundant database queries (e.g., if you already have an ActiveRecord object available before calling `Rdux.perform`). A helper is available to facilitate this use case: `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`, where `:ars` represents ActiveRecord objects. Note that `opts` is not stored in the database, and the `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
+* `meta` (Hash): Additional metadata stored in the database alongside the `action` and `payload`. The `stream` key is particularly useful for scoping actions during reversions. For example, a `stream` can be constructed based on the owner of the action.
 
 Example:
 
