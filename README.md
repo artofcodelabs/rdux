@@ -91,15 +91,15 @@ Rdux.perform(
 
 ![Flow Diagram](docs/flow.png)
 
-### 💪 Action
+### 🕵️‍♀️ Processing an action
 
-An action in Rdux is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
-This method must return an `Rdux::Result` `struct`.  
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
+This method must return a `Rdux::Result` `struct`.  
 Optionally, an action can implement a class or instance method `down` to specify how to revert it.
 
 #### Action Structure:
 
-* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns an `Rdux::Result`.
+* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns a `Rdux::Result`.
 * `down` method: Accepts the deserialized `down_payload` which is one of arguments of the `Rdux::Result` `struct` returned by the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Action`s
 
 See [🚛 Dispatching an action](#-dispatching-an-action) section.
