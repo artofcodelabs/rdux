@@ -192,8 +192,8 @@ end
 Arguments:
 
 * `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
-* `down_payload` (Hash): Passed to the action’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method. `down_payload` is saved in the DB.
-* `val` (Hash): Contains any additional data to return besides down_payload.
+* `down_payload` (Hash): Passed to the action performer’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action performer does not implement the `down` method. `down_payload` is saved in the DB.
+* `val` (Hash): Contains different returned data than `down_payload`.
 * `up_result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
 * `save` (Boolean): If `true` and `ok` is `false`, the action is saved as a `Rdux::FailedAction`.
 * `after_save` (Proc): Called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument.
