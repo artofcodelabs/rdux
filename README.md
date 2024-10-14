@@ -240,19 +240,19 @@ res.action.down
 
 ### 😷 Sanitization
 
-When calling `Rdux.perform`, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before saving to the database.  
-The action’s `up` or `call` method receives the unsanitized version.  
-Note that if the `up_payload` is sanitized, the `Rdux::Action` cannot be retried via calling the `#up` method.
+When `Rdux.perform` is called, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.  
+The action performer’s `up` or `call` method receives the unsanitized version.  
+Note that once the `up_payload` is sanitized, the `Rdux::Action` cannot be retried by calling the `#up` method.
 
 ### 🗣️ Queries
 
-Most likely, it won't be needed to save a `Rdux::Action` for every request a Rails app receives.  
+Most likely, it won't be necessary to save a `Rdux::Action` for every request a Rails app receives.  
 The suggested approach is to save `Rdux::Action`s for Create, Update, and Delete (CUD) operations.  
 This approach organically creates a new layer - queries in addition to actions.  
 Thus, it is required to call `Rdux.perform` only for actions.
 
-An example approach is to create the `perform` method that calls `Rdux.perform` or a query depending on the presence of `action` or `query` keywords.  
-This method can set `meta` attributes, fulfill params validation, etc.
+One approach is to create a `perform` method that invokes either `Rdux.perform` or a query, depending on the presence of `action` or `query` keywords.  
+This method can also handle setting `meta` attributes, performing parameter validation, and more.
 
 Example:
 
@@ -276,10 +276,9 @@ end
 
 ### 🕵️ Indexing
 
- Depending on your use case, create indices, especially when using PostgreSQL and querying based on JSONB columns.  
+Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.  
 Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
-You can inherit from them and extend.  
-Depending on your use case, create indices, especially when using PostgreSQL and querying based on `JSONB` columns.  
+You can inherit from them and extend.
 
 Example:
 ```ruby
