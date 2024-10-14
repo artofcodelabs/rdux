@@ -1,6 +1,15 @@
 # Rdux - A Minimal Event Sourcing Plugin for Rails
 
-![Logo](docs/logo.webp)
+<div align="center">
+
+  <div>
+    <img width="500px" src="docs/logo.webp">
+  </div>
+
+![GitHub](https://img.shields.io/github/license/artofcodelabs/rdux)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/artofcodelabs/rdux)
+
+</div>
 
 Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application. With Rdux, you can efficiently track and store the history of actions performed within your app, offering transparency and traceability for key processes.
 
@@ -8,7 +17,9 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 
 * **Audit Logging** 👉 Rdux stores sanitized input data, the name of module or class (action performer) responsible for processing them, processing results, and additional metadata in the database.
 * **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
-* **Revert and Retry** 👉 `Rdux::Action` can be reverted or retried.
+* **Revert and Retry** 👉 `Rdux::Action` can be reverted. `Rdux::FailedAction` retains the input data and processing results necessary for implementing custom mechanisms to retry failed actions.
+* **Metadata** 👉 Metadata can include the ID of the authenticated resource responsible for performing a given action, as well as resource IDs from external systems related to the action. This creates a clear audit trail of who executed each action and on whose behalf.
+* **Streams** 👉 Rdux enables the identification of action chains (streams) by utilizing resource IDs stored in metadata. This makes it easy to query and track related actions.
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
 
@@ -50,17 +61,17 @@ To dispatch an action using Rdux, use the `dispatch` method (aliased as `perform
 Definition:
 
 ```ruby
-def dispatch(action_name, payload, opts = {}, meta: nil)
+def dispatch(action, payload, opts = {}, meta: nil)
 
 alias perform dispatch
 ```
 
 Arguments:
 
-* `action_name`: The name of the service, class, or module that will process the action. This is persisted as an instance of `Rdux::Action` in the database, with its `name` attribute set to `action_name`. The `action_name` should correspond to the class or module that implements the `call` or `up` method, referred to as "action" or “action performer.”
-* `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. This is sanitized and stored in the database before being processed. The keys in the `payload` are stringified during deserialization.
-* `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This is useful when you want to avoid redundant database queries (e.g., if you already have an ActiveRecord object available). There is a helper that facitilates this use case. The implementation is clear enough IMO `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`. `:ars` means ActiveRecords. Note that `opts` is not stored in the database and `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
-* `meta` (Hash): Additional metadata stored in the database alongside the `action_name` and `payload`. The `stream` key is particularly useful for scoping actions during reversions. For example, you can construct a `stream` based on the owner of action.
+* `action`: The name of the module or class (action performer) that processes the action. This is stored in the database as an instance of `Rdux::Action`, with its `name` attribute set to `action` (e.g., `Task::Create`).
+* `payload` (Hash): The input data passed as the first argument to the `call` or `up` method of the action performer. The data is sanitized and stored in the database before being processed by the action performer. During deserialization, the keys in the `payload` are converted to strings.
+* `opts` (Hash): Optional parameters passed as the second argument to the `call` or `up` method, if defined. This can help avoid redundant database queries (e.g., if you already have an ActiveRecord object available before calling `Rdux.perform`). A helper is available to facilitate this use case: `(opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }`, where `:ars` represents ActiveRecord objects. Note that `opts` is not stored in the database, and the `payload` should be fully sufficient to perform an **action**. `opts` provides an optimization.
+* `meta` (Hash): Additional metadata stored in the database alongside the `action` and `payload`. The `stream` key is particularly useful for specifying the stream of actions used during reversions. For example, a `stream` can be constructed based on the owner of the action.
 
 Example:
 
@@ -80,15 +91,15 @@ Rdux.perform(
 
 ![Flow Diagram](docs/flow.png)
 
-### 💪 Action
+### 🕵️‍♀️ Processing an action
 
-An action in Rdux is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
-This method must return an `Rdux::Result` `struct`.  
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
+This method must return a `Rdux::Result` `struct`.  
 Optionally, an action can implement a class or instance method `down` to specify how to revert it.
 
 #### Action Structure:
 
-* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns an `Rdux::Result`.
+* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns a `Rdux::Result`.
 * `down` method: Accepts the deserialized `down_payload` which is one of arguments of the `Rdux::Result` `struct` returned by the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Action`s
 
 See [🚛 Dispatching an action](#-dispatching-an-action) section.
@@ -181,8 +192,8 @@ end
 Arguments:
 
 * `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
-* `down_payload` (Hash): Passed to the action’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action does not implement the `down` method. `down_payload` is saved in the DB.
-* `val` (Hash): Contains any additional data to return besides down_payload.
+* `down_payload` (Hash): Passed to the action performer’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action performer does not implement the `down` method. `down_payload` is saved in the DB.
+* `val` (Hash): Contains different returned data than `down_payload`.
 * `up_result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
 * `save` (Boolean): If `true` and `ok` is `false`, the action is saved as a `Rdux::FailedAction`.
 * `after_save` (Proc): Called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument.
@@ -229,19 +240,19 @@ res.action.down
 
 ### 😷 Sanitization
 
-When calling `Rdux.perform`, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before saving to the database.  
-The action’s `up` or `call` method receives the unsanitized version.  
-Note that if the `up_payload` is sanitized, the `Rdux::Action` cannot be retried via calling the `#up` method.
+When `Rdux.perform` is called, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.  
+The action performer’s `up` or `call` method receives the unsanitized version.  
+Note that once the `up_payload` is sanitized, the `Rdux::Action` cannot be retried by calling the `#up` method.
 
 ### 🗣️ Queries
 
-Most likely, it won't be needed to save a `Rdux::Action` for every request a Rails app receives.  
+Most likely, it won't be necessary to save a `Rdux::Action` for every request a Rails app receives.  
 The suggested approach is to save `Rdux::Action`s for Create, Update, and Delete (CUD) operations.  
 This approach organically creates a new layer - queries in addition to actions.  
 Thus, it is required to call `Rdux.perform` only for actions.
 
-An example approach is to create the `perform` method that calls `Rdux.perform` or a query depending on the presence of `action` or `query` keywords.  
-This method can set `meta` attributes, fulfill params validation, etc.
+One approach is to create a `perform` method that invokes either `Rdux.perform` or a query, depending on the presence of `action` or `query` keywords.  
+This method can also handle setting `meta` attributes, performing parameter validation, and more.
 
 Example:
 
@@ -265,10 +276,9 @@ end
 
 ### 🕵️ Indexing
 
- Depending on your use case, create indices, especially when using PostgreSQL and querying based on JSONB columns.  
+Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.  
 Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
-You can inherit from them and extend.  
-Depending on your use case, create indices, especially when using PostgreSQL and querying based on `JSONB` columns.  
+You can inherit from them and extend.
 
 Example:
 ```ruby
