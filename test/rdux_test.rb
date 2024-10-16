@@ -84,6 +84,19 @@ module Rdux
         assert_equal 1, Rdux::Action.count
       end
 
+      it 'saves up_result set via opts if exeption is raised' do
+        payload = TestData::Payloads.credit_card_create(users(:zbig))
+        payload[:amount] = -99.99
+        assert_raises(RuntimeError) do
+          Rdux.dispatch(CreditCard::Charge, payload)
+        end
+        up_result = {
+          'credit_card_create_action_id' => Rdux::Action.last.id,
+          'Exception' => { 'class' => 'RuntimeError', 'message' => 'Negative amount' }
+        }
+        assert_equal(up_result, Rdux::FailedAction.last.up_result)
+      end
+
       it 'can save both: actions and failed action assigned to failed action' do
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
@@ -113,16 +126,15 @@ module Rdux
         end
         assert_equal 0, Rdux::Action.count
         assert_equal 1, Rdux::FailedAction.count
-        up_result = { 'Foo' => 'Bar',
-                      'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
+        up_result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
                                        'message' => "Couldn't find User with 'id'=0" } }
         assert_equal up_result, Rdux::FailedAction.last.up_result
       end
 
       it 'sets up_result via opts[:up_result]' do
         res = create_task
-        assert_equal({ 'Foo' => 'Bar', task_id: res.val[:task].id }, res.up_result)
-        assert_equal({ 'Foo' => 'Bar', 'task_id' => res.val[:task].id }, res.action.up_result)
+        assert_equal({ task_id: res.val[:task].id }, res.up_result)
+        assert_equal({ 'task_id' => res.val[:task].id }, res.action.up_result)
       end
     end
   end

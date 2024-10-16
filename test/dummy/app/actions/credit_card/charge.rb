@@ -7,6 +7,7 @@ class CreditCard
         create_res = create(payload.slice('user_id', 'credit_card'), opts.slice(:user))
         return create_res unless create_res.ok
 
+        opts[:up_result] = { credit_card_create_action_id: create_res.action.id }
         charge_id = PaymentGateway.charge(create_res.val[:credit_card].token, payload['amount'])[:id]
         if charge_id.nil?
           Rdux::Result[ok: false, val: { errors: { base: 'Invalid credit card' } }, save: true,
