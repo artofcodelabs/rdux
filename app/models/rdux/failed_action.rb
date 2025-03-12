@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Rdux
-  class FailedAction < ApplicationRecord
+  class FailedAction < ActiveRecord::Base
     include Actionable
 
     belongs_to :rdux_failed_action, optional: true, class_name: 'Rdux::FailedAction'

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Rdux
-  class Action < ApplicationRecord
+  class Action < ActiveRecord::Base
     include Actionable
 
     attr_accessor :up_payload_unsanitized
