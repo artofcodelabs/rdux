@@ -120,6 +120,14 @@ module Rdux
         assert_equal 21, res.action.meta['inc']
       end
 
+      it 'does not call after_save callback if no failed action' do
+        payload = TestData::Payloads.credit_card_create(users(:zbig))
+        payload[:credit_card][:number] = '1234'
+        assert_nothing_raised do
+          Rdux.dispatch(CreditCard::Create, payload, meta: { foo: 'bar', stream: 'baz' })
+        end
+      end
+
       it 'allows for recognizing failed actions caused by exception' do
         assert_raises(ActiveRecord::RecordNotFound) do
           Rdux.dispatch(Task::Create, { user_id: 0 })

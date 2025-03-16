@@ -13,14 +13,10 @@ class CreditCard
       def up(payload, opts)
         user = opts[:user] || User.find(payload['user_id'])
         card = user.credit_cards.new(payload['credit_card'])
-        if card.invalid?(context: :before_request_gateway)
-          return Rdux::Result[ok: false, val: { errors: card.errors }, save: true, after_save: AFTER_SAVE]
-        end
+        res = validate_and_tokenize(card)
+        return res if res.is_a?(Rdux::Result)
 
-        token = PaymentGateway.tokenize(card)
-        return Rdux::Result[false, { errors: { base: 'Invalid credit card' } }] unless token
-
-        card.token = token
+        card.token = res
         save_credit_card(card)
       end
 
@@ -31,6 +27,16 @@ class CreditCard
       end
 
       private
+
+      def validate_and_tokenize(card)
+        if card.invalid?(context: :before_request_gateway)
+          return Rdux::Result[ok: false, val: { errors: card.errors }, save: true, after_save: AFTER_SAVE]
+        end
+
+        token = PaymentGateway.tokenize(card)
+        token || Rdux::Result[ok: false, val: { errors: { base: 'Invalid credit card' } },
+                              after_save: AFTER_SAVE]
+      end
 
       def save_credit_card(card)
         if card.save

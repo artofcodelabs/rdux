@@ -129,7 +129,7 @@ GEM
     parser (3.3.5.0)
       ast (~> 2.4.1)
       racc
-    pg (1.5.8)
+    pg (1.5.9)
     psych (5.1.2)
       stringio
     racc (1.8.1)
@@ -216,7 +216,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  pg (>= 1.5.8)
+  pg (>= 1.5.9)
   rdux!
   rubocop (>= 1.66.1)
   rubocop-rails (>= 2.26.0)
