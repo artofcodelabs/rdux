@@ -8,20 +8,25 @@ require 'active_support/concern'
 module Rdux
   class << self
     def dispatch(action_name, payload, opts = {}, meta: nil)
-      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(name: action_name, up_payload: payload, meta:)
-      sanitize(action)
-      action.save!
+      action = create_action(action_name, payload, opts, meta)
       res = call_call_or_up_on_action(action, opts)
       res.up_result ||= opts[:up_result]
       assign_and_persist(res, action)
-      res.after_save&.call(res.action)
+      res.after_save.call(res.action) if res.after_save && res.action
       res
     end
 
     alias perform dispatch
 
     private
+
+    def create_action(action_name, payload, opts, meta)
+      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
+      action = Action.new(name: action_name, up_payload: payload, meta:)
+      sanitize(action)
+      action.save!
+      action
+    end
 
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
