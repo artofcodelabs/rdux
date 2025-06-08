@@ -14,6 +14,6 @@ require 'rdux'
 
 module Dummy
   class Application < Rails::Application
-    config.load_defaults 7.2
+    config.load_defaults 8.0
   end
 end
