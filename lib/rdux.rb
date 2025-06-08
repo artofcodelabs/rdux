@@ -2,7 +2,6 @@
 
 require 'rdux/engine'
 require 'rdux/result'
-require 'rdux/sanitize'
 require 'active_support/concern'
 
 module Rdux
@@ -80,7 +79,8 @@ module Rdux
     end
 
     def sanitize(action)
-      up_payload_sanitized = Sanitize.call(action.up_payload)
+      param_filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
+      up_payload_sanitized = param_filter.filter(action.up_payload)
       action.up_payload_sanitized = action.up_payload != up_payload_sanitized
       action.up_payload_unsanitized = action.up_payload if action.up_payload_sanitized
       action.up_payload = up_payload_sanitized
