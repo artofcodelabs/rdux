@@ -6,19 +6,13 @@ module Rdux
 
     included do
       if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
-        serialize :up_payload, coder: JSON
-        serialize :up_result, coder: JSON
+        serialize :payload, coder: JSON
+        serialize :result, coder: JSON
         serialize :meta, coder: JSON
       end
 
       validates :name, presence: true
-      validates :up_payload, presence: true
-
-      before_save do
-        if meta_changed? && meta['stream'] && (meta_was || {})['stream'] != meta['stream']
-          self.stream_hash = Digest::SHA256.hexdigest(meta['stream'].to_json)
-        end
-      end
+      validates :payload, presence: true
     end
 
     class_methods do

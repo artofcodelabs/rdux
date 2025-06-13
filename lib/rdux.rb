@@ -9,9 +9,8 @@ module Rdux
     def dispatch(action_name, payload, opts = {}, meta: nil)
       action = create_action(action_name, payload, opts, meta)
       res = call_call_or_up_on_action(action, opts)
-      res.up_result ||= opts[:up_result]
+      res.result ||= opts[:result]
       assign_and_persist(res, action)
-      res.after_save.call(res.action) if res.after_save && res.action
       res
     end
 
@@ -19,9 +18,9 @@ module Rdux
 
     private
 
-    def create_action(action_name, payload, opts, meta)
+    def create_action(name, payload, opts, meta)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(name: action_name, up_payload: payload, meta:)
+      action = Action.new(ok: true, name:, payload:, meta:)
       sanitize(action)
       action.save!
       action
@@ -29,23 +28,14 @@ module Rdux
 
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
-      if res
-        no_down(res)
-        return res
-      end
+      return res if res
 
       action.up(opts)
     rescue StandardError => e
-      handle_exception(e, action, opts[:up_result])
-    end
-
-    def no_down(res)
-      res[:val] ||= res.down_payload
-      res.down_payload = nil
+      handle_exception(e, action, opts[:result])
     end
 
     def assign_and_persist(res, action)
-      action.down_payload = res.down_payload&.deep_stringify_keys!
       if res.ok
         assign_and_persist_for_ok(res, action)
       elsif res.save_failed?
@@ -56,15 +46,14 @@ module Rdux
     end
 
     def assign_and_persist_for_ok(res, action)
-      action.up_result = res.up_result
+      action.result = res.result
       res.action = action.tap(&:save!)
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
     end
 
     def assign_and_persist_for_failed(res, action)
-      action.up_result = res.up_result
+      action.result = res.result
       res.action = action.to_failed_action.tap(&:save!)
-      action.destroy
       assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
     end
 
@@ -80,21 +69,20 @@ module Rdux
 
     def sanitize(action)
       param_filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-      up_payload_sanitized = param_filter.filter(action.up_payload)
-      action.up_payload_sanitized = action.up_payload != up_payload_sanitized
-      action.up_payload_unsanitized = action.up_payload if action.up_payload_sanitized
-      action.up_payload = up_payload_sanitized
+      payload_sanitized = param_filter.filter(action.payload)
+      action.payload_sanitized = action.payload != payload_sanitized
+      action.payload_unsanitized = action.payload if action.payload_sanitized
+      action.payload = payload_sanitized
     end
 
-    def handle_exception(exc, action, up_result)
-      failed_action = action.to_failed_action
-      failed_action.up_result ||= up_result || {}
-      failed_action.up_result.merge!({ 'Exception' => {
-                                       class: exc.class.name,
-                                       message: exc.message
-                                     } })
-      failed_action.save!
-      action.destroy
+    def handle_exception(exc, action, result)
+      action.to_failed_action
+      action.result ||= result || {}
+      action.result.merge!({ 'Exception' => {
+                             class: exc.class.name,
+                             message: exc.message
+                           } })
+      action.save!
       raise exc
     end
   end

@@ -10,9 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_13_153409) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+  enable_extension "pg_catalog.plpgsql"
 
   create_table "activities", force: :cascade do |t|
     t.bigint "user_id", null: false
@@ -49,32 +49,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
 
   create_table "rdux_actions", force: :cascade do |t|
     t.string "name", null: false
-    t.jsonb "up_payload", null: false
-    t.jsonb "down_payload"
-    t.datetime "down_at"
-    t.boolean "up_payload_sanitized", default: false, null: false
-    t.jsonb "up_result"
+    t.jsonb "payload", null: false
+    t.boolean "payload_sanitized", default: false, null: false
+    t.jsonb "result"
     t.jsonb "meta"
-    t.string "stream_hash"
+    t.boolean "ok", null: false
     t.bigint "rdux_action_id"
-    t.bigint "rdux_failed_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
-    t.index ["rdux_failed_action_id"], name: "index_rdux_actions_on_rdux_failed_action_id"
-  end
-
-  create_table "rdux_failed_actions", force: :cascade do |t|
-    t.string "name", null: false
-    t.jsonb "up_payload", null: false
-    t.boolean "up_payload_sanitized", default: false, null: false
-    t.jsonb "up_result"
-    t.jsonb "meta"
-    t.string "stream_hash"
-    t.bigint "rdux_failed_action_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["rdux_failed_action_id"], name: "index_rdux_failed_actions_on_rdux_failed_action_id"
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -96,7 +79,5 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_13_114436) do
   add_foreign_key "credit_cards", "users"
   add_foreign_key "plans", "users"
   add_foreign_key "rdux_actions", "rdux_actions"
-  add_foreign_key "rdux_actions", "rdux_failed_actions"
-  add_foreign_key "rdux_failed_actions", "rdux_failed_actions"
   add_foreign_key "tasks", "users"
 end

@@ -8,7 +8,7 @@ module Rdux
 
     describe '#dispatch' do
       it 'persists an action' do
-        puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash['up_payload'].type}"
+        puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash['payload'].type}"
         create_task
         assert_equal 1, Rdux::Action.count
       end
@@ -29,7 +29,7 @@ module Rdux
         res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
         assert res.ok
         assert_equal '4242', res.val[:credit_card].last_four
-        assert_equal '[FILTERED]', res.action.up_payload['credit_card']['number']
+        assert_equal '[FILTERED]', res.action.payload['credit_card']['number']
       end
 
       it 'assigns nested actions' do
@@ -54,14 +54,14 @@ module Rdux
         assert_equal({ 'foo' => 'bar' }, res.action.meta)
       end
 
-      it 'sets up_result on action' do
+      it 'sets result on action' do
         user = users(:zbig)
         res1 = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id })
         res2 = Rdux.dispatch(Activity::Stop, { user_id: user.id, activity_id: res1.val[:activity].id })
-        res2.action.up_result.tap do |up_result|
-          assert_nil up_result['end_at'][0]
-          assert_not_nil up_result['end_at'][1]
-          assert up_result['updated_at'][0] < up_result['updated_at'][1]
+        res2.action.result.tap do |result|
+          assert_nil result['end_at'][0]
+          assert_not_nil result['end_at'][1]
+          assert result['updated_at'][0] < result['updated_at'][1]
         end
       end
 
@@ -72,7 +72,7 @@ module Rdux
         assert_equal 1, Rdux::FailedAction.count
         assert_equal 0, Rdux::Action.count
         fa = Rdux::FailedAction.last
-        assert_equal '[FILTERED]', fa.up_payload['credit_card']['number']
+        assert_equal '[FILTERED]', fa.payload['credit_card']['number']
         assert_equal({ 'foo' => 'bar', 'stream' => 'baz' }, fa.meta)
       end
 
@@ -84,17 +84,17 @@ module Rdux
         assert_equal 1, Rdux::Action.count
       end
 
-      it 'saves up_result set via opts if exeption is raised' do
+      it 'saves result set via opts if exeption is raised' do
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = -99.99
         assert_raises(RuntimeError) do
           Rdux.dispatch(CreditCard::Charge, payload)
         end
-        up_result = {
+        result = {
           'credit_card_create_action_id' => Rdux::Action.last.id,
           'Exception' => { 'class' => 'RuntimeError', 'message' => 'Negative amount' }
         }
-        assert_equal(up_result, Rdux::FailedAction.last.up_result)
+        assert_equal(result, Rdux::FailedAction.last.result)
       end
 
       it 'can save both: actions and failed action assigned to failed action' do
@@ -134,15 +134,15 @@ module Rdux
         end
         assert_equal 0, Rdux::Action.count
         assert_equal 1, Rdux::FailedAction.count
-        up_result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
-                                       'message' => "Couldn't find User with 'id'=0" } }
-        assert_equal up_result, Rdux::FailedAction.last.up_result
+        result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
+                                    'message' => "Couldn't find User with 'id'=0" } }
+        assert_equal result, Rdux::FailedAction.last.result
       end
 
-      it 'sets up_result via opts[:up_result]' do
+      it 'sets result via opts[:result]' do
         res = create_task
-        assert_equal({ task_id: res.val[:task].id }, res.up_result)
-        assert_equal({ 'task_id' => res.val[:task].id }, res.action.up_result)
+        assert_equal({ task_id: res.val[:task].id }, res.result)
+        assert_equal({ 'task_id' => res.val[:task].id }, res.action.result)
       end
     end
   end
