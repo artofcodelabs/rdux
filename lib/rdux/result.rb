@@ -3,7 +3,7 @@
 module Rdux
   Result = Struct.new(:ok, :val, :result, :save, :after_save, :nested, :action) do
     def save_failed?
-      ok == false && save
+      ok == false && save ? true : false
     end
   end
 end
