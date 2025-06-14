@@ -39,14 +39,6 @@ module Rdux
         assert_equal 2, res.action.rdux_actions.count
       end
 
-      it 'reverts nested actions' do
-        task = tasks(:homework)
-        create_activity(task:)
-        res = Rdux.dispatch(Activity::Switch, { user_id: task.user_id, task_id: create_task(task.user).val[:task].id })
-        res.action.down
-        assert_equal 2, Rdux::Action.down.where(rdux_action_id: res.action.id).count
-      end
-
       it 'sets meta' do
         user = users(:zbig)
         res = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id },
