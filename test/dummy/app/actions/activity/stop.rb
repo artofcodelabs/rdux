@@ -9,7 +9,7 @@ class Activity
       activity.end_at = Time.current
       activity.save!
       result = activity.previous_changes
-      Rdux::Result[ok: true, down_payload: { activity_id: opts[:action].payload['activity_id'] }, result:]
+      Rdux::Result[ok: true, val: { activity_id: opts[:action].payload['activity_id'] }, result:]
     end
 
     def self.down(payload)
