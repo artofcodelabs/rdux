@@ -86,7 +86,7 @@ module Rdux
           'credit_card_create_action_id' => Rdux::Action.last.id,
           'Exception' => { 'class' => 'RuntimeError', 'message' => 'Negative amount' }
         }
-        assert_equal(result, Rdux::FailedAction.last.result)
+        assert_equal(result, Rdux::Action.failed.last.result)
       end
 
       it 'can save both: actions and failed action assigned to failed action' do
