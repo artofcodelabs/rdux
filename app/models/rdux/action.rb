@@ -35,6 +35,7 @@ module Rdux
 
     def to_failed_action
       self.ok = false
+      self
     end
 
     private
