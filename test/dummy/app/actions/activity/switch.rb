@@ -11,9 +11,5 @@ class Activity
       create_res = Rdux.perform(Activity::Create, {}, { ars: { user:, task: } })
       Rdux::Result[ok: true, nested: [stop_res, create_res].compact, val: create_res.val]
     end
-
-    def self.down(_, opts)
-      opts[:nested].reverse.map(&:down)
-    end
   end
 end

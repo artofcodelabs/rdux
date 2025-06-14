@@ -19,9 +19,5 @@ class Task
         Rdux::Result[false, { errors: task.errors }]
       end
     end
-
-    def down(payload)
-      Delete.up(payload)
-    end
   end
 end

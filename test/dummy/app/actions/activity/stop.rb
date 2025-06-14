@@ -11,11 +11,5 @@ class Activity
       result = activity.previous_changes
       Rdux::Result[ok: true, val: { activity_id: opts[:action].payload['activity_id'] }, result:]
     end
-
-    def self.down(payload)
-      activity = Activity.find(payload['activity_id'])
-      activity.end_at = nil
-      activity.save!
-    end
   end
 end
