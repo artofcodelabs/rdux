@@ -20,12 +20,6 @@ class CreditCard
         save_credit_card(card)
       end
 
-      def down(payload)
-        cc = CreditCard.find(payload['credit_card_id'])
-        PaymentGateway.delete_credit_card(cc.token)
-        CreditCard.find(cc.id).destroy
-      end
-
       private
 
       def validate_and_tokenize(card)
@@ -40,7 +34,7 @@ class CreditCard
 
       def save_credit_card(card)
         if card.save
-          Rdux::Result[true, { credit_card_id: card.id }, { credit_card: card }]
+          Rdux::Result[true, { credit_card: card }]
         else
           Rdux::Result[false, { errors: card.errors }]
         end
