@@ -2,13 +2,21 @@
 
 module Rdux
   class Action < ActiveRecord::Base
-    include Actionable
+    self.table_name_prefix = 'rdux_'
 
     attr_accessor :payload_unsanitized
 
-    belongs_to :rdux_failed_action, optional: true, class_name: 'Rdux::FailedAction'
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
+
+    if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+      serialize :payload, coder: JSON
+      serialize :result, coder: JSON
+      serialize :meta, coder: JSON
+    end
+
+    validates :name, presence: true
+    validates :payload, presence: true
 
     scope :ok, -> { where(ok: true) }
     scope :failed, -> { where(ok: false) }
