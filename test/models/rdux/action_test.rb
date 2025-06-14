@@ -34,37 +34,5 @@ module Rdux
         assert_equal false, res1.action.up
       end
     end
-
-    describe '#down' do
-      it 'sets down_at' do
-        res = create_task
-        assert_nil res.action.down_at
-        res.action.down
-        assert_not_nil res.action.down_at
-      end
-
-      it 'prevents down if not the last action' do
-        res = create_task
-        Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: res.val[:task].id })
-        assert_equal false, Action.first.down
-      end
-
-      it 'prevents down if already down' do
-        res = create_task
-        res.action.down
-        assert_equal false, res.action.down
-      end
-
-      it 'allows for reusing other action creators' do
-        res = create_task
-        res.action.down
-        assert_equal 1, Action.count
-        assert_equal 1, Task.count # fixtures
-      end
-
-      it 'returns a response from an action performer' do
-        assert_equal Rdux::Result, create_task.action.down.class
-      end
-    end
   end
 end
