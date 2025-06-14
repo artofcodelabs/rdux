@@ -14,7 +14,9 @@ module Rdux
       perform_action(:call, payload_unsanitized || payload, opts)
     end
 
+    # TODO: unify with #call
     def up(opts = {})
+      return false if performed?
       return false if payload_sanitized && payload_unsanitized.nil?
 
       perform_action(:up, payload_unsanitized || payload, opts)
@@ -25,6 +27,10 @@ module Rdux
     end
 
     private
+
+    def performed?
+      !ok.nil?
+    end
 
     def action_performer(meth)
       name_const = name.to_s.constantize

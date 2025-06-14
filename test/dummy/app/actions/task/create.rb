@@ -14,8 +14,7 @@ class Task
       task = user.tasks.new(payload['task'])
       if task.save
         opts[:result] = { task_id: task.id }
-        Rdux::Result[ok: true, down_payload: { user_id: user.id, task_id: task.id }, val: { task: },
-                     after_save: AFTER_SAVE]
+        Rdux::Result[ok: true, val: { task: }, after_save: AFTER_SAVE]
       else
         Rdux::Result[false, { errors: task.errors }]
       end

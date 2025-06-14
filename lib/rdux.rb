@@ -11,6 +11,7 @@ module Rdux
       res = call_call_or_up_on_action(action, opts)
       res.result ||= opts[:result]
       assign_and_persist(res, action)
+      res.after_save.call(res.action) if res.after_save && res.action
       res
     end
 
@@ -20,7 +21,7 @@ module Rdux
 
     def create_action(name, payload, opts, meta)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(ok: true, name:, payload:, meta:)
+      action = Action.new(name:, payload:, meta:)
       sanitize(action)
       action.save!
       action
@@ -36,6 +37,7 @@ module Rdux
     end
 
     def assign_and_persist(res, action)
+      action.ok = res.ok
       if res.ok
         assign_and_persist_for_ok(res, action)
       elsif res.save_failed?
@@ -47,7 +49,7 @@ module Rdux
 
     def assign_and_persist_for_ok(res, action)
       action.result = res.result
-      res.action = action.tap(&:save!)
+      res.action = action.tap(&:save!) # TODO: don't save if no changes
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
     end
 

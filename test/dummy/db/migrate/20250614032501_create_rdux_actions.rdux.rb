@@ -9,7 +9,7 @@ class CreateRduxActions < ActiveRecord::Migration[7.0]
       t.boolean :payload_sanitized, default: false, null: false
       t.column :result, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
       t.column :meta, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
-      t.column :ok, :boolean, null: false
+      t.column :ok, :boolean
 
       t.belongs_to :rdux_action, index: true, foreign_key: true
 

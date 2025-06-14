@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_153409) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_14_032501) do
   create_table "activities", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "task_id", null: false
@@ -50,7 +50,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_153409) do
     t.boolean "payload_sanitized", default: false, null: false
     t.text "result"
     t.text "meta"
-    t.boolean "ok", null: false
+    t.boolean "ok"
     t.integer "rdux_action_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

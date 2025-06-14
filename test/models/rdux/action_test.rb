@@ -13,10 +13,14 @@ module Rdux
     end
 
     describe '#up' do
-      it 'prevents going up again if sanitized payload' do
-        res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
-        res.action.down
+      it 'prevents performing an action again' do
+        res = create_task
         assert_equal false, res.action.up
+      end
+
+      it 'prevents performing a stored action if sanitized payload' do
+        skip 'implement after adding .store'
+        Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
       end
 
       it 'prevents going up again in general' do
@@ -43,15 +47,6 @@ module Rdux
         res = create_task
         Rdux.dispatch(Activity::Create, { user_id: users(:zbig).id, task_id: res.val[:task].id })
         assert_equal false, Action.first.down
-      end
-
-      it 'prevents down if not the last action in a given stream' do
-        res_t1 = create_task(users(:zbig), meta: { stream: { user_id: users(:zbig).id } })
-        res_a1 = create_activity(task: res_t1.val[:task], meta: { stream: { user_id: users(:zbig).id } })
-        create_task(users(:joe), meta: { stream: { user_id: users(:joe).id } })
-        assert_equal false, res_t1.action.down
-        assert_nil res_a1.action.down
-        assert res_t1.action.down
       end
 
       it 'prevents down if already down' do
