@@ -124,11 +124,11 @@ module Rdux
         assert_raises(ActiveRecord::RecordNotFound) do
           Rdux.dispatch(Task::Create, { user_id: 0 })
         end
-        assert_equal 0, Rdux::Action.count
-        assert_equal 1, Rdux::FailedAction.count
+        assert_equal 0, Rdux::Action.ok.count
+        assert_equal 1, Rdux::Action.failed.count
         result = { 'Exception' => { 'class' => 'ActiveRecord::RecordNotFound',
                                     'message' => "Couldn't find User with 'id'=0" } }
-        assert_equal result, Rdux::FailedAction.last.result
+        assert_equal result, Rdux::Action.failed.last.result
       end
 
       it 'sets result via opts[:result]' do

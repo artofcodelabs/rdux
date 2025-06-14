@@ -10,6 +10,9 @@ module Rdux
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
+    scope :ok, -> { where(ok: true) }
+    scope :failed, -> { where(ok: false) }
+
     def call(opts = {})
       perform_action(:call, payload_unsanitized || payload, opts)
     end
