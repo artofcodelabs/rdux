@@ -40,24 +40,22 @@ module Rdux
     end
 
     def action_performer
-      meth = :call
       name_const = name.to_s.constantize
-      return name_const if name_const.respond_to?(meth)
+      return name_const if name_const.respond_to?(:call)
       return unless name_const.is_a?(Class)
 
       obj = name_const.new
-      obj.respond_to?(meth) ? obj : nil
+      obj.respond_to?(:call) ? obj : nil
     end
 
     def perform_action(payload, opts)
-      meth = :call
       performer = action_performer
       return if performer.nil?
 
-      if opts.any? || performer.method(meth).arity.abs == 2
-        performer.public_send(meth, payload, opts.merge!(action: self))
+      if opts.any? || performer.method(:call).arity.abs == 2
+        performer.public_send(:call, payload, opts.merge!(action: self))
       else
-        performer.public_send(meth, payload)
+        performer.public_send(:call, payload)
       end
     end
 
