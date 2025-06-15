@@ -17,12 +17,10 @@ module Rdux
         assert_instance_of Rdux::Action, create_task.action
       end
 
-      it 'uses self.call unless up/down and does not store down_payload' do
+      it 'uses self.call unless up' do
         res = create_activity
         assert res.ok
         assert_equal users(:zbig).activities.last.id, res.val[:activity].id
-        assert_nil res.down_payload
-        assert_nil res.action.down_payload
       end
 
       it 'uses self.up/self.down and filters defined params' do

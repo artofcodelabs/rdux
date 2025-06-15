@@ -18,7 +18,7 @@ module Rdux
     validates :name, presence: true
     validates :payload, presence: true
 
-    scope :ok, -> { where(ok: true) }
+    scope :ok, ->(val = true) { where(ok: val) }
     scope :failed, -> { where(ok: false) }
 
     def call(opts = {})
