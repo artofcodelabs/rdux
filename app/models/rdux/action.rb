@@ -25,6 +25,7 @@ module Rdux
       return false if performed?
       return false if payload_sanitized && payload_unsanitized.nil?
 
+      opts.merge!(action: self)
       perform_action(payload_unsanitized || payload, opts)
     end
 
@@ -52,10 +53,10 @@ module Rdux
       performer = action_performer
       return if performer.nil?
 
-      if opts.any? || performer.method(:call).arity.abs == 2
-        performer.public_send(:call, payload, opts.merge!(action: self))
+      if performer.method(:call).arity.abs == 2
+        performer.call(payload, opts)
       else
-        performer.public_send(:call, payload)
+        performer.call(payload)
       end
     end
 
