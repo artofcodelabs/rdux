@@ -9,16 +9,20 @@ module Rdux
   class << self
     def dispatch(name, payload, opts = {}, meta: nil)
       action = store(name, payload, opts, meta:)
-      res = call_call_or_up_on_action(action, opts)
-      res.result ||= opts[:result]
-      assign_and_persist(res, action)
-      res.after_save.call(res.action) if res.after_save && res.action
-      res
+      process(action, opts)
     end
 
     def store(name, payload, opts = {}, meta: nil)
       (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
       Store.call(name, payload, meta)
+    end
+
+    def process(action, opts = {})
+      res = call_call_or_up_on_action(action, opts)
+      res.result ||= opts[:result]
+      assign_and_persist(res, action)
+      res.after_save.call(res.action) if res.after_save && res.action
+      res
     end
 
     alias perform dispatch
