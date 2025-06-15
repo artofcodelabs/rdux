@@ -33,25 +33,14 @@ module Rdux
 
     def assign_and_persist(res, action)
       action.ok = res.ok
-      if res.ok
-        assign_and_persist_for_ok(res, action)
-      elsif res.save_failed?
-        assign_and_persist_for_failed(res, action)
+      action.to_failed_action if res.save_failed?
+      if res.ok || res.save_failed?
+        action.result = res.result
+        res.action = action.tap(&:save!)
+        res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
       else
         action.destroy
       end
-    end
-
-    def assign_and_persist_for_ok(res, action)
-      action.result = res.result
-      res.action = action.tap(&:save!) # TODO: don't save if no changes
-      res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
-    end
-
-    def assign_and_persist_for_failed(res, action)
-      action.result = res.result
-      res.action = action.to_failed_action.tap(&:save!)
-      res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
     end
 
     def handle_exception(exc, action, result)
