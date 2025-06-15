@@ -51,17 +51,7 @@ module Rdux
     def assign_and_persist_for_failed(res, action)
       action.result = res.result
       res.action = action.to_failed_action.tap(&:save!)
-      assign_nested_responses_to_failed_action(res.action, res.nested) if res.nested
-    end
-
-    def assign_nested_responses_to_failed_action(failed_action, nested)
-      nested.each do |nested_res|
-        if nested_res.action.is_a?(Rdux::Action)
-          failed_action.rdux_actions << nested_res.action
-        else
-          failed_action.rdux_failed_actions << nested_res.action
-        end
-      end
+      res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
     end
 
     def handle_exception(exc, action, result)
