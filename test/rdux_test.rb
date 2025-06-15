@@ -99,18 +99,18 @@ module Rdux
         assert_equal ['CreditCard::Create'], res.action.rdux_actions.failed[0].rdux_actions.map(&:name)
       end
 
-      it 'calls after_save callback' do
+      it 'does not need a callback' do
         res = create_task(meta: { inc: 1 })
         assert_equal 2, res.action.meta['inc']
       end
 
-      it 'calls after_save callback for failed action' do
+      it 'does not need a callback for failed action' do
         payload = { user_id: users(:zbig).id, credit_card: {} }
         res = Rdux.perform(CreditCard::Create, payload, meta: { inc: 11 })
         assert_equal 21, res.action.meta['inc']
       end
 
-      it 'does not call after_save callback if no failed action' do
+      it 'does not call not needed callback if no failed action' do
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:credit_card][:number] = '1234'
         assert_nothing_raised do

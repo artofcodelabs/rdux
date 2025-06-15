@@ -21,7 +21,6 @@ module Rdux
       res = action.call(opts)
       res.result ||= opts[:result]
       assign_and_persist(res, action)
-      res.after_save.call(res.action) if res.after_save && res.action
       res
     rescue StandardError => e
       handle_exception(e, action, opts[:result])
