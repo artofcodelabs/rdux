@@ -8,12 +8,12 @@ require 'active_support/concern'
 module Rdux
   class << self
     def dispatch(name, payload, opts = {}, meta: nil)
-      action = store(name, payload, opts, meta:)
+      action = store(name, payload, ars: opts[:ars], meta:)
       process(action, opts)
     end
 
-    def store(name, payload, opts = {}, meta: nil)
-      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
+    def store(name, payload, ars: nil, meta: nil)
+      (ars || {}).each { |k, v| payload["#{k}_id"] = v.id }
       Store.call(name, payload, meta)
     end
 
