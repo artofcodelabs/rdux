@@ -59,12 +59,5 @@ module Rdux
         performer.call(payload)
       end
     end
-
-    def build_opts
-      nested = rdux_actions.order(:created_at)
-      {}.tap do |h|
-        h[:nested] = nested if nested.any?
-      end
-    end
   end
 end
