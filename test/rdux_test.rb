@@ -23,7 +23,7 @@ module Rdux
         assert_equal users(:zbig).activities.last.id, res.val[:activity].id
       end
 
-      it 'uses self.up/self.down and filters defined params' do
+      it 'filters defined params' do
         res = Rdux.dispatch(CreditCard::Create, TestData::Payloads.credit_card_create(users(:zbig)))
         assert res.ok
         assert_equal '4242', res.val[:credit_card].last_four

@@ -28,14 +28,6 @@ module Rdux
       perform_action(payload_unsanitized || payload, opts)
     end
 
-    # TODO: unify with #call
-    def up(opts = {})
-      return false if performed?
-      return false if payload_sanitized && payload_unsanitized.nil?
-
-      perform_action(payload_unsanitized || payload, opts)
-    end
-
     def to_failed_action
       self.ok = false
       self

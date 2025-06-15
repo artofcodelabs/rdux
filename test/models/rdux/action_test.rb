@@ -22,8 +22,8 @@ module Rdux
         user = users(:zbig)
         res1 = Rdux.dispatch(Activity::Switch, { user_id: user.id, task_id: create_task(user).val[:task].id })
         res2 = Rdux.dispatch(Activity::Stop, { user_id: user.id, activity_id: res1.val[:activity].id })
-        assert_equal false, res2.action.up
-        assert_equal false, res1.action.up
+        assert_equal false, res2.action.call
+        assert_equal false, res1.action.call
       end
     end
   end

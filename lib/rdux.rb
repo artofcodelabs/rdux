@@ -18,7 +18,7 @@ module Rdux
     end
 
     def process(action, opts = {})
-      res = call_call_or_up_on_action(action, opts)
+      res = call_on_action(action, opts)
       res.result ||= opts[:result]
       assign_and_persist(res, action)
       res.after_save.call(res.action) if res.after_save && res.action
@@ -29,11 +29,8 @@ module Rdux
 
     private
 
-    def call_call_or_up_on_action(action, opts)
-      res = action.call(opts)
-      return res if res
-
-      action.up(opts)
+    def call_on_action(action, opts)
+      action.call(opts)
     rescue StandardError => e
       handle_exception(e, action, opts[:result])
     end
