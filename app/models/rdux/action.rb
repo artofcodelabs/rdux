@@ -25,7 +25,7 @@ module Rdux
       return false if performed?
       return false if payload_sanitized && payload_unsanitized.nil?
 
-      perform_action(:call, payload_unsanitized || payload, opts)
+      perform_action(payload_unsanitized || payload, opts)
     end
 
     # TODO: unify with #call
@@ -33,7 +33,7 @@ module Rdux
       return false if performed?
       return false if payload_sanitized && payload_unsanitized.nil?
 
-      perform_action(:up, payload_unsanitized || payload, opts)
+      perform_action(payload_unsanitized || payload, opts)
     end
 
     def to_failed_action
@@ -56,7 +56,8 @@ module Rdux
       obj.respond_to?(meth) ? obj : nil
     end
 
-    def perform_action(meth, payload, opts)
+    def perform_action(payload, opts)
+      meth = :call
       performer = action_performer(meth)
       return if performer.nil?
 
