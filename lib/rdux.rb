@@ -1,13 +1,14 @@
 # frozen_string_literal: true
 
 require 'rdux/engine'
+require 'rdux/store'
 require 'rdux/result'
 require 'active_support/concern'
 
 module Rdux
   class << self
-    def dispatch(action_name, payload, opts = {}, meta: nil)
-      action = create_action(action_name, payload, opts, meta)
+    def dispatch(name, payload, opts = {}, meta: nil)
+      action = store(name, payload, opts, meta:)
       res = call_call_or_up_on_action(action, opts)
       res.result ||= opts[:result]
       assign_and_persist(res, action)
@@ -15,17 +16,14 @@ module Rdux
       res
     end
 
+    def store(name, payload, opts = {}, meta: nil)
+      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
+      Store.call(name, payload, meta)
+    end
+
     alias perform dispatch
 
     private
-
-    def create_action(name, payload, opts, meta)
-      (opts[:ars] || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      action = Action.new(name:, payload:, meta:)
-      sanitize(action)
-      action.save!
-      action
-    end
 
     def call_call_or_up_on_action(action, opts)
       res = action.call(opts)
@@ -67,14 +65,6 @@ module Rdux
           failed_action.rdux_failed_actions << nested_res.action
         end
       end
-    end
-
-    def sanitize(action)
-      param_filter = ActiveSupport::ParameterFilter.new(Rails.application.config.filter_parameters)
-      payload_sanitized = param_filter.filter(action.payload)
-      action.payload_sanitized = action.payload != payload_sanitized
-      action.payload_unsanitized = action.payload if action.payload_sanitized
-      action.payload = payload_sanitized
     end
 
     def handle_exception(exc, action, result)
