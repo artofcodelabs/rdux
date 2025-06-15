@@ -22,6 +22,9 @@ module Rdux
     scope :failed, -> { where(ok: false) }
 
     def call(opts = {})
+      return false if performed?
+      return false if payload_sanitized && payload_unsanitized.nil?
+
       perform_action(:call, payload_unsanitized || payload, opts)
     end
 

@@ -2,7 +2,7 @@
 
 class Task
   module Delete
-    def self.up(payload)
+    def self.call(payload)
       user = User.find(payload['user_id'])
       task = user.tasks.find(payload['task_id'])
       task.destroy

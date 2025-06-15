@@ -9,7 +9,7 @@ class Task
       end
     }
 
-    def up(payload, opts)
+    def call(payload, opts)
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save

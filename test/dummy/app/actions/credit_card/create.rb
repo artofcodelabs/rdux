@@ -10,7 +10,7 @@ class CreditCard
     }
 
     class << self
-      def up(payload, opts)
+      def call(payload, opts)
         user = opts[:user] || User.find(payload['user_id'])
         card = user.credit_cards.new(payload['credit_card'])
         res = validate_and_tokenize(card)
