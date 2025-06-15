@@ -47,7 +47,8 @@ module Rdux
       !ok.nil?
     end
 
-    def action_performer(meth)
+    def action_performer
+      meth = :call
       name_const = name.to_s.constantize
       return name_const if name_const.respond_to?(meth)
       return unless name_const.is_a?(Class)
@@ -58,7 +59,7 @@ module Rdux
 
     def perform_action(payload, opts)
       meth = :call
-      performer = action_performer(meth)
+      performer = action_performer
       return if performer.nil?
 
       if opts.any? || performer.method(meth).arity.abs == 2
