@@ -59,9 +59,9 @@ module Rdux
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:credit_card][:number] = '123'
         Rdux.dispatch(CreditCard::Create, payload, meta: { foo: 'bar', stream: 'baz' })
-        assert_equal 1, Rdux::FailedAction.count
-        assert_equal 0, Rdux::Action.count
-        fa = Rdux::FailedAction.last
+        assert_equal 1, Rdux::Action.failed.count
+        assert_equal 0, Rdux::Action.ok.count
+        fa = Rdux::Action.ok(false).last
         assert_equal '[FILTERED]', fa.payload['credit_card']['number']
         assert_equal({ 'foo' => 'bar', 'stream' => 'baz' }, fa.meta)
       end
@@ -70,8 +70,8 @@ module Rdux
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
         Rdux.dispatch(CreditCard::Charge, payload)
-        assert_equal 1, Rdux::FailedAction.count
-        assert_equal 1, Rdux::Action.count
+        assert_equal 1, Rdux::Action.ok(false).count
+        assert_equal 1, Rdux::Action.ok.count
       end
 
       it 'saves result set via opts if exeption is raised' do
@@ -92,11 +92,11 @@ module Rdux
         payload[:amount] = 99.99
         payload[:plan] = 'gold'
         res = Rdux.dispatch(Plan::Create, payload, { user: users(:zbig) })
-        assert_equal 2, Rdux::FailedAction.count
-        assert_equal 1, Rdux::Action.count
+        assert_equal 2, Rdux::Action.ok(false).count
+        assert_equal 1, Rdux::Action.ok.count
         assert_equal 'Plan::Create', res.action.name
-        assert_equal ['CreditCard::Charge'], res.action.rdux_failed_actions.map(&:name)
-        assert_equal ['CreditCard::Create'], res.action.rdux_failed_actions[0].rdux_actions.map(&:name)
+        assert_equal ['CreditCard::Charge'], res.action.rdux_actions.failed.map(&:name)
+        assert_equal ['CreditCard::Create'], res.action.rdux_actions.failed[0].rdux_actions.map(&:name)
       end
 
       it 'calls after_save callback' do
