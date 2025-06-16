@@ -26,7 +26,7 @@ module Rdux
       return false if payload_sanitized && payload_unsanitized.nil?
 
       opts.merge!(action: self)
-      perform_action(payload_unsanitized || payload, opts)
+      perform_action(opts)
     end
 
     def to_failed_action
@@ -49,14 +49,14 @@ module Rdux
       obj.respond_to?(:call) ? obj : nil
     end
 
-    def perform_action(payload, opts)
+    def perform_action(opts)
       performer = action_performer
       return if performer.nil?
 
       if performer.method(:call).arity.abs == 2
-        performer.call(payload, opts)
+        performer.call(payload_unsanitized || payload, opts)
       else
-        performer.call(payload)
+        performer.call(payload_unsanitized || payload)
       end
     end
   end
