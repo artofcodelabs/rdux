@@ -22,6 +22,7 @@ module Rdux
       res.result ||= opts[:result]
       return res if destroy_action(res, action)
 
+      action.to_failed_action if res.save_failed?
       assign_to_action(res, action)
       persist(res, action)
       res
@@ -41,7 +42,6 @@ module Rdux
 
     def assign_to_action(res, action)
       action.ok = res.ok
-      action.to_failed_action if res.save_failed?
       action.result = res.result
     end
 
