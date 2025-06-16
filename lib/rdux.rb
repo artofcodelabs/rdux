@@ -20,7 +20,8 @@ module Rdux
     def process(action, opts = {})
       res = action.call(opts)
       res.result ||= opts[:result]
-      assign_and_persist(res, action)
+      assign(res, action)
+      persist(res, action)
       res
     rescue StandardError => e
       handle_exception(e, action, opts[:result])
@@ -30,11 +31,14 @@ module Rdux
 
     private
 
-    def assign_and_persist(res, action)
+    def assign(res, action)
       action.ok = res.ok
       action.to_failed_action if res.save_failed?
+      action.result = res.result
+    end
+
+    def persist(res, action)
       if res.ok || res.save_failed?
-        action.result = res.result
         res.action = action.tap(&:save!)
         res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
       else
