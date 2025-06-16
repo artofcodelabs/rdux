@@ -16,11 +16,9 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 **Key Features**
 
 * **Audit Logging** 👉 Rdux stores sanitized input data, the name of module or class (action performer) responsible for processing them, processing results, and additional metadata in the database.
-* **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. `Rdux::Action` is converted to the `Rdux::FailedAction` when it fails. These models can be nested, allowing for complex action structures.
-* **Revert and Retry** 👉 `Rdux::Action` can be reverted. `Rdux::FailedAction` retains the input data and processing results necessary for implementing custom mechanisms to retry failed actions.
-* **Exception Handling and Recovery** 👉 Rdux automatically creates a `Rdux::FailedAction` when an exception occurs during action execution. It retains the `up_payload` and allows you to capture additional data using `opts[:up_result]`, ensuring all necessary information is available for retrying the action.
+* **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. This model can be nested, allowing for complex action structures.
+* **Exception Handling and Recovery** 👉 Rdux automatically creates a `Rdux::Action` record when an exception occurs during action execution. It retains the `payload` and allows you to capture additional data using `opts[:result]`, ensuring all necessary information is available for retrying the action.
 * **Metadata** 👉 Metadata can include the ID of the authenticated resource responsible for performing a given action, as well as resource IDs from external systems related to the action. This creates a clear audit trail of who executed each action and on whose behalf.
-* **Streams** 👉 Rdux enables the identification of action chains (streams) by utilizing resource IDs stored in metadata. This makes it easy to query and track related actions.
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
 
@@ -94,8 +92,8 @@ Rdux.perform(
 
 ### 🕵️‍♀️ Processing an action
 
-Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.  
-This method must return a `Rdux::Result` `struct`.  
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.
+This method must return a `Rdux::Result` `struct`.
 Optionally, an action can implement a class or instance method `down` to specify how to revert it.
 
 #### Action Structure:
@@ -146,10 +144,10 @@ end
 
 #### Suggested Directory Structure:
 
-The location that is often used for entities like actions accross code bases is `app/services`.  
-This directory is de facto the bag of random objects.  
-I'd recomment to place actions inside `app/actions` for better organization and consistency.  
-Actions are consistent in terms of structure, input and output data.  
+The location that is often used for entities like actions accross code bases is `app/services`.
+This directory is de facto the bag of random objects.
+I'd recomment to place actions inside `app/actions` for better organization and consistency.
+Actions are consistent in terms of structure, input and output data.
 They are good canditates to create a new layer in Rails apps.
 
 Structure:
@@ -203,7 +201,7 @@ Arguments:
 
 ### ⏮️ Reverting an Action
 
-To revert an action, call the `down` method on the persisted in DB `Rdux::Action` instance.  
+To revert an action, call the `down` method on the persisted in DB `Rdux::Action` instance.
 The `Rdux::Action` must have a `down_payload` defined and the action (action performer) must have the `down` method implemented.
 
 ![Revert action](docs/down.png)
@@ -241,18 +239,18 @@ res.action.down
 
 ### 😷 Sanitization
 
-When `Rdux.perform` is called, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.  
-The action performer’s `up` or `call` method receives the unsanitized version.  
+When `Rdux.perform` is called, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.
+The action performer’s `up` or `call` method receives the unsanitized version.
 Note that once the `up_payload` is sanitized, the `Rdux::Action` cannot be retried by calling the `#up` method.
 
 ### 🗣️ Queries
 
-Most likely, it won't be necessary to save a `Rdux::Action` for every request a Rails app receives.  
-The suggested approach is to save `Rdux::Action`s for Create, Update, and Delete (CUD) operations.  
-This approach organically creates a new layer - queries in addition to actions.  
+Most likely, it won't be necessary to save a `Rdux::Action` for every request a Rails app receives.
+The suggested approach is to save `Rdux::Action`s for Create, Update, and Delete (CUD) operations.
+This approach organically creates a new layer - queries in addition to actions.
 Thus, it is required to call `Rdux.perform` only for actions.
 
-One approach is to create a `perform` method that invokes either `Rdux.perform` or a query, depending on the presence of `action` or `query` keywords.  
+One approach is to create a `perform` method that invokes either `Rdux.perform` or a query, depending on the presence of `action` or `query` keywords.
 This method can also handle setting `meta` attributes, performing parameter validation, and more.
 
 Example:
@@ -277,8 +275,8 @@ end
 
 ### 🕵️ Indexing
 
-Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.  
-Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.  
+Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.
+Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.
 You can inherit from them and extend.
 
 Example:
@@ -290,10 +288,10 @@ end
 
 ### 🚑 Recovering from Exceptions
 
-Rdux creates a `Rdux::FailedAction` when an exception is raised during the execution of an action.  
-The `up_payload` is retained, but having only the input data is often not enough to retry an action.  
-It is crucial to capture data obtained during the action’s execution, up until the exception occurred.  
-This can be done by using `opts[:up_result]` to store all necessary data incrementally.  
+Rdux creates a `Rdux::FailedAction` when an exception is raised during the execution of an action.
+The `up_payload` is retained, but having only the input data is often not enough to retry an action.
+It is crucial to capture data obtained during the action’s execution, up until the exception occurred.
+This can be done by using `opts[:up_result]` to store all necessary data incrementally.
 The assigned data will then be available as the `up_result` argument in the `Rdux::FailedAction`.
 
 Example:
