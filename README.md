@@ -149,13 +149,9 @@ Definition:
 
 ```ruby
 module Rdux
-  Result = Struct.new(:ok, :down_payload, :val, :up_result, :save, :after_save, :nested, :action) do
-    def val
-      self[:val] || down_payload
-    end
-
+  Result = Struct.new(:ok, :val, :result, :save, :nested, :action) do
     def save_failed?
-      ok == false && save
+      ok == false && save ? true : false
     end
   end
 end
@@ -164,11 +160,9 @@ end
 Arguments:
 
 * `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
-* `down_payload` (Hash): Passed to the action performer’s `down` method during reversion (`down` method is called on `Rdux::Action`). It does not have to be defined if an action performer does not implement the `down` method. `down_payload` is saved in the DB.
-* `val` (Hash): Contains different returned data than `down_payload`.
-* `up_result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
+* `val` (Hash): returned data.
+* `result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
 * `save` (Boolean): If `true` and `ok` is `false`, the action is saved as a `Rdux::FailedAction`.
-* `after_save` (Proc): Called just before the `dispatch` method returns the `Rdux::Result` with `Rdux::Action` or `Rdux::FailedAction` as an argument.
 * `nested` (Array of `Rdux::Result`): `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by the `dispatch` value (`Rdux::Result`) to the `:nested` array
 * `action`: Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
 
