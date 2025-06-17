@@ -90,49 +90,26 @@ Rdux.perform(
 ### 🕵️‍♀️ Processing an action
 
 Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call`.
-This method must return a `Rdux::Result` `struct`.
-
-#### Action Structure:
-
-* `call` or `up` method: Accepts a required `payload` and an optional `opts` argument. This method processes the action and returns a `Rdux::Result`.
-* `down` method: Accepts the deserialized `down_payload` which is one of arguments of the `Rdux::Result` `struct` returned by the `up` method on success and saved in DB. `down` method can optionally accept the 2nd argument (Hash) which `:nested` key contains nested `Rdux::Action`s
+This method accepts a required `payload` and an optional `opts` argument.
+`call` method processes the action and must return a `Rdux::Result` struct.
 
 See [🚛 Dispatching an action](#-dispatching-an-action) section.
 
-Examples:
+Example:
 
 ```ruby
 # app/actions/task/create.rb
 
 class Task
   class Create
-    def up(payload, opts)
+    def call(payload, opts)
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save
-        Rdux::Result[ok: true, down_payload: { user_id: user.id, task_id: task.id }, val: { task: }]
+        Rdux::Result[ok: true, val: { task: }]
       else
         Rdux::Result[false, { errors: task.errors }]
       end
-    end
-
-    def down(payload)
-      Delete.up(payload)
-    end
-  end
-end
-```
-
-```ruby
-# app/actions/task/delete.rb
-
-class Task
-  module Delete
-    def self.up(payload)
-      user = User.find(payload['user_id'])
-      task = user.tasks.find(payload['task_id'])
-      task.destroy
-      Rdux::Result[true, { task: task.attributes }]
     end
   end
 end
