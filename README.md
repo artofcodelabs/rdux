@@ -89,9 +89,8 @@ Rdux.perform(
 
 ### 🕵️‍♀️ Processing an action
 
-Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call` or `up`.
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call`.
 This method must return a `Rdux::Result` `struct`.
-Optionally, an action can implement a class or instance method `down` to specify how to revert it.
 
 #### Action Structure:
 
