@@ -161,10 +161,10 @@ Arguments:
 
 * `ok` (Boolean): Indicates whether the action was successful. If `true`, the `Rdux::Action` is persisted in the database.
 * `val` (Hash): returned data.
-* `result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc.
-* `save` (Boolean): If `true` and `ok` is `false`, the action is saved as a `Rdux::FailedAction`.
-* `nested` (Array of `Rdux::Result`): `Rdux::Action` can be connected with other `rdux_actions`. `Rdux::FailedAction` can be connected with other `rdux_actions` and `rdux_failed_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `up` or `call` method and add the returned by the `dispatch` value (`Rdux::Result`) to the `:nested` array
-* `action`: Rdux assigns `Rdux::Action` or `Rdux::FailedAction` to this argument
+* `result` (Hash): Stores data related to the action’s execution, such as created record IDs, DB changes, responses from 3rd parties, etc. that will be persisted as `Rdux::Action#result`.
+* `save` (Boolean): If `true` and `ok` is `false`, the action is still persisted in the database.
+* `nested` (Array of `Rdux::Result`): `Rdux::Action` can be connected with other `rdux_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `call` method and add the returned by the `dispatch` value (`Rdux::Result`) to the `:nested` array
+* `action`: Rdux assigns persisted `Rdux::Action` to this argument
 
 ### ⏮️ Reverting an Action
 
