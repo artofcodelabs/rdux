@@ -22,7 +22,6 @@ module Rdux
       res.result ||= opts[:result]
       return res if destroy_action(res, action)
 
-      action.to_failed_action if res.save_failed?
       assign_to_action(res, action)
       persist(res, action)
       res
@@ -51,7 +50,7 @@ module Rdux
     end
 
     def handle_exception(exc, action, result)
-      action.to_failed_action
+      action.ok = false
       action.result ||= result || {}
       action.result.merge!({ 'Exception' => {
                              class: exc.class.name,

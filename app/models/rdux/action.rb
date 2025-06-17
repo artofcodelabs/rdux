@@ -29,10 +29,6 @@ module Rdux
       perform_action(opts)
     end
 
-    def to_failed_action
-      self.ok = false
-    end
-
     private
 
     def performed?
