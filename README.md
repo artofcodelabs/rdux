@@ -231,6 +231,7 @@ Depending on your use case, it’s recommended to create indices, especially whe
 You can inherit from it and extend.
 
 Example:
+
 ```ruby
 class Action < Rdux::Action
   include Actionable
@@ -246,6 +247,7 @@ This can be done by using `opts[:result]` to store all necessary data incrementa
 The assigned data will then be available as the `Rdux::Action#result` attribute.
 
 Example:
+
 ```ruby
 class CreditCard
   class Charge
