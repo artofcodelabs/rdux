@@ -239,11 +239,11 @@ end
 
 ### 🚑 Recovering from Exceptions
 
-Rdux creates a `Rdux::FailedAction` when an exception is raised during the execution of an action.
-The `up_payload` is retained, but having only the input data is often not enough to retry an action.
+Rdux captures exceptions raised during the execution of an action and sets the `Rdux::Action#ok` attribute to `false`.
+The `payload` is retained, but having only the input data is often not enough to retry an action.
 It is crucial to capture data obtained during the action’s execution, up until the exception occurred.
-This can be done by using `opts[:up_result]` to store all necessary data incrementally.
-The assigned data will then be available as the `up_result` argument in the `Rdux::FailedAction`.
+This can be done by using `opts[:result]` to store all necessary data incrementally.
+The assigned data will then be available as the `Rdux::Action#result` attribute.
 
 Example:
 ```ruby
@@ -254,7 +254,7 @@ class CreditCard
         create_res = create(payload.slice('user_id', 'credit_card'), opts.slice(:user))
         return create_res unless create_res.ok
 
-        opts[:up_result] = { credit_card_create_action_id: create_res.action.id }
+        opts[:result] = { credit_card_create_action_id: create_res.action.id }
         charge_id = PaymentGateway.charge(create_res.val[:credit_card].token, payload['amount'])[:id]
         if charge_id.nil?
           Rdux::Result[ok: false, val: { errors: { base: 'Invalid credit card' } }, save: true,
@@ -268,9 +268,7 @@ class CreditCard
 
       def create(payload, opts)
         res = Rdux.perform(Create, payload, opts)
-        return res if res.ok
-
-        Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true, nested: [res]]
+        res.ok ? res : Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true]
       end
     end
   end
