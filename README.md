@@ -226,9 +226,9 @@ end
 
 ### 🕵️ Indexing
 
-Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.
-Both `Rdux::Action` and `Rdux::FailedAction` are standard ActiveRecord models.
-You can inherit from them and extend.
+Depending on your use case, it’s recommended to create indices, especially when using PostgreSQL and querying JSONB columns.\
+`Rdux::Action` is a standard ActiveRecord model.
+You can inherit from it and extend.
 
 Example:
 ```ruby
