@@ -191,9 +191,8 @@ res.action
 
 ### 😷 Sanitization
 
-When `Rdux.perform` is called, the `up_payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.
-The action performer’s `up` or `call` method receives the unsanitized version.
-Note that once the `up_payload` is sanitized, the `Rdux::Action` cannot be retried by calling the `#up` method.
+When `Rdux.perform` is called, the `payload` is sanitized using `Rails.application.config.filter_parameters` before being saved to the database.
+The action performer’s `call` method receives the unsanitized version.
 
 ### 🗣️ Queries
 
