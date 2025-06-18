@@ -166,15 +166,6 @@ Arguments:
 * `nested` (Array of `Rdux::Result`): `Rdux::Action` can be connected with other `rdux_actions`. To establish an association, a given action must `Rdux.dispatch` other actions in the `call` method and add the returned by the `dispatch` value (`Rdux::Result`) to the `:nested` array
 * `action`: Rdux assigns persisted `Rdux::Action` to this argument
 
-### ⏮️ Reverting an Action
-
-To revert an action, call the `down` method on the persisted in DB `Rdux::Action` instance.
-The `Rdux::Action` must have a `down_payload` defined and the action (action performer) must have the `down` method implemented.
-
-![Revert action](docs/down.png)
-
-The `down_at` attribute is set upon successful reversion. Actions cannot be reverted if there are newer, unreverted actions in the same stream (if defined) or in general. See `meta` in [🚛 Dispatching an action](#-dispatching-an-action) section.
-
 ### 🗿 Data model
 
 ```ruby
