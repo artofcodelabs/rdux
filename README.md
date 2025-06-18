@@ -180,19 +180,13 @@ res.action
 # #<Rdux::Action:0x000000011c4d8e98
 #   id: 1,
 #   name: "Task::Create",
-#   up_payload: {"task"=>{"name"=>"Foo bar baz"}, "user_id"=>159163583},
-#   down_payload: {"task_id"=>207620945},
-#   down_at: nil,
-#   up_payload_sanitized: false,
-#   up_result: nil,
+#   payload: {"task"=>{"name"=>"Foo bar baz"}, "user_id"=>159163583},
+#   payload_sanitized: false,
+#   result: nil,
 #   meta: {},
-#   stream_hash: nil,
 #   rdux_action_id: nil,
-#   rdux_failed_action_id: nil,
 #   created_at: Fri, 28 Jun 2024 21:35:36.838898000 UTC +00:00,
 #   updated_at: Fri, 28 Jun 2024 21:35:36.839728000 UTC +00:00>>
-
-res.action.down
 ```
 
 ### 😷 Sanitization
