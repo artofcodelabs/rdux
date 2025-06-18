@@ -21,9 +21,7 @@ class CreditCard
 
       def create(payload, opts)
         res = Rdux.perform(Create, payload, opts)
-        return res if res.ok
-
-        Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true, nested: [res]]
+        res.ok ? res : Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true]
       end
     end
   end
