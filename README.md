@@ -91,6 +91,7 @@ Rdux.perform(
 
 Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call`.
 This method accepts a required `payload` and an optional `opts` argument.
+`opts[:action]` stores the Active Record object.
 `call` method processes the action and must return a `Rdux::Result` struct.
 
 See [🚛 Dispatching an action](#-dispatching-an-action) section.
@@ -115,7 +116,7 @@ class Task
 end
 ```
 
-#### Suggested Directory Structure:
+#### Suggested Directory Structure
 
 The location that is often used for entities like actions accross code bases is `app/services`.
 This directory is de facto the bag of random objects.
