@@ -5,7 +5,7 @@ class Task
     def call(payload, opts)
       task = init_task(payload, opts)
       if task.save
-        opts[:result] = { task_id: task.id }
+        opts[:action].result = { task_id: task.id }
         opts[:action].meta['inc'] += 1 if opts[:action].meta['inc']
         Rdux::Result[ok: true, val: { task: }]
       else

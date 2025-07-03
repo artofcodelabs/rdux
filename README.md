@@ -17,7 +17,7 @@ Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sou
 
 * **Audit Logging** 👉 Rdux stores sanitized input data, the name of module or class (action performer) responsible for processing them, processing results, and additional metadata in the database.
 * **Model Representation** 👉 Before action is executed it gets stored in the database through the `Rdux::Action` model. This model can be nested, allowing for complex action structures.
-* **Exception Handling and Recovery** 👉 Rdux automatically creates a `Rdux::Action` record when an exception occurs during action execution. It retains the `payload` and allows you to capture additional data using `opts[:result]`, ensuring all necessary information is available for retrying the action.
+* **Exception Handling and Recovery** 👉 Rdux automatically creates a `Rdux::Action` record when an exception occurs during action execution. It retains the `payload` and allows you to capture additional data using `opts[:action].result`, ensuring all necessary information is available for retrying the action.
 * **Metadata** 👉 Metadata can include the ID of the authenticated resource responsible for performing a given action, as well as resource IDs from external systems related to the action. This creates a clear audit trail of who executed each action and on whose behalf.
 
 Rdux is designed to integrate seamlessly with your existing Rails application, offering a straightforward and powerful solution for managing and auditing key actions.
@@ -244,8 +244,7 @@ end
 Rdux captures exceptions raised during the execution of an action and sets the `Rdux::Action#ok` attribute to `false`.
 The `payload` is retained, but having only the input data is often not enough to retry an action.
 It is crucial to capture data obtained during the action’s execution, up until the exception occurred.
-This can be done by using `opts[:result]` to store all necessary data incrementally.
-The assigned data will then be available as the `Rdux::Action#result` attribute.
+This can be done by using `opts[:action].result` attribute to store all necessary data incrementally.
 
 Example:
 
@@ -257,7 +256,7 @@ class CreditCard
         create_res = create(payload.slice('user_id', 'credit_card'), opts.slice(:user))
         return create_res unless create_res.ok
 
-        opts[:result] = { credit_card_create_action_id: create_res.action.id }
+        opts[:action].result = { credit_card_create_action_id: create_res.action.id }
         charge_id = PaymentGateway.charge(create_res.val[:credit_card].token, payload['amount'])[:id]
         if charge_id.nil?
           Rdux::Result[ok: false, val: { errors: { base: 'Invalid credit card' } }, save: true,

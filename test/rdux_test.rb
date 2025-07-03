@@ -129,9 +129,9 @@ module Rdux
         assert_equal result, Rdux::Action.failed.last.result
       end
 
-      it 'sets result via opts[:result]' do
+      it 'sets result via opts[:action].result' do
         res = create_task
-        assert_equal({ task_id: res.val[:task].id }, res.result)
+        assert_nil(res.result)
         assert_equal({ 'task_id' => res.val[:task].id }, res.action.result)
       end
     end
