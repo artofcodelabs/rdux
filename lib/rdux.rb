@@ -19,14 +19,13 @@ module Rdux
 
     def process(action, opts = {})
       res = action.call(opts)
-      res.result ||= opts[:result]
       return res if destroy_action(res, action)
 
       assign_to_action(res, action)
       persist(res, action)
       res
     rescue StandardError => e
-      handle_exception(e, action, opts[:result])
+      handle_exception(e, action)
     end
 
     alias perform dispatch
@@ -41,7 +40,10 @@ module Rdux
 
     def assign_to_action(res, action)
       action.ok = res.ok
-      action.result = res.result
+      return unless res.result
+
+      action.result ||= {}
+      action.result.merge!(res.result)
     end
 
     def persist(res, action)
@@ -49,9 +51,9 @@ module Rdux
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
     end
 
-    def handle_exception(exc, action, result)
+    def handle_exception(exc, action)
       action.ok = false
-      action.result ||= result || {}
+      action.result ||= {}
       action.result.merge!({ 'Exception' => {
                              class: exc.class.name,
                              message: exc.message
