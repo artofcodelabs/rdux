@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.version     = Rdux::VERSION
   spec.authors     = ['Zbigniew Humeniuk']
   spec.email       = ['hello@artofcode.co']
-  spec.homepage    = 'https://artofcode.co'
+  spec.homepage    = 'https://github.com/artofcodelabs/rdux'
   spec.summary     = 'A Minimal Event Sourcing Plugin for Rails'
   spec.description = <<~DESC
     Rdux is a lightweight, minimalistic Rails plugin designed to introduce event sourcing and audit logging capabilities to your Rails application.#{' '}
@@ -25,10 +25,10 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'rails', '>= 7.0', '< 9.0'
 
-  spec.add_development_dependency 'pg', '>= 1.5.9'
-  spec.add_development_dependency 'rubocop', '>= 1.66.1'
-  spec.add_development_dependency 'rubocop-rails', '>= 2.26.0'
-  spec.add_development_dependency 'sqlite3', '>= 2.1.0'
+  spec.add_development_dependency 'pg', '>= 1.6.2'
+  spec.add_development_dependency 'rubocop', '>= 1.80.2'
+  spec.add_development_dependency 'rubocop-rails', '>= 2.33.3'
+  spec.add_development_dependency 'sqlite3', '>= 2.7.4'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
