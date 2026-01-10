@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_14_032501) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_09_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,9 +55,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_032501) do
     t.jsonb "meta"
     t.boolean "ok"
     t.bigint "rdux_action_id"
+    t.bigint "rdux_process_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
+    t.index ["rdux_process_id"], name: "index_rdux_actions_on_rdux_process_id"
+  end
+
+  create_table "rdux_processes", force: :cascade do |t|
+    t.string "name"
+    t.jsonb "steps", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "tasks", force: :cascade do |t|
@@ -79,5 +88,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_14_032501) do
   add_foreign_key "credit_cards", "users"
   add_foreign_key "plans", "users"
   add_foreign_key "rdux_actions", "rdux_actions"
+  add_foreign_key "rdux_actions", "rdux_processes"
   add_foreign_key "tasks", "users"
 end

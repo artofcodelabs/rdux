@@ -277,6 +277,26 @@ class CreditCard
 end
 ```
 
+## Process
+
+Process 👉 a series of actions or steps taken in order to achieve a particular end
+
+TODO:
+[] Rdux::Process has many Rdux::Action(s)
+  [] inside a given action (performer) it should be possible to do rdux_action.process.actions (us their result)
+[] Persist STEPS on Rdux::Process#steps:jsonb/text
+
+```ruby
+class Subscription::Create
+  # sugestion
+  # [] it would be good to use sytax that can distinguish the order of steps but also signalizing which steps can bo executed immediately/in parallel
+  STEPS = [
+    [first_action, second_action],
+    third_action
+  ]
+end
+```
+
 ## 👩🏽‍🔬 Testing
 
 ### 💉 Setup
