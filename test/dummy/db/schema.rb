@@ -61,6 +61,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_09_000001) do
 
   create_table "rdux_processes", force: :cascade do |t|
     t.string "name"
+    t.boolean "ok"
     t.text "steps", default: "[]", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

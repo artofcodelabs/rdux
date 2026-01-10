@@ -55,15 +55,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_09_000001) do
     t.jsonb "meta"
     t.boolean "ok"
     t.bigint "rdux_action_id"
-    t.bigint "rdux_process_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "rdux_process_id"
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
     t.index ["rdux_process_id"], name: "index_rdux_actions_on_rdux_process_id"
   end
 
   create_table "rdux_processes", force: :cascade do |t|
     t.string "name"
+    t.boolean "ok"
     t.jsonb "steps", default: [], null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

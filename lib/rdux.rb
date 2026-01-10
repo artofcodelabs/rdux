@@ -30,6 +30,13 @@ module Rdux
 
     alias perform dispatch
 
+    def start(process)
+      process = process.to_s.constantize unless process.is_a?(Class)
+      steps = process.const_defined?(:STEPS, false) ? process.const_get(:STEPS, false) : []
+
+      Result[ok: true, val: { process: Rdux::Process.create!(name: process.to_s, steps:) }]
+    end
+
     private
 
     def destroy_action(res, action)
