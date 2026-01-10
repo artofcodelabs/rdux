@@ -281,19 +281,38 @@ end
 
 Process 👉 a series of actions or steps taken in order to achieve a particular end
 
-TODO:
-[] Rdux::Process has many Rdux::Action(s)
-  [] inside a given action (performer) it should be possible to do rdux_action.process.actions (us their result)
-[] Persist STEPS on Rdux::Process#steps:jsonb/text
+`Rdux::Process` is a persisted model that groups many `Rdux::Action`s.
+It also persists an ordered list of `steps` (jsonb/text), which can encode sequential and parallel execution.
+
+Key points:
+
+* `Rdux::Process` **has many** `Rdux::Action`s (`process.actions`)
+* `Rdux::Action` **belongs to** a `process` (`action.process`)
+* `Rdux.start(ProcessClass, ...)` starts a process (a PORO with a `STEPS` constant) and **automatically propagates**
+  the process to any nested actions executed during that run
+* Inside an action performer you can reach the current persisted action via `opts[:action]`
+  and then traverse: `opts[:action].process.actions` (and their `result`)
+
+Example:
 
 ```ruby
 class Subscription::Create
-  # sugestion
-  # [] it would be good to use sytax that can distinguish the order of steps but also signalizing which steps can bo executed immediately/in parallel
   STEPS = [
-    [first_action, second_action],
-    third_action
+    # can be executed in parallel
+    ['CreditCard::Create', 'Subscription::Preview'],
+    # then
+    'Plan::Create'
   ]
+end
+
+start_res = Rdux.start(Subscription::Create, payload, { user: current_user })
+process = start_res.val[:process]
+results = start_res.val[:results]
+
+# later, from any performer:
+def self.call(payload, opts)
+  results = opts[:action].process.actions.order(:id).pluck(:result)
+  # ...
 end
 ```
 
