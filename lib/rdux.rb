@@ -31,10 +31,10 @@ module Rdux
     alias perform dispatch
 
     def start(process)
-      process = process.to_s.constantize unless process.is_a?(Class)
-      steps = process.const_defined?(:STEPS, false) ? process.const_get(:STEPS, false) : []
-
-      Result[ok: true, val: { process: Rdux::Process.create!(name: process.to_s, steps:) }]
+      Result[
+        ok: true,
+        val: { process: Rdux::Process.create!(name: process.to_s, steps: process::STEPS) }
+      ]
     end
 
     private

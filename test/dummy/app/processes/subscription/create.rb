@@ -2,6 +2,6 @@
 
 module Subscription
   class Create
-    STEPS = [].freeze
+    STEPS = [CreditCard::Create].freeze
   end
 end

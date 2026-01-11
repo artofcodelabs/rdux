@@ -298,10 +298,7 @@ Example:
 ```ruby
 class Subscription::Create
   STEPS = [
-    # can be executed in parallel
-    ['CreditCard::Create', 'Subscription::Preview'],
-    # then
-    'Plan::Create'
+    CreditCard::Create
   ]
 end
 
