@@ -2,7 +2,7 @@
 
 module Processes
   module Subscription
-    class Create
+    module Create
       STEPS = [
         ::Subscription::Preview,
         # Customer::Create,

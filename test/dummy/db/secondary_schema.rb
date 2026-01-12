@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_09_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_12_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,11 +40,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_09_000001) do
 
   create_table "plans", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "ext_charge_id"
     t.string "name"
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["user_id"], name: "index_plans_on_user_id"
   end
 
   create_table "rdux_actions", force: :cascade do |t|
@@ -70,6 +67,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_09_000001) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "subscriptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ext_charge_id"
+    t.bigint "plan_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
+  end
+
   create_table "tasks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -87,8 +94,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_09_000001) do
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
   add_foreign_key "credit_cards", "users"
-  add_foreign_key "plans", "users"
   add_foreign_key "rdux_actions", "rdux_actions"
   add_foreign_key "rdux_actions", "rdux_processes"
+  add_foreign_key "subscriptions", "plans"
+  add_foreign_key "subscriptions", "users"
   add_foreign_key "tasks", "users"
 end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Subscription
+class Subscription
   module Preview
     def self.call(_payload)
       Rdux::Result[ok: true]
