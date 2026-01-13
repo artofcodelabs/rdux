@@ -2,7 +2,7 @@
 
 class Subscription
   module Preview
-    def self.call(payload)
+    def self.call(payload) # rubocop:disable Metrics/MethodLength
       plan = Plan.find(payload['plan_id'])
       price_cents = plan.price_cents
       tax_rate = TaxGateway.rate_for(payload.dig('customer', 'postal_code'))
