@@ -20,6 +20,17 @@ module Rdux
         assert_equal ['Subscription::Preview', 'CreditCard::Create'], res.val[:process].steps
         assert_equal ['Subscription::Preview', 'CreditCard::Create'],
                      res.val[:process].actions.order(:id).pluck(:name)
+
+        first, second = res.val[:process].actions.order(:id).to_a
+        assert_equal 'Subscription::Preview', first.name
+        assert_equal %w[customer plan_id], first.payload.keys.sort
+        assert_equal plans(:gold).id, first.payload['plan_id']
+        assert_equal({ 'postal_code' => '94105' }, first.payload['customer'])
+
+        assert_equal 'CreditCard::Create', second.name
+        assert_equal %w[credit_card user_id], second.payload.keys.sort
+        assert_equal users(:zbig).id, second.payload['user_id']
+        assert_equal '[FILTERED]', second.payload['credit_card']['number']
       end
     end
   end

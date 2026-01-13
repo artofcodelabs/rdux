@@ -33,7 +33,8 @@ module Rdux
 
     def start(process_performer, payload = {})
       process = Process.create!(name: process_performer, steps: process_performer::STEPS)
-      res = Processing.call_steps(process, payload)
+      selector = Processing.payload_selector_for(process_performer)
+      res = Processing.call_steps(process, payload, payload_selector: selector)
       process.update!(ok: res.ok)
       Result[ok: res.ok, val: { process: }]
     end
