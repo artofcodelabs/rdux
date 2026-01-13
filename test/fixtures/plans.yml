@@ -1,6 +1,8 @@
 gold:
   name: gold
+  price_cents: 9900
 
 premium:
   name: premium
+  price_cents: 19900
 

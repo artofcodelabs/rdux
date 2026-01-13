@@ -296,17 +296,25 @@ Key points:
 Example:
 
 ```ruby
-class Subscription::Create
-  STEPS = [
-    CreditCard::Create
-  ]
+module Processes
+  module Subscription
+    module Create
+      STEPS = [
+        ::Subscription::Preview,
+        Customer::Create,
+        CreditCard::Create
+        Payment::Create,
+        Create,
+        Invoice::Create
+      ].freeze
+    end
+  end
 end
 
-start_res = Rdux.start(Subscription::Create, payload, { user: current_user })
-process = start_res.val[:process]
-results = start_res.val[:results]
+res = Rdux.start(Subscription::Create, payload)
+process = res.val[:process]
 
-# later, from any performer:
+# from any action performer:
 def self.call(payload, opts)
   results = opts[:action].process.actions.order(:id).pluck(:result)
   # ...

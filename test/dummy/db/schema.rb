@@ -10,14 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_12_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_13_090000) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "activities", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "end_at"
     t.datetime "start_at"
-    t.integer "task_id", null: false
+    t.bigint "task_id", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.index ["task_id"], name: "index_activities_on_task_id"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end
@@ -31,26 +34,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_12_090000) do
     t.string "last_name"
     t.string "token"
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.bigint "user_id"
     t.index ["user_id"], name: "index_credit_cards_on_user_id"
   end
 
   create_table "plans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
+    t.integer "price_cents", default: 0, null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "rdux_actions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.text "meta"
+    t.jsonb "meta"
     t.string "name", null: false
     t.boolean "ok"
-    t.text "payload", null: false
+    t.jsonb "payload", null: false
     t.boolean "payload_sanitized", default: false, null: false
-    t.integer "rdux_action_id"
-    t.integer "rdux_process_id"
-    t.text "result"
+    t.bigint "rdux_action_id"
+    t.bigint "rdux_process_id"
+    t.jsonb "result"
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
     t.index ["rdux_process_id"], name: "index_rdux_actions_on_rdux_process_id"
@@ -60,16 +64,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_12_090000) do
     t.datetime "created_at", null: false
     t.string "name"
     t.boolean "ok"
-    t.text "steps", default: "[]", null: false
+    t.jsonb "steps", default: [], null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "subscriptions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ext_charge_id"
-    t.integer "plan_id", null: false
+    t.bigint "plan_id", null: false
     t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
     t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
@@ -78,7 +82,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_12_090000) do
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
-    t.integer "user_id"
+    t.bigint "user_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
