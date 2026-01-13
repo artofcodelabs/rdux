@@ -288,8 +288,7 @@ Key points:
 
 * `Rdux::Process` **has many** `Rdux::Action`s (`process.actions`)
 * `Rdux::Action` **belongs to** a `process` (`action.process`)
-* `Rdux.start(ProcessClass, ...)` starts a process (a PORO with a `STEPS` constant) and **automatically propagates**
-  the process to any nested actions executed during that run
+* `Rdux.start(ProcessClass, payload)` starts a process (a PORO with a `STEPS` constant)
 * Inside an action performer you can reach the current persisted action via `opts[:action]`
   and then traverse: `opts[:action].process.actions` (and their `result`)
 

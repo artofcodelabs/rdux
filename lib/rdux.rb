@@ -3,6 +3,7 @@
 require 'rdux/engine'
 require 'rdux/store'
 require 'rdux/result'
+require 'rdux/processing'
 require 'active_support/concern'
 
 module Rdux
@@ -30,11 +31,11 @@ module Rdux
 
     alias perform dispatch
 
-    def start(process)
-      Result[
-        ok: true,
-        val: { process: Rdux::Process.create!(name: process.to_s, steps: process::STEPS) }
-      ]
+    def start(process_performer, payload = {})
+      process = Process.create!(name: process_performer, steps: process_performer::STEPS)
+      res = Processing.call_steps(process, payload)
+      process.update!(ok: res.ok)
+      Result[ok: res.ok, val: { process: }]
     end
 
     private
