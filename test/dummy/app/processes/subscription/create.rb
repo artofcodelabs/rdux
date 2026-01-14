@@ -17,7 +17,7 @@ module Processes
       def payload_for_action(action_name:, payload:, prev_result:)
         case action_name
         when 'Subscription::Preview'
-          payload.slice('plan_id', 'user')
+          payload.slice('plan_id', 'user', 'total_cents')
         when 'User::Create'
           payload.slice('user')
         when 'CreditCard::Create'
