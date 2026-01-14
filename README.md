@@ -291,7 +291,8 @@ Key points:
 * `Rdux.start(ProcessModuleOrClass, payload)` starts a process (a PORO namespace with a `STEPS` constant)
 * `STEPS` must be an `Array` (validated on `Rdux::Process`)
 * `steps` is stored as `jsonb` on PostgreSQL and as JSON-serialized `text` on other adapters (defaults to `[]`)
-* Each step is dispatched via `Rdux.perform(step, step_payload)` and then the persisted `Rdux::Action` is assigned to the `process` ❗️TODO: handle not persisted actions
+* Each step is dispatched via `Rdux.perform(step, step_payload)` and then the persisted `Rdux::Action` is assigned to the `process`
+  - ⚠️ If a step returns `ok: false`, that step action is only persisted (and thus can be connected to the process) when it returns `save: true`. **It is a requirement.**
 * The final process status is persisted as `process.ok` (based on the last step result)
 * Optional: a process performer can define `payload_for_action(action_name:, payload:, prev_result:)` to compute the payload per step
 * Inside an action performer you can reach the current persisted action via `opts[:action]`
