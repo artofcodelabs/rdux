@@ -300,7 +300,7 @@ module Processes
     module Create
       STEPS = [
         ::Subscription::Preview,
-        Customer::Create,
+        User::Create,
         CreditCard::Create
         Payment::Create,
         Create,

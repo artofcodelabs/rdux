@@ -5,7 +5,7 @@ class Subscription
     def self.call(payload) # rubocop:disable Metrics/MethodLength
       plan = Plan.find(payload['plan_id'])
       price_cents = plan.price_cents
-      tax_rate = TaxGateway.rate_for(payload.dig('customer', 'postal_code'))
+      tax_rate = TaxGateway.rate_for(payload.dig('user', 'postal_code'))
       tax_cents = (price_cents * tax_rate).round
 
       Rdux::Result[

@@ -7,13 +7,15 @@ module Rdux
     def payload_selector_for(process_performer)
       return unless process_performer.respond_to?(:payload_for_action)
 
-      ->(action_name, payload) { process_performer.payload_for_action(action_name, payload) }
+      lambda { |action_name, payload, prev_result|
+        process_performer.payload_for_action(action_name:, payload:, prev_result:)
+      }
     end
 
     def call_steps(process, payload, payload_selector: nil)
       res = nil
       process.steps.each do |step|
-        step_payload = payload_selector ? payload_selector.call(step, payload) : payload
+        step_payload = payload_selector ? payload_selector.call(step, payload, res) : payload
         res = Rdux.perform(step, step_payload)
         res.action.process = process
         res.action.save!

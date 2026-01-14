@@ -5,7 +5,7 @@ module Processes
     module Create
       STEPS = [
         ::Subscription::Preview,
-        # Customer::Create,
+        User::Create,
         CreditCard::Create
         # Payment::Create,
         # Create,
@@ -14,12 +14,14 @@ module Processes
 
       module_function
 
-      def payload_for_action(action_name, payload)
+      def payload_for_action(action_name:, payload:, prev_result:)
         case action_name
         when 'Subscription::Preview'
-          payload.slice('plan_id', 'customer')
+          payload.slice('plan_id', 'user')
+        when 'User::Create'
+          payload.slice('user')
         when 'CreditCard::Create'
-          payload.slice('user_id', 'credit_card')
+          payload.slice('credit_card').merge(user_id: prev_result.val[:user_id])
         else
           payload
         end
