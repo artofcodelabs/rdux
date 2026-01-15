@@ -3,8 +3,9 @@
 module Rdux
   module Store
     class << self
-      def call(name, payload, meta)
+      def call(name, payload, meta, process)
         action = Action.new(name:, payload:, meta:)
+        action.process = process
         sanitize(action)
         action.save!
         action
