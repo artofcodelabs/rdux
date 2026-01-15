@@ -12,7 +12,8 @@ module Processes
         # Invoice::Create
       ].freeze
 
-      def self.payload_for_action(payload:, action_name:, prev_result:) # TODO: prev_result optional
+      # TODO: prev_result optional
+      def self.payload_for_action(payload:, action_name:, prev_result:) # rubocop:disable Metrics/MethodLength
         case action_name
         when 'Subscription::Preview'
           payload.slice('plan_id', 'user', 'total_cents')
