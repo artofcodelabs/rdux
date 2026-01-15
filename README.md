@@ -89,7 +89,7 @@ Rdux.perform(
 
 ### 🕵️‍♀️ Processing an action
 
-Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call`.
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements the `self.call` method.
 This method accepts a required `payload` and an optional `opts` argument.
 `opts[:action]` stores the Active Record object.
 `call` method processes the action and must return a `Rdux::Result` struct.
@@ -102,8 +102,8 @@ Example:
 # app/actions/task/create.rb
 
 class Task
-  class Create
-    def call(payload, opts)
+  module Create
+    def self.call(payload, opts)
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save

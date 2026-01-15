@@ -36,17 +36,8 @@ module Rdux
       !ok.nil?
     end
 
-    def action_performer
-      name_const = name.to_s.constantize
-      return name_const if name_const.respond_to?(:call)
-      return unless name_const.is_a?(Class)
-
-      obj = name_const.new # TODO: remove + document self.call only
-      obj.respond_to?(:call) ? obj : nil
-    end
-
     def perform_action(opts)
-      performer = action_performer
+      performer = name.to_s.constantize
       return if performer.nil?
 
       if performer.method(:call).arity.abs == 2
