@@ -32,12 +32,7 @@ module Rdux
     alias perform dispatch
 
     def start(process_performer, payload)
-      payload = payload.deep_stringify_keys
-      process = Process.create!(name: process_performer, steps: process_performer::STEPS)
-      selector = Processing.payload_selector_for(process_performer)
-      res = Processing.call_steps(process, payload, payload_selector: selector)
-      process.update!(ok: res.ok)
-      Result[ok: res.ok, val: { process: }]
+      Processing.start(process_performer, payload.deep_stringify_keys)
     end
 
     private

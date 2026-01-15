@@ -4,6 +4,16 @@ module Rdux
   module Processing
     module_function
 
+    def start(process_performer, payload)
+      process = Process.create!(name: process_performer, steps: process_performer::STEPS)
+      selector = payload_selector_for(process_performer)
+      res = call_steps(process, payload, payload_selector: selector)
+      process.update!(ok: res.ok)
+      Result[ok: res.ok, val: { process: }]
+    end
+
+    # TODO: private
+
     def payload_selector_for(process_performer)
       return unless process_performer.respond_to?(:payload_for_action)
 
