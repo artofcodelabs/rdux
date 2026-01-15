@@ -294,7 +294,7 @@ Key points:
 * Each step is dispatched via `Rdux.perform(step, step_payload)` and then the persisted `Rdux::Action` is assigned to the `process`
   - ⚠️ If a step returns `ok: false`, that step action is only persisted (and thus can be connected to the process) when it returns `save: true`. **It is a requirement.**
 * The final process status is persisted as `process.ok` (based on the last step result)
-* Optional: a process performer can define `payload_for_action(action_name:, payload:, prev_result:)` to compute the payload per step
+* Optional: a process performer can define `payload_for_action(payload:, action_name:, prev_result:)` to compute the payload per step
 * Inside an action performer you can reach the current persisted action via `opts[:action]`
   and then traverse: `opts[:action].process.actions` (and their `result`)
 * Note: actions dispatched *inside* an action (via `Rdux.perform`) are linked via `rdux_action_id` (`action.rdux_actions`) and are not automatically assigned to the process

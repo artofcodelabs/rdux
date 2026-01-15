@@ -41,7 +41,7 @@ module Rdux
       return name_const if name_const.respond_to?(:call)
       return unless name_const.is_a?(Class)
 
-      obj = name_const.new
+      obj = name_const.new # TODO: remove + document self.call only
       obj.respond_to?(:call) ? obj : nil
     end
 

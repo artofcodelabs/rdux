@@ -18,12 +18,8 @@ class Subscription
 
       Rdux::Result[
         ok: true,
-        val: {
-          price_cents:,
-          tax_rate:,
-          tax_cents:,
-          total_cents:
-        }
+        val: { total_cents: },
+        result: { total_cents: }
       ]
     end
   end

@@ -6,15 +6,13 @@ module Processes
       STEPS = [
         ::Subscription::Preview,
         User::Create,
-        CreditCard::Create
-        # Payment::Create,
+        CreditCard::Create,
+        Payment::Create
         # Create,
         # Invoice::Create
       ].freeze
 
-      module_function
-
-      def payload_for_action(action_name:, payload:, prev_result:)
+      def self.payload_for_action(payload:, action_name:, prev_result:) # TODO: prev_result optional
         case action_name
         when 'Subscription::Preview'
           payload.slice('plan_id', 'user', 'total_cents')
@@ -22,6 +20,8 @@ module Processes
           payload.slice('user')
         when 'CreditCard::Create'
           payload.slice('credit_card').merge(user_id: prev_result.val[:user_id])
+        when 'Payment::Create'
+          { token: prev_result.val[:credit_card].token }
         else
           payload
         end

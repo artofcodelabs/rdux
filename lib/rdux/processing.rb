@@ -16,7 +16,7 @@ module Rdux
       res = nil
       process.steps.each do |step|
         step_payload = payload_selector ? payload_selector.call(step, payload, res) : payload
-        res = Rdux.perform(step, step_payload)
+        res = Rdux.perform(step, step_payload, { process: }) # TODO: document this, assign to action asap
         res.action.process = process
         res.action.save!
         break unless res.ok
