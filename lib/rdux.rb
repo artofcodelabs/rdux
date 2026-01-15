@@ -7,6 +7,8 @@ require 'rdux/processing'
 require 'active_support/concern'
 
 module Rdux
+  extend Processing
+
   class << self
     def dispatch(name, payload, opts = {}, meta: nil)
       action = store(name, payload, ars: opts[:ars], meta:, process: opts[:process])
@@ -30,10 +32,6 @@ module Rdux
     end
 
     alias perform dispatch
-
-    def start(process_performer, payload)
-      Processing.start(process_performer, payload.deep_stringify_keys)
-    end
 
     private
 

@@ -2,9 +2,8 @@
 
 module Rdux
   module Processing
-    module_function
-
     def start(process_performer, payload)
+      payload = payload.deep_stringify_keys
       process = Process.create!(name: process_performer, steps: process_performer::STEPS)
       selector = payload_selector_for(process_performer)
       res = call_steps(process, payload, payload_selector: selector)
@@ -12,7 +11,7 @@ module Rdux
       Result[ok: res.ok, val: { process: }]
     end
 
-    # TODO: private
+    private
 
     def payload_selector_for(process_performer)
       return unless process_performer.respond_to?(:payload_for_action)
