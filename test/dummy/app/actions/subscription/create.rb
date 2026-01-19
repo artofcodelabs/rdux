@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
 class Subscription
-  class Create
-    def self.call(payload, opts)
-      res = Rdux.perform(CreditCard::Charge, payload.slice('user_id', 'credit_card', 'amount'), opts.slice(:user))
-      Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true, nested: [res]] unless res.ok
+  module Create
+    def self.call(payload)
     end
   end
 end

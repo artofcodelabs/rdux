@@ -91,10 +91,10 @@ module Rdux
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
         payload[:plan_id] = plans(:gold).id
-        res = Rdux.dispatch(Subscription::Create, payload, { user: users(:zbig) })
+        res = Rdux.dispatch(Order::Create, payload, { user: users(:zbig) })
         assert_equal 2, Rdux::Action.ok(false).count
         assert_equal 1, Rdux::Action.ok.count
-        assert_equal 'Subscription::Create', res.action.name
+        assert_equal 'Order::Create', res.action.name
         assert_equal ['CreditCard::Charge'], res.action.rdux_actions.failed.map(&:name)
         assert_equal ['CreditCard::Create'], res.action.rdux_actions.failed[0].rdux_actions.map(&:name)
       end
