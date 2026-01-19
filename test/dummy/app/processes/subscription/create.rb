@@ -7,8 +7,8 @@ module Processes
         ::Subscription::Preview,
         User::Create,
         CreditCard::Create,
-        Payment::Create
-        # ::Subscription::Create
+        Payment::Create,
+        ::Subscription::Create
         # Invoice::Create
       ].freeze
 
