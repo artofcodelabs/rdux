@@ -9,10 +9,8 @@ module Processes
         CreditCard::Create,
         Payment::Create,
         ::Subscription::Create
-        # Invoice::Create
       ].freeze
 
-      # TODO: prev_result optional
       def self.payload_for_action(payload:, action_name:, prev_result:) # rubocop:disable Metrics/MethodLength
         case action_name
         when 'Subscription::Preview'

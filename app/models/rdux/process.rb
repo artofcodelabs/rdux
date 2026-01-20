@@ -14,7 +14,12 @@ module Rdux
     private
 
     def steps_must_be_array
-      errors.add(:steps, 'must be an Array') unless steps.is_a?(Array)
+      unless steps.is_a?(Array)
+        errors.add(:steps, 'must be an Array')
+        return
+      end
+
+      errors.add(:steps, 'must include at least 1 step') if steps.empty?
     end
   end
 end
