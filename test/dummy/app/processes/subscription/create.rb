@@ -23,6 +23,8 @@ module Processes
           payload.slice('credit_card').merge(user_id: prev_result.val[:user_id])
         when 'Payment::Create'
           { token: prev_result.val[:credit_card].token }
+        when 'Subscription::Create'
+          payload.slice('plan_id').merge(ext_charge_id: prev_result.val[:charge_id])
         else
           payload
         end
