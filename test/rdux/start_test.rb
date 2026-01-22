@@ -26,6 +26,11 @@ module Rdux
                      res.val[:process].actions.order(:id).pluck(:name)
       end
 
+      it 'starts a process asynchronously' do
+        res = Rdux.start(Processes::Subscription::CreateAsync, subscription_create_payload)
+        assert_nil res.val[:process].actions.first.ok
+      end
+
       it 'stores trimmed payload per step' do
         res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok
