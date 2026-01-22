@@ -7,7 +7,7 @@ module Rdux
       process = Process.create!(name: process_performer, steps: process_performer::STEPS)
       selector = payload_selector_for(process_performer)
       res = call_steps(process, payload, payload_selector: selector)
-      process.update!(ok: res.ok)
+      process.update!(ok: res.ok) unless res.ok.nil?
       Result[ok: res.ok, val: { process: }]
     end
 
