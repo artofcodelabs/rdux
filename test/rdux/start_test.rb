@@ -28,7 +28,7 @@ module Rdux
 
       it 'starts a process asynchronously' do
         res = Rdux.start(Processes::Subscription::CreateAsync, subscription_create_payload)
-        assert_nil res.val[:process].actions.first.ok
+        assert_nil res.val[:process].ok
       end
 
       it 'stores trimmed payload per step' do

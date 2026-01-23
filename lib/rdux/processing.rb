@@ -8,7 +8,7 @@ module Rdux
       selector = payload_selector_for(process_performer)
       res = call_steps(process, payload, payload_selector: selector)
       process.update!(ok: res.ok) unless res.ok.nil?
-      Result[ok: res.ok, val: { process: }]
+      res
     end
 
     private
@@ -21,15 +21,29 @@ module Rdux
       }
     end
 
-    def call_steps(process, payload, payload_selector: nil)
-      res = nil
-      process.steps.each do |step|
-        step_payload = payload_selector ? payload_selector.call(step, payload, res) : payload
-        res = Rdux.perform(step, step_payload, { process: }) # TODO: document this, assign to action asap
-        res.action.process = process
-        res.action.save!
-        break unless res.ok
+    def call_steps(process, payload, payload_selector: nil) # rubocop:disable Metrics/MethodLength
+      res = Result[val: { process: }]
+      action_res = nil
+      process.steps.each_with_index do |step, index|
+        if step.is_a?(Hash)
+          process.name.constantize::STEPS[index].call(payload)
+          return res
+        end
+        action_res = call_step(step:, payload:, process:, payload_selector:, prev_res: action_res)
+        unless action_res.ok
+          res.ok = action_res.ok
+          return res
+        end
       end
+      res.ok = true
+      res
+    end
+
+    def call_step(step:, payload:, process:, payload_selector:, prev_res:)
+      step_payload = payload_selector ? payload_selector.call(step, payload, prev_res) : payload
+      res = Rdux.perform(step, step_payload, { process: })
+      res.action.process = process
+      res.action.save!
       res
     end
   end
