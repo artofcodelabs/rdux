@@ -28,7 +28,7 @@ module Rdux
     private
 
     def destroy_action(res, action)
-      return false if res.ok != false || res.save
+      return false if res.ok || res.save
 
       action.destroy
     end
