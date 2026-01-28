@@ -2,8 +2,8 @@
 
 module Rdux
   module Dispatching
-    def dispatch(name, payload, opts = {}, meta: nil)
-      action = store(name, payload, ars: opts[:ars], meta:, process: opts[:process])
+    def dispatch(name, payload, opts = {}, meta: nil, process: nil)
+      action = store(name, payload, ars: opts[:ars], meta:, process:)
       process(action, opts)
     end
 
@@ -14,10 +14,11 @@ module Rdux
 
     def process(action, opts = {})
       res = action.call(opts)
-      return res if destroy_action(res, action)
+      return res if action.rdux_process_id.nil? && destroy_action(res, action)
 
       assign_to_action(res, action)
       persist(res, action)
+      action.process.resume(action) if action.rdux_process_id # TODO: async
       res
     rescue StandardError => e
       handle_exception(e, action)

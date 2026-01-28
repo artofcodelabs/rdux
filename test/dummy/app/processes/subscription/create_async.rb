@@ -4,9 +4,10 @@ module Processes
   module Subscription
     module CreateAsync
       STEPS = [
-        lambda { |payload|
-          Rdux.perform(::Subscription::Preview, payload)
-        }
+        lambda { |payload, process|
+          Rdux.perform(::Subscription::Preview, payload, process:)
+        },
+        User::Create
       ].freeze
     end
   end
