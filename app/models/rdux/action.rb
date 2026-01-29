@@ -36,14 +36,18 @@ module Rdux
       !ok.nil?
     end
 
+    def safe_payload
+      payload_unsanitized || payload
+    end
+
     def perform_action(opts)
       performer = name.to_s.constantize
       return if performer.nil?
 
       if performer.method(:call).arity.abs == 2
-        performer.call(payload_unsanitized || payload, opts)
+        performer.call(safe_payload, opts)
       else
-        performer.call(payload_unsanitized || payload)
+        performer.call(safe_payload)
       end
     end
   end
