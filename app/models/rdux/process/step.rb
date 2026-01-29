@@ -8,13 +8,18 @@ module Rdux
         @process = process
       end
 
-      def call(payload:, prev_res:)
+      def call(prev_res:)
         if @step.is_a?(Proc)
-          @step.call(payload, prev_res)
+          @step.call(@process.payload, prev_res)
           return Rdux::Result[ok: nil]
         end
 
-        step_payload = @process.payload_selector ? @process.payload_selector.call(@step, payload, prev_res) : payload
+        step_payload = if @process.payload_selector
+                         @process.payload_selector.call(@step, @process.payload,
+                                                        prev_res)
+                       else
+                         @process.payload
+                       end
         res = Rdux.perform(@step, step_payload, { process: @process })
         res.action.process = @process
         res.action.save!
