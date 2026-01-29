@@ -24,7 +24,7 @@ module Rdux
 
     def call(opts = {})
       return false if performed?
-      return false if payload_sanitized && payload_unsanitized.nil?
+      return false if only_sanitized_payload?
 
       opts.merge!(action: self)
       perform_action(opts)

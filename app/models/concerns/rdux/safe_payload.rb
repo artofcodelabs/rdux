@@ -8,6 +8,10 @@ module Rdux
       attr_accessor :payload_unsanitized
     end
 
+    def only_sanitized_payload?
+      payload_sanitized && payload_unsanitized.nil?
+    end
+
     def safe_payload
       payload_unsanitized || payload
     end
