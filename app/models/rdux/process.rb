@@ -31,8 +31,8 @@ module Rdux
       ok_actions_count = actions.ok.count
       update!(ok: true) && return if ok_actions_count == steps_def.size
 
-      steps_def[ok_actions_count]
-      # TODO: call next step asynchronously
+      step_performer = steps_def[ok_actions_count]
+      Step.new(step_performer, process: self).call(prev_res: nil)
     end
 
     def call

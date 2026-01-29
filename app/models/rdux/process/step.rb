@@ -10,7 +10,7 @@ module Rdux
 
       def call(prev_res:)
         if @step.is_a?(Proc)
-          @step.call(payload, prev_res)
+          @step.call(payload, @process) # TODO: through payload_selector
           return Rdux::Result[ok: nil]
         end
 
