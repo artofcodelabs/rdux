@@ -4,7 +4,7 @@ module Rdux
   class Process < ActiveRecord::Base
     self.table_name_prefix = 'rdux_'
 
-    attr_accessor :payload_unsanitized
+    include SafePayload
 
     has_many :actions, class_name: 'Rdux::Action', foreign_key: 'rdux_process_id', inverse_of: :process,
                        dependent: :nullify
@@ -16,10 +16,6 @@ module Rdux
 
     validates :payload, presence: true
     validate :steps_must_be_array
-
-    def safe_payload
-      payload_unsanitized || payload
-    end
 
     def payload_selector
       return unless performer.respond_to?(:payload_for_action)

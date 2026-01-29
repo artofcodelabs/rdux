@@ -4,7 +4,7 @@ module Rdux
   class Action < ActiveRecord::Base
     self.table_name_prefix = 'rdux_'
 
-    attr_accessor :payload_unsanitized
+    include SafePayload
 
     belongs_to :rdux_action, optional: true, class_name: 'Rdux::Action'
     belongs_to :process, optional: true, class_name: 'Rdux::Process', foreign_key: 'rdux_process_id'
@@ -34,10 +34,6 @@ module Rdux
 
     def performed?
       !ok.nil?
-    end
-
-    def safe_payload
-      payload_unsanitized || payload
     end
 
     def perform_action(opts)
