@@ -37,6 +37,7 @@ module Rdux
 
     def call
       steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
+        # TODO: steps_def[index] returns class 👉 to_s
         step_performer = step.is_a?(Hash) ? steps_def[index] : step
         res = Step.new(step_performer, process: self).call(prev_res:)
         break res if res.ok != true
