@@ -3,6 +3,7 @@
 require 'rdux/engine'
 require 'rdux/store'
 require 'rdux/result'
+require 'rdux/sanitize'
 require 'rdux/dispatching'
 require 'rdux/processing'
 
