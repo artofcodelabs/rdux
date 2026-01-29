@@ -35,7 +35,7 @@ module Rdux
       # TODO: call next step asynchronously
     end
 
-    def process_steps
+    def call
       steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
         step_performer = step.is_a?(Hash) ? steps_def[index] : step
         res = Step.new(step_performer, process: self).call(prev_res:)

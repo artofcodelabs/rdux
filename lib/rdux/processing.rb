@@ -6,7 +6,7 @@ module Rdux
       process = Process.new(name: process_performer, steps: process_performer::STEPS, payload:)
       Sanitize.call(process)
       process.save!
-      res = process.process_steps
+      res = process.call
       process.update!(ok: res.ok) unless res.ok.nil?
       Result[ok: res.ok, val: { process: }]
     end
