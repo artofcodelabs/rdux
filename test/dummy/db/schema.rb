@@ -35,6 +35,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_045118) do
     t.index ["user_id"], name: "index_credit_cards_on_user_id"
   end
 
+  create_table "customers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "postal_code"
+    t.datetime "updated_at", null: false
+  end
+
   create_table "plans", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -61,6 +69,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_045118) do
     t.datetime "created_at", null: false
     t.string "name"
     t.boolean "ok"
+    t.text "payload", null: false
+    t.boolean "payload_sanitized", default: false, null: false
     t.text "steps", default: "[]", null: false
     t.datetime "updated_at", null: false
   end

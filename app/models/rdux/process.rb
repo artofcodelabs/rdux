@@ -7,8 +7,12 @@ module Rdux
     has_many :actions, class_name: 'Rdux::Action', foreign_key: 'rdux_process_id', inverse_of: :process,
                        dependent: :nullify
 
-    serialize :steps, coder: JSON if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+    if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+      serialize :payload, coder: JSON
+      serialize :steps, coder: JSON
+    end
 
+    validates :payload, presence: true
     validate :steps_must_be_array
 
     def payload_selector
@@ -29,7 +33,7 @@ module Rdux
       # TODO: call next step asynchronously
     end
 
-    def process_steps(payload:)
+    def process_steps
       steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
         step_performer = step.is_a?(Hash) ? steps_def[index] : step
         res = Step.new(step_performer, process: self).call(payload:, prev_res:)

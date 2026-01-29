@@ -5,7 +5,7 @@ require 'test_helper'
 module Rdux
   class ProcessTest < TC
     it 'requires steps to be an array with at least one step' do
-      process = Process.new(name: 'SomeProcess', steps: [])
+      process = Process.new(name: 'SomeProcess', steps: [], payload: { a: 1 })
       assert_equal false, process.valid?
       assert_includes process.errors[:steps], 'must include at least 1 step'
 
