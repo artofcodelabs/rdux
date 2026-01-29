@@ -14,7 +14,7 @@ module Rdux
           return Rdux::Result[ok: nil]
         end
 
-        step_payload = payload_selector ? payload_selector.call(@step, payload, prev_res) : @process.payload
+        step_payload = payload_selector ? payload_selector.call(@step, payload, prev_res) : payload
         res = Rdux.perform(@step, step_payload, { process: @process })
         res.action.process = @process
         res.action.save!
@@ -24,7 +24,7 @@ module Rdux
       private
 
       def payload
-        @process.payload
+        @process.safe_payload
       end
 
       def payload_selector
