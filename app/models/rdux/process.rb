@@ -20,8 +20,15 @@ module Rdux
     def payload_selector
       return unless performer.respond_to?(:payload_for_action)
 
+      payload_for_action = performer.method(:payload_for_action)
+      accepts_prev_result = payload_for_action.parameters.any? do |type, name|
+        %i[keyreq].include?(type) && name == :prev_result
+      end
+
       lambda { |action_name, payload, prev_result|
-        performer.payload_for_action(action_name:, payload:, prev_result:)
+        kwargs = { action_name:, payload: }
+        kwargs[:prev_result] = prev_result if accepts_prev_result
+        payload_for_action.call(**kwargs)
       }
     end
 
@@ -37,7 +44,6 @@ module Rdux
 
     def call
       steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
-        # TODO: steps_def[index] returns class 👉 to_s
         step_performer = step.is_a?(Hash) ? steps_def[index] : step
         res = Step.new(step_performer, process: self).call(prev_res:)
         break res if res.ok != true

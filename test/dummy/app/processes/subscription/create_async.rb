@@ -9,6 +9,15 @@ module Processes
         },
         User::Create
       ].freeze
+
+      def self.payload_for_action(payload:, action_name:)
+        case action_name
+        when 'User::Create'
+          payload.slice('user')
+        else
+          payload
+        end
+      end
     end
   end
 end
