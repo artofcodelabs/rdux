@@ -8,8 +8,8 @@ module Rdux
         @process = process
       end
 
-      def call(prev_res:)
-        step_payload = payload_selector ? payload_selector.call(@step, payload, prev_res) : payload
+      def call(prev_res:, action_index:)
+        step_payload = payload_selector ? payload_selector.call(@step, payload, prev_res, action_index) : payload
         if @step.is_a?(Proc)
           @step.call(step_payload, @process)
           return Rdux::Result[ok: nil]
