@@ -8,7 +8,7 @@ module Processes
           payload = payload.slice('plan_id', 'user', 'total_cents')
           Rdux.perform(::Subscription::Preview, payload, process:)
         },
-        User::Create
+        { name: User::Create }
       ].freeze
 
       def self.payload_for_action(payload:, name:)

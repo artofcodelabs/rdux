@@ -3,7 +3,7 @@
 module Rdux
   module Processing
     def start(process_performer, payload)
-      process = Process.new(name: process_performer, steps: process_performer::STEPS, payload:)
+      process = Process.new(name: process_performer, payload:)
       Sanitize.call(process)
       process.save!
       res = process.call

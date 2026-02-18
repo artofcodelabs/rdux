@@ -4,11 +4,11 @@ module Processes
   module Subscription
     module Create
       STEPS = [
-        ::Subscription::Preview,
-        User::Create,
-        CreditCard::Create,
-        Payment::Create,
-        ::Subscription::Create
+        { name: ::Subscription::Preview },
+        { name: User::Create },
+        { name: CreditCard::Create },
+        { name: Payment::Create },
+        { name: ::Subscription::Create }
       ].freeze
 
       def self.payload_for_action(payload:, name:, prev_result:) # rubocop:disable Metrics/MethodLength

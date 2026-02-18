@@ -17,6 +17,10 @@ module Rdux
     validates :payload, presence: true
     validate :steps_must_be_array
 
+    before_validation do
+      self.steps = steps_def
+    end
+
     def payload_selector
       return unless performer.respond_to?(:payload_for_action)
 
@@ -68,7 +72,7 @@ module Rdux
     end
 
     def steps_def
-      performer::STEPS
+      performer::STEPS.map { _1.is_a?(Hash) ? _1[:name] : _1 }
     end
 
     def accepts_param?(param)
