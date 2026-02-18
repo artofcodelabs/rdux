@@ -20,8 +20,8 @@ module Rdux
     def payload_selector
       return unless performer.respond_to?(:payload_for_action)
 
-      lambda { |action_name, payload, prev_result, action_index|
-        kwargs = { action_name:, payload: }
+      lambda { |name, payload, prev_result, action_index|
+        kwargs = { name:, payload: }
         kwargs[:prev_result] = prev_result if accepts_param?(:prev_result)
         kwargs[:action_index] = action_index if accepts_param?(:action_index)
         payload_for_action.call(**kwargs)

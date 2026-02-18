@@ -11,8 +11,8 @@ module Processes
         User::Create
       ].freeze
 
-      def self.payload_for_action(payload:, action_name:)
-        case action_name
+      def self.payload_for_action(payload:, name:)
+        case name
         when 'User::Create'
           payload.slice('user')
         else

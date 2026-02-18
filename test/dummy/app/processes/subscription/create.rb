@@ -11,8 +11,8 @@ module Processes
         ::Subscription::Create
       ].freeze
 
-      def self.payload_for_action(payload:, action_name:, prev_result:) # rubocop:disable Metrics/MethodLength
-        case action_name
+      def self.payload_for_action(payload:, name:, prev_result:) # rubocop:disable Metrics/MethodLength
+        case name
         when 'Subscription::Preview'
           payload.slice('plan_id', 'user', 'total_cents')
         when 'User::Create'
