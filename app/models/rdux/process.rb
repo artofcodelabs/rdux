@@ -22,8 +22,8 @@ module Rdux
 
       lambda { |action_name, payload, prev_result, action_index|
         kwargs = { action_name:, payload: }
-        kwargs[:prev_result] = prev_result if accepts_prev_result?
-        kwargs[:action_index] = action_index if accepts_action_index?
+        kwargs[:prev_result] = prev_result if accepts_param?(:prev_result)
+        kwargs[:action_index] = action_index if accepts_param?(:action_index)
         payload_for_action.call(**kwargs)
       }
     end
@@ -71,16 +71,9 @@ module Rdux
       performer::STEPS
     end
 
-    # TODO: dry
-    def accepts_prev_result?
+    def accepts_param?(param)
       payload_for_action.parameters.any? do |type, name|
-        %i[keyreq].include?(type) && name == :prev_result
-      end
-    end
-
-    def accepts_action_index?
-      payload_for_action.parameters.any? do |type, name|
-        %i[keyreq].include?(type) && name == :action_index
+        %i[keyreq].include?(type) && name == param
       end
     end
   end
