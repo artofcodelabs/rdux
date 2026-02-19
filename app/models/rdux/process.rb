@@ -17,7 +17,7 @@ module Rdux
     validates :payload, presence: true
     validate :steps_must_be_array
 
-    before_validation do
+    before_validation on: :create do
       self.steps = steps_def
     end
 
@@ -36,10 +36,10 @@ module Rdux
       return unless action.ok
 
       ok_actions_count = actions.ok.count
-      update!(ok: true) && return if ok_actions_count == steps_def.size
+      update!(ok: true) && return if ok_actions_count == steps.size
 
-      step_performer = steps_def[ok_actions_count]
-      Step.new(step_performer, process: self).call(prev_res: nil, action_index: ok_actions_count)
+      action_performer = steps_def[ok_actions_count]
+      Step.new(action_performer, process: self).call(prev_res: nil, action_index: ok_actions_count)
     end
 
     def call
@@ -55,12 +55,11 @@ module Rdux
     private
 
     def steps_must_be_array
-      unless steps.is_a?(Array)
+      if !steps.is_a?(Array)
         errors.add(:steps, 'must be an Array')
-        return
+      elsif steps.empty?
+        errors.add(:steps, 'must include at least 1 step')
       end
-
-      errors.add(:steps, 'must include at least 1 step') if steps.empty?
     end
 
     def performer
