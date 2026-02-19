@@ -3,7 +3,7 @@
 module Processes
   module Subscription
     module Create
-      STEPS = [
+      ACTIONS = [
         { name: ::Subscription::Preview },
         { name: User::Create },
         { name: CreditCard::Create },

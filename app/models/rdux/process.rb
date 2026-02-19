@@ -72,7 +72,7 @@ module Rdux
     end
 
     def steps_def
-      performer::STEPS.map { _1.is_a?(Hash) ? _1[:name] : _1 }
+      performer::ACTIONS.map { _1.is_a?(Hash) ? _1[:name] : _1 }
     end
 
     def accepts_param?(param)
