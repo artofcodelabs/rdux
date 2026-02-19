@@ -18,7 +18,7 @@ module Rdux
     validate :steps_must_be_array
 
     before_validation on: :create do
-      self.steps = steps_def
+      self.steps = performer::ACTIONS.map { _1.is_a?(Hash) ? _1[:name] : _1 } if steps.empty?
     end
 
     def payload_selector
@@ -38,14 +38,14 @@ module Rdux
       ok_actions_count = actions.ok.count
       update!(ok: true) && return if ok_actions_count == steps.size
 
-      action_performer = steps_def[ok_actions_count]
-      Step.new(action_performer, process: self).call(prev_res: nil, action_index: ok_actions_count)
+      step = Step.new(action_performer(index: ok_actions_count), process: self)
+      step.call(prev_res: nil, action_index: ok_actions_count)
     end
 
     def call
-      steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
-        step_performer = step.is_a?(Hash) ? steps_def[index] : step
-        res = Step.new(step_performer, process: self).call(prev_res:, action_index: index)
+      steps.each_with_index.reduce(nil) do |prev_res, (current_step, index)|
+        step = Step.new(action_performer(index:, step: current_step), process: self)
+        res = step.call(prev_res:, action_index: index)
         break res if res.ok != true
 
         res
@@ -70,8 +70,9 @@ module Rdux
       performer.method(:payload_for_action)
     end
 
-    def steps_def
-      performer::ACTIONS.map { _1.is_a?(Hash) ? _1[:name] : _1 }
+    def action_performer(index: nil, step: nil)
+      step ||= steps[index]
+      step.is_a?(Hash) ? performer::ACTIONS[index] : step
     end
 
     def accepts_param?(param)
