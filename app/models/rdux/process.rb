@@ -90,7 +90,7 @@ module Rdux
     def call_step(index:, step: nil, prev_res: nil)
       action_performer = action_performer(index:, step:)
       action_payload = action_payload(action_performer:, prev_res:, index:)
-      Step.new(action_performer, process: self).call(action_payload)
+      Step.call(action_performer:, action_payload:, process: self)
     end
   end
 end
