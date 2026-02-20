@@ -21,17 +21,6 @@ module Rdux
       self.steps = performer::ACTIONS.map { _1.is_a?(Hash) ? _1[:name] : _1 } if steps.empty?
     end
 
-    def payload_selector
-      return unless performer.respond_to?(:payload_for_action)
-
-      lambda { |name, payload, prev_result, action_index|
-        kwargs = { name:, payload: }
-        kwargs[:prev_result] = prev_result if accepts_param?(:prev_result)
-        kwargs[:action_index] = action_index if accepts_param?(:action_index)
-        payload_for_action.call(**kwargs)
-      }
-    end
-
     def resume(action)
       return unless action.ok
 
@@ -64,8 +53,25 @@ module Rdux
       name.constantize
     end
 
-    def payload_for_action
+    def payload_for_action_method
+      return unless performer.respond_to?(:payload_for_action)
+
       performer.method(:payload_for_action)
+    end
+
+    def accepts_param?(param)
+      payload_for_action_method.parameters.any? do |type, name|
+        %i[keyreq].include?(type) && name == param
+      end
+    end
+
+    def payload_selector
+      lambda { |name, payload, prev_result, action_index|
+        kwargs = { name:, payload: }
+        kwargs[:prev_result] = prev_result if accepts_param?(:prev_result)
+        kwargs[:action_index] = action_index if accepts_param?(:action_index)
+        payload_for_action_method.call(**kwargs)
+      }
     end
 
     def action_performer(index: nil, step: nil)
@@ -74,16 +80,10 @@ module Rdux
     end
 
     def action_payload(action_performer:, prev_res:, index:)
-      if payload_selector
+      if payload_for_action_method
         payload_selector.call(action_performer, safe_payload, prev_res, index)
       else
         safe_payload
-      end
-    end
-
-    def accepts_param?(param)
-      payload_for_action.parameters.any? do |type, name|
-        %i[keyreq].include?(type) && name == param
       end
     end
 
