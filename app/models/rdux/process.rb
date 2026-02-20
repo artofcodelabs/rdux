@@ -42,8 +42,8 @@ module Rdux
     end
 
     def call
-      steps.each_with_index.reduce(nil) do |prev_res, (current_step, index)|
-        res = call_step(index:, step: current_step, prev_res:)
+      steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
+        res = call_step(index:, step:, prev_res:)
         break res if res.ok != true
 
         res
