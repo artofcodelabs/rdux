@@ -38,18 +38,12 @@ module Rdux
       ok_actions_count = actions.ok.count
       update!(ok: true) && return if ok_actions_count == steps.size
 
-      a_performer = action_performer(index: ok_actions_count)
-      step = Step.new(a_performer, process: self)
-      a_payload = action_payload(performer: a_performer, prev_res: nil, action_index: ok_actions_count)
-      step.call(a_payload)
+      call_step(index: ok_actions_count)
     end
 
     def call
       steps.each_with_index.reduce(nil) do |prev_res, (current_step, index)|
-        a_performer = action_performer(index:, step: current_step)
-        step = Step.new(a_performer, process: self)
-        a_payload = action_payload(performer: a_performer, prev_res:, action_index: index)
-        res = step.call(a_payload)
+        res = call_step(index:, step: current_step, prev_res:)
         break res if res.ok != true
 
         res
@@ -79,9 +73,9 @@ module Rdux
       step.is_a?(Hash) ? performer::ACTIONS[index] : step
     end
 
-    def action_payload(performer:, prev_res:, action_index:)
+    def action_payload(action_performer:, prev_res:, index:)
       if payload_selector
-        payload_selector.call(performer, safe_payload, prev_res, action_index)
+        payload_selector.call(action_performer, safe_payload, prev_res, index)
       else
         safe_payload
       end
@@ -91,6 +85,12 @@ module Rdux
       payload_for_action.parameters.any? do |type, name|
         %i[keyreq].include?(type) && name == param
       end
+    end
+
+    def call_step(index:, step: nil, prev_res: nil)
+      action_performer = action_performer(index:, step:)
+      action_payload = action_payload(action_performer:, prev_res:, index:)
+      Step.new(action_performer, process: self).call(action_payload)
     end
   end
 end
