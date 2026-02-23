@@ -7,8 +7,8 @@ module Rdux
         @performer = performer
       end
 
-      def actions
-        @performer::ACTIONS
+      def steps
+        @performer::STEPS
       end
 
       def payload_selector

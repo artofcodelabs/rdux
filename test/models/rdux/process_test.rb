@@ -5,11 +5,11 @@ require 'test_helper'
 module Rdux
   class ProcessTest < TC
     module InvalidProcess
-      ACTIONS = [].freeze
+      STEPS = [].freeze
     end
 
     module SomeProcess
-      ACTIONS = [
+      STEPS = [
         { name: 'Subscription::Preview' },
         { name: 'User::Create' },
         { name: 'CreditCard::Create' },
