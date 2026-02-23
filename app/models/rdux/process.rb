@@ -58,8 +58,10 @@ module Rdux
       step.is_a?(Hash) ? performer.steps[index] : step
     end
 
-    def action_payload(action_performer:, prev_res:, index:)
-      if performer.payload_for_action_method
+    def action_payload(action_performer:, prev_res:, index:) # rubocop:disable Metrics/AbcSize
+      if !action_performer.is_a?(Proc) && performer.steps[index][:payload].is_a?(Proc)
+        performer.steps[index][:payload].call(safe_payload, prev_res)
+      elsif performer.payload_for_action_method
         performer.payload_selector.call(action_performer, safe_payload, prev_res, index)
       else
         safe_payload
