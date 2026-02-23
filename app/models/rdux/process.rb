@@ -18,7 +18,7 @@ module Rdux
     validate :steps_must_be_array
 
     before_validation on: :create do
-      self.steps = performer::ACTIONS.map { _1.is_a?(Hash) ? _1[:name] : _1 } if steps.empty?
+      self.steps = performer.actions.map { _1.is_a?(Hash) ? _1[:name] : _1 } if steps.empty?
     end
 
     def resume(action)
@@ -50,18 +50,17 @@ module Rdux
     end
 
     def performer
-      name.constantize
+      Performer.new(name.constantize)
     end
 
     def action_performer(index: nil, step: nil)
       step ||= steps[index]
-      step.is_a?(Hash) ? performer::ACTIONS[index] : step
+      step.is_a?(Hash) ? performer.actions[index] : step
     end
 
     def action_payload(action_performer:, prev_res:, index:)
-      perf = Performer.new(performer)
-      if perf.payload_for_action_method
-        perf.payload_selector.call(action_performer, safe_payload, prev_res, index)
+      if performer.payload_for_action_method
+        performer.payload_selector.call(action_performer, safe_payload, prev_res, index)
       else
         safe_payload
       end

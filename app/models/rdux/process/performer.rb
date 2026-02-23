@@ -7,6 +7,10 @@ module Rdux
         @performer = performer
       end
 
+      def actions
+        @performer::ACTIONS
+      end
+
       def payload_selector
         lambda { |name, payload, prev_result, action_index|
           kwargs = { name:, payload: }
