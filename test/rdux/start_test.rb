@@ -17,7 +17,7 @@ module Rdux
       end
 
       it 'starts a process' do
-        res = Rdux.start(Processes::Subscription::CreateAlt, subscription_create_payload)
+        res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok
         assert_equal 1, res.val[:process].id
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
@@ -34,7 +34,7 @@ module Rdux
       end
 
       it 'stores trimmed payload per step' do
-        res = Rdux.start(Processes::Subscription::CreateAlt, subscription_create_payload)
+        res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok
 
         first, second, third = res.val[:process].actions.order(:id).to_a
@@ -57,7 +57,7 @@ module Rdux
       it 'fails when total_cents is invalid' do
         payload = subscription_create_payload.merge(total_cents: 10_864)
 
-        res = Rdux.start(Processes::Subscription::CreateAlt, payload)
+        res = Rdux.start(Processes::Subscription::Create, payload)
         assert_not res.ok
 
         process = res.val[:process].reload

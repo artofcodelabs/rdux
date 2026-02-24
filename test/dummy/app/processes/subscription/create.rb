@@ -2,7 +2,7 @@
 
 module Processes
   module Subscription
-    module CreateAlt
+    module Create
       STEPS = [
         { name: ::Subscription::Preview,
           payload: ->(payload, _) { payload.slice('plan_id', 'user', 'total_cents') } },
