@@ -11,6 +11,10 @@ module Processes
         lambda { |payload, process|
           payload = payload.slice('user')
           Rdux.perform(User::Create, payload, process:)
+        },
+        lambda { |payload, process|
+          payload = payload.slice('credit_card').merge(user_id: process.actions.last.result['user_id'])
+          Rdux.perform(CreditCard::Create, payload, process:)
         }
       ].freeze
     end
