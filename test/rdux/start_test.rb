@@ -26,6 +26,16 @@ module Rdux
                      res.val[:process].actions.order(:id).pluck(:name)
       end
 
+      it 'starts a process in alt format' do
+        res = Rdux.start(Processes::Subscription::CreateAlt, subscription_create_payload)
+        assert res.ok
+        assert_equal 1, res.val[:process].id
+        assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
+                     res.val[:process].steps
+        assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
+                     res.val[:process].actions.order(:id).pluck(:name)
+      end
+
       it 'starts a process asynchronously' do
         user_count = User.count
         res = Rdux.start(Processes::Subscription::CreateAsync, subscription_create_payload)
