@@ -53,14 +53,18 @@ module Rdux
       Performer.new(name.constantize)
     end
 
+    def payload_func(index:)
+      performer.steps[index][:payload]
+    end
+
     def action_performer(index: nil, step: nil)
       step ||= steps[index]
       step.is_a?(Hash) ? performer.steps[index] : step
     end
 
-    def action_payload(action_performer:, prev_res:, index:) # rubocop:disable Metrics/AbcSize
-      if !action_performer.is_a?(Proc) && performer.steps[index][:payload].is_a?(Proc)
-        performer.steps[index][:payload].call(safe_payload, prev_res)
+    def action_payload(action_performer:, prev_res:, index:)
+      if !action_performer.is_a?(Proc) && payload_func(index:).is_a?(Proc)
+        payload_func(index:).call(safe_payload, prev_res)
       elsif performer.payload_for_action_method
         performer.payload_selector.call(action_performer, safe_payload, prev_res, index)
       else
