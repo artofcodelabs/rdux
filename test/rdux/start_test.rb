@@ -29,7 +29,7 @@ module Rdux
       it 'starts a process asynchronously' do
         user_count = User.count
         res = Rdux.start(Processes::Subscription::CreateAsync, subscription_create_payload)
-        assert_nil res.val[:process].ok
+        assert res.val[:process].ok
         assert_equal user_count + 1, User.count
       end
 
