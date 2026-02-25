@@ -27,10 +27,10 @@ module Rdux
       end
 
       it 'starts a process asynchronously' do
-        user_count = User.count
+        cc_count = CreditCard.count
         res = Rdux.start(Processes::Subscription::CreateAsync, subscription_create_payload)
         assert res.val[:process].ok
-        assert_equal user_count + 1, User.count
+        assert_equal cc_count + 1, CreditCard.count
       end
 
       it 'stores trimmed payload per step' do
