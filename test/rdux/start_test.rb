@@ -23,7 +23,7 @@ module Rdux
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
                      res.val[:process].steps
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
-                     res.val[:process].actions.order(:id).pluck(:name)
+                     res.val[:process].actions.ok.order(:id).pluck(:name)
       end
 
       it 'starts a process asynchronously' do
