@@ -61,10 +61,7 @@ module Rdux
     def action_payload(action_performer:, prev_res:, index:)
       return safe_payload if action_performer.is_a?(Proc)
 
-      step_definition = performer::STEPS[index]
-      return safe_payload unless step_definition.is_a?(Hash)
-
-      func = step_definition[:payload]
+      func = performer::STEPS[index][:payload]
       func.is_a?(Proc) ? func.call(safe_payload, prev_res) : safe_payload
     end
 
