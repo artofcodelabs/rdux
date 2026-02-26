@@ -33,6 +33,11 @@ module Rdux
         assert_equal cc_count + 1, CreditCard.count
       end
 
+      it 'starts a process with mixed steps' do
+        res = Rdux.start(Processes::Subscription::CreateMixed, subscription_create_payload)
+        assert_equal 5, res.val[:process].actions.ok.count
+      end
+
       it 'stores trimmed payload per step' do
         res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok

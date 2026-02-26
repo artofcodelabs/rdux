@@ -18,7 +18,7 @@ module Rdux
 
       assign_to_action(res, action)
       persist(res, action)
-      action.process.resume(action) if action.rdux_process_id && action.ok
+      action.process.resume(res) if action.rdux_process_id && action.ok
       res
     rescue StandardError => e
       handle_exception(e, action)
