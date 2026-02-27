@@ -2,7 +2,7 @@
 
 module Rdux
   module Store
-    def self.call(name, payload, meta, process)
+    def self.call(name:, payload:, meta:, process:)
       action = Action.new(name:, payload:, meta:)
       action.process = process
       Sanitize.call(action)

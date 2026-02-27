@@ -15,13 +15,10 @@ module Rdux
               ars: nil, meta: nil, process: nil)
       unify_args(name_arg, payload_arg, name:, payload:) => { name:, payload: }
       (ars || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      Store.call(name, payload, meta, process)
+      Store.call(name:, payload:, meta:, process:)
     end
 
-    def process(action_arg = nil, opts_arg = {}, action: nil, opts: nil)
-      action = action_arg || action
-      opts = opts_arg || opts
-
+    def process(action, opts = {})
       res = action.call(opts)
       return res if destroy_action(res, action)
 
