@@ -3,7 +3,8 @@
 module Rdux
   class Process
     class Step
-      def self.call(action_performer:, action_payload:, process:, attach_to_process:) # TODO: remove
+      # TODO: remove
+      def self.call(action_performer:, action_payload:, process:, attach_to_process:)
         if action_performer.is_a?(Proc)
           action_performer.call(action_payload, process)
           return Rdux::Result[ok: nil]

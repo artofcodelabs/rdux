@@ -2,17 +2,26 @@
 
 module Rdux
   module Dispatching
-    def dispatch(name, payload, opts = {}, meta: nil, process: nil)
+    def dispatch(name_arg = nil, payload_arg = nil, opts_arg = {}, # rubocop:disable Metrics/ParameterLists
+                 name: nil, payload: nil, opts: nil, meta: nil,
+                 process: nil)
+      unify_args(name_arg, payload_arg, opts_arg, name:, payload:, opts:) => { name:, payload:, opts: }
       action = store(name, payload, ars: opts[:ars], meta:, process:)
       process(action, opts)
     end
 
-    def store(name, payload, ars: nil, meta: nil, process: nil)
+    def store(name_arg = nil, payload_arg = nil, # rubocop:disable Metrics/ParameterLists
+              name: nil, payload: nil,
+              ars: nil, meta: nil, process: nil)
+      unify_args(name_arg, payload_arg, name:, payload:) => { name:, payload: }
       (ars || {}).each { |k, v| payload["#{k}_id"] = v.id }
       Store.call(name, payload, meta, process)
     end
 
-    def process(action, opts = {})
+    def process(action_arg = nil, opts_arg = {}, action: nil, opts: nil)
+      action = action_arg || action
+      opts = opts_arg || opts
+
       res = action.call(opts)
       return res if destroy_action(res, action)
 
@@ -27,6 +36,13 @@ module Rdux
     alias perform dispatch
 
     private
+
+    def unify_args(name_arg, payload_arg, opts_arg = nil, name:, payload:, opts: nil) # rubocop:disable Metrics/ParameterLists
+      name ||= name_arg
+      payload ||= payload_arg
+      opts ||= opts_arg
+      { name:, payload:, opts: }
+    end
 
     def destroy_action(res, action)
       return false if res.ok || res.save
