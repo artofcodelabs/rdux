@@ -3,10 +3,10 @@
 module Rdux
   module Dispatching
     def dispatch(name_arg = nil, payload_arg = nil, opts_arg = {}, # rubocop:disable Metrics/ParameterLists
-                 name: nil, payload: nil, opts: nil, meta: nil,
-                 process: nil)
+                 name: nil, payload: nil, opts: nil,
+                 meta: nil, process: nil)
       unify_args(name_arg, payload_arg, opts_arg, name:, payload:, opts:) => { name:, payload:, opts: }
-      action = store(name, payload, ars: opts[:ars], meta:, process:)
+      action = store(name:, payload:, ars: opts.delete(:ars), meta:, process:)
       process(action, opts)
     end
 
