@@ -4,17 +4,17 @@ module Rdux
   class Process
     class Step
       # TODO: remove
-      def self.call(action_performer:, payload:, process:, attach_to_process:)
-        if action_performer.is_a?(Proc)
-          action_performer.call(payload, process)
+      def self.call(performer:, payload:, process:, attach_to_process:)
+        if performer.is_a?(Proc)
+          performer.call(payload, process)
           return Rdux::Result[ok: nil]
         end
 
         opts = { process: }
         res = if attach_to_process
-                Rdux.perform(name: action_performer, payload:, opts:, process:)
+                Rdux.perform(name: performer, payload:, opts:, process:)
               else
-                Rdux.perform(name: action_performer, payload:, opts:)
+                Rdux.perform(name: performer, payload:, opts:)
               end
         res.action.process = process
         res.action.save!
