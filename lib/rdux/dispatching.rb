@@ -2,18 +2,14 @@
 
 module Rdux
   module Dispatching
-    def dispatch(name_arg = nil, payload_arg = nil, opts_arg = {}, # rubocop:disable Metrics/ParameterLists
-                 name: nil, payload: nil, opts: nil,
-                 meta: nil, process: nil)
-      unify_args(name_arg, payload_arg, opts_arg, name:, payload:, opts:) => { name:, payload:, opts: }
-      action = store(name:, payload:, ars: opts.delete(:ars), meta:, process:)
+    def dispatch(name, payload, opts_arg = {}, opts: nil, meta: nil, process: nil) # rubocop:disable Metrics/ParameterLists
+      opts ||= opts_arg
+      opts[:process] ||= process
+      action = store(name, payload, ars: opts.delete(:ars), meta:, process: opts[:process])
       process(action, opts)
     end
 
-    def store(name_arg = nil, payload_arg = nil, # rubocop:disable Metrics/ParameterLists
-              name: nil, payload: nil,
-              ars: nil, meta: nil, process: nil)
-      unify_args(name_arg, payload_arg, name:, payload:) => { name:, payload: }
+    def store(name, payload, ars: nil, meta: nil, process: nil)
       (ars || {}).each { |k, v| payload["#{k}_id"] = v.id }
       Store.call(name:, payload:, meta:, process:)
     end
@@ -24,7 +20,8 @@ module Rdux
 
       assign_to_action(res, action)
       persist(res, action)
-      action.process.resume(res) if action.rdux_process_id && action.ok
+      action.process.resume(res)&.tap { return _1 } if action.rdux_process_id && action.ok
+
       res
     rescue StandardError => e
       handle_exception(e, action)
@@ -33,13 +30,6 @@ module Rdux
     alias perform dispatch
 
     private
-
-    def unify_args(name_arg, payload_arg, opts_arg = nil, name:, payload:, opts: nil) # rubocop:disable Metrics/ParameterLists
-      name ||= name_arg
-      payload ||= payload_arg
-      opts ||= opts_arg
-      { name:, payload:, opts: }
-    end
 
     def destroy_action(res, action)
       return false if res.ok || res.save

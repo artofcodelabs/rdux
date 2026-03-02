@@ -22,21 +22,12 @@ module Rdux
     end
 
     def resume(res)
-      return unless res.ok
+      return res unless res.ok
 
       ok_actions_count = actions.ok.count
       update!(ok: true) && return if ok_actions_count == steps.size
 
-      call_step(index: ok_actions_count, prev_res: res, attach_to_process: true)
-    end
-
-    def call
-      steps.each_with_index.reduce(nil) do |prev_res, (step, index)|
-        res = call_step(index:, step:, prev_res:, attach_to_process: false)
-        break res if res.ok != true
-
-        res
-      end
+      call_step(index: ok_actions_count, prev_res: res)
     end
 
     private
@@ -53,22 +44,25 @@ module Rdux
       name.constantize
     end
 
-    def action_performer(index: nil, step: nil)
-      step ||= steps[index]
+    def action_performer(index:)
+      step = steps[index]
       step.is_a?(Hash) ? performer::STEPS[index] : step
     end
 
-    def action_payload(action_performer:, prev_res:, index:)
-      return safe_payload if action_performer.is_a?(Proc)
-
-      func = performer::STEPS[index][:payload]
+    def action_payload(prev_res:, index:)
+      func = performer::STEPS[index][:payload] # TODO: dry
       func.is_a?(Proc) ? func.call(safe_payload, prev_res) : safe_payload
     end
 
-    def call_step(index:, step: nil, prev_res: nil, attach_to_process: false)
-      action_performer = action_performer(index:, step:)
-      action_payload = action_payload(action_performer:, prev_res:, index:)
-      Step.call(performer: action_performer, payload: action_payload, process: self, attach_to_process:)
+    def call_step(index:, prev_res: nil)
+      action_performer = action_performer(index:)
+      if action_performer.is_a?(Proc)
+        action_performer.call(safe_payload, self)
+        return Rdux::Result[ok: nil]
+      end
+
+      action_payload = action_payload(prev_res:, index:)
+      Rdux.perform(action_performer, action_payload, process: self)
     end
   end
 end

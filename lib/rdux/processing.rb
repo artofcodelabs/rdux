@@ -2,11 +2,11 @@
 
 module Rdux
   module Processing
-    def start(process_performer, payload)
-      process = Process.new(name: process_performer, payload:)
+    def start(performer, payload)
+      process = Process.new(name: performer, payload:)
       Sanitize.call(process)
       process.save!
-      res = process.call
+      res = process.resume(Rdux::Result[ok: true])
       process.update!(ok: res.ok) unless res.ok.nil?
       Result[ok: res.ok, val: { process: }]
     end
