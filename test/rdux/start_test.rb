@@ -82,11 +82,11 @@ module Rdux
         payload = subscription_create_payload.merge(
           credit_card: TestData::VALID_CREDIT_CARD.merge(number: '123')
         )
-        res = Rdux.start(Processes::Subscription::Create, payload)
+        res = Rdux.start(Processes::Subscription::CreateMixed, payload)
         assert_not res.ok
 
         process = res.val[:process]
-        assert_equal false, process.ok
+        assert_nil process.ok
 
         actions = process.actions.order(:id).to_a
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create'], actions.map(&:name)
