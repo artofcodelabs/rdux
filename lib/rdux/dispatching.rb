@@ -4,9 +4,8 @@ module Rdux
   module Dispatching
     def dispatch(name, payload, opts_arg = {}, opts: nil, meta: nil, process: nil) # rubocop:disable Metrics/ParameterLists
       opts ||= opts_arg
-      opts[:process] ||= process
-      action = store(name, payload, ars: opts.delete(:ars), meta:, process: opts[:process])
-      process(action, opts)
+      action = store(name, payload, ars: opts.delete(:ars), meta:, process:)
+      process(action, opts.merge(process:))
     end
 
     def store(name, payload, ars: nil, meta: nil, process: nil)
