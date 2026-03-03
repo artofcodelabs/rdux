@@ -6,16 +6,16 @@ module Rdux
   class StartTest < TC
     include TestHelpers
 
-    describe '#start' do
-      def subscription_create_payload
-        {
-          plan_id: plans(:gold).id,
-          user: { name: 'John Doe', postal_code: '94105' },
-          credit_card: TestData::VALID_CREDIT_CARD,
-          total_cents: 10_865
-        }
-      end
+    def subscription_create_payload
+      {
+        plan_id: plans(:gold).id,
+        user: { name: 'John Doe', postal_code: '94105' },
+        credit_card: TestData::VALID_CREDIT_CARD,
+        total_cents: 10_865
+      }
+    end
 
+    describe '#start' do
       it 'starts a process' do
         res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok
@@ -76,6 +76,23 @@ module Rdux
           ['must equal 10865 (got 10864)'],
           actions.first.result.dig('errors', 'total_cents')
         )
+      end
+
+      it 'fails on the given step when payload is invalid' do
+        payload = subscription_create_payload.merge(
+          credit_card: TestData::VALID_CREDIT_CARD.merge(number: '123')
+        )
+        res = Rdux.start(Processes::Subscription::Create, payload)
+        assert_not res.ok
+
+        process = res.val[:process]
+        assert_equal false, process.ok
+
+        actions = process.actions.order(:id).to_a
+        assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create'], actions.map(&:name)
+        assert_equal [true, true, false], actions.map(&:ok)
+        assert_equal 'CreditCard::Create', actions.last.name
+        assert_equal false, actions.last.ok
       end
     end
   end

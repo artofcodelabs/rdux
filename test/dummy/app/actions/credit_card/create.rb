@@ -26,6 +26,8 @@ class CreditCard
       end
 
       def update_meta(action)
+        return if action.meta.nil?
+
         action.meta['inc'] += 10 if action.meta['inc']
       end
 
