@@ -277,20 +277,25 @@ class CreditCard
 end
 ```
 
-## Process
+## 🧩 Process
 
 **Process** 👉 a series of actions or steps taken in order to achieve a particular end.
 
-`Rdux::Process` is a persisted model that groups many `Rdux::Action`s.
-It also persists an ordered list of `steps` (jsonb/text). Steps are executed **sequentially** in order and processing stops on the first failed step (`ok == false`).
+`Rdux::Process` is a persisted model that groups multiple `Rdux::Action`s.
+It also stores an ordered list of `steps` (`jsonb`/`text`).
+
+When a process starts:
+
+* Steps run **sequentially** in the order defined in `STEPS`
+* Execution stops on the first failed step (`ok == false`)
+* `process.ok` is set based on the final step result
 
 Key points:
 
 * `Rdux::Process` **has many** `Rdux::Action`s (`process.actions`)
-* `Rdux::Action` **belongs to** a `process` (`action.process`)
-* `Rdux.start(ProcessModuleOrClass, payload)` starts a process (a PORO namespace with a `STEPS` constant)
+* `Rdux::Action` **belongs to** a process (`action.process`)
+* `Rdux.start(ProcessModuleOrClass, payload)` starts a process performer (a PORO namespace/class with a `STEPS` constant)
 * `STEPS` must be an `Array` (validated on `Rdux::Process`)
-* `steps` is stored as `jsonb` on PostgreSQL and as JSON-serialized `text` on other adapters (defaults to `[]`)
 * Each step is dispatched via `Rdux.perform(step, step_payload)` and then the persisted `Rdux::Action` is assigned to the `process`
   - ⚠️ If a step returns `ok: false`, that step action is only persisted (and thus can be connected to the process) when it returns `save: true`. **It is a requirement.**
 * The final process status is persisted as `process.ok` (based on the last step result)
@@ -298,6 +303,7 @@ Key points:
 * Inside an action performer you can reach the current persisted action via `opts[:action]`
   and then traverse: `opts[:action].process.actions` (and their `result`)
 * Note: actions dispatched *inside* an action (via `Rdux.perform`) are linked via `rdux_action_id` (`action.rdux_actions`) and are not automatically assigned to the process
+* `steps` is stored as `jsonb` on PostgreSQL and as JSON-serialized `text` on other adapters (default: `[]`)
 
 Example:
 
@@ -329,7 +335,7 @@ module Processes
   end
 end
 
-res = Rdux.start(Subscription::Create, payload)
+res = Rdux.start(Processes::Subscription::Create, payload)
 process = res.val[:process]
 
 # from any action performer:
