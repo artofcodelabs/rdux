@@ -44,25 +44,19 @@ module Rdux
       name.constantize
     end
 
-    def action_performer(index:)
-      step = steps[index]
-      step.is_a?(Hash) ? performer::STEPS[index] : step
-    end
-
-    def action_payload(prev_res:, index:)
-      func = performer::STEPS[index][:payload] # TODO: dry
-      func.is_a?(Proc) ? func.call(safe_payload, prev_res) : safe_payload
+    def action_payload(step_def:, prev_res:)
+      step_def[:payload].is_a?(Proc) ? step_def[:payload].call(safe_payload, prev_res) : safe_payload
     end
 
     def call_step(index:, prev_res: nil)
-      action_performer = action_performer(index:)
-      if action_performer.is_a?(Proc)
-        action_performer.call(safe_payload, self)
+      step_def = performer::STEPS[index]
+      if steps[index].is_a?(Hash)
+        step_def.call(safe_payload, self)
         return Rdux::Result[ok: nil]
       end
 
-      action_payload = action_payload(prev_res:, index:)
-      Rdux.perform(action_performer, action_payload, process: self)
+      action_payload = action_payload(step_def:, prev_res:)
+      Rdux.perform(steps[index], action_payload, process: self)
     end
   end
 end
