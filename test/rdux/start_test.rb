@@ -65,7 +65,7 @@ module Rdux
         res = Rdux.start(Processes::Subscription::Create, payload)
         assert_not res.ok
 
-        process = res.val[:process].reload
+        process = res.val[:process]
         assert_equal false, process.ok
 
         actions = process.actions.order(:id).to_a
