@@ -35,6 +35,7 @@ module Rdux
 
       it 'starts a process with mixed steps' do
         res = Rdux.start(Processes::Subscription::CreateMixed, subscription_create_payload)
+        assert_equal [{}, {}, 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'], res.val[:process].steps
         assert_equal 5, res.val[:process].actions.ok.count
       end
 
