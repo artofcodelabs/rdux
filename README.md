@@ -287,8 +287,9 @@ It also stores an ordered list of `steps` (`jsonb`/`text`).
 When a process starts:
 
 * Steps run **sequentially** in the order defined in `STEPS`
-* Execution stops on the first failed step (`ok == false`)
-* `process.ok` is set based on the final step result
+* Process execution continues only when the latest process action returns `ok: true`
+* Execution stops on the first failed action step (`ok == false`)
+* `process.ok` is persisted from the latest non-`nil` step result
 
 Key points:
 
@@ -296,14 +297,15 @@ Key points:
 * `Rdux::Action` **belongs to** a process (`action.process`)
 * `Rdux.start(ProcessModuleOrClass, payload)` starts a process performer (a PORO namespace/class with a `STEPS` constant)
 * `STEPS` must be an `Array` (validated on `Rdux::Process`)
-* Each step is dispatched via `Rdux.perform(step, step_payload)` and then the persisted `Rdux::Action` is assigned to the `process`
-  - ⚠️ If a step returns `ok: false`, that step action is only persisted (and thus can be connected to the process) when it returns `save: true`. **It is a requirement.**
-* The final process status is persisted as `process.ok` (based on the last step result)
-* Optional: a process performer can define `payload_for_action(payload:, action_name:, prev_result:)` to compute the payload per step
-* Inside an action performer you can reach the current persisted action via `opts[:action]`
-  and then traverse: `opts[:action].process.actions` (and their `result`)
-* Note: actions dispatched *inside* an action (via `Rdux.perform`) are linked via `rdux_action_id` (`action.rdux_actions`) and are not automatically assigned to the process
 * `steps` is stored as `jsonb` on PostgreSQL and as JSON-serialized `text` on other adapters (default: `[]`)
+* `STEPS` supports:
+  * a step definition hash (`{ name: User::Create, payload: ->(payload, prev_res) { ... } }`)
+  * a callable step (`->(payload, process) { ... }`)
+* For hash steps, Rdux dispatches `Rdux.perform(step_name, step_payload, process: process)` (`step_payload` is the full process payload unless `payload:` proc is provided)
+* For callable steps, Rdux calls the step with `(safe_payload, process)` and the step is responsible for dispatching an action (with `Rdux.perform(..., process:)`)
+  * ⚠️ If a step returns `ok: false`, that step action is persisted (and can be assigned to the process) **only** when it also returns `save: true`. This is required.
+* Inside an action performer, use `opts[:action]` to access the current persisted action, then traverse `opts[:action].process.actions` (and their `result`)
+* Actions dispatched *inside* an action performer (via `Rdux.perform`) are linked via `rdux_action_id` (`action.rdux_actions`) and are not automatically assigned to the process
 
 Example:
 
@@ -312,25 +314,23 @@ module Processes
   module Subscription
     module Create
       STEPS = [
-        ::Subscription::Preview,
-        User::Create,
-        CreditCard::Create
+        lambda { |payload, process|
+          payload = payload.slice('plan_id', 'user', 'total_cents')
+          Rdux.perform(::Subscription::Preview, payload, process:)
+        },
+        lambda { |payload, process|
+          payload = payload.slice('user')
+          Rdux.perform(User::Create, payload, process:)
+        },
+        { name: CreditCard::Create,
+          payload: lambda { |payload, prev_res|
+            payload.slice('credit_card').merge(user_id: prev_res.action.result['user_id'])
+          } },
+        { name: Payment::Create,
+          payload: ->(_, prev_res) { { token: prev_res.val[:credit_card].token } } },
+        { name: ::Subscription::Create,
+          payload: ->(payload, prev_res) { payload.slice('plan_id').merge(ext_charge_id: prev_res.val[:charge_id]) } }
       ].freeze
-
-      module_function
-
-      def payload_for_action(action_name:, payload:, prev_result:)
-        case action_name
-        when 'Subscription::Preview'
-          payload.slice('plan_id', 'user')
-        when 'User::Create'
-          payload.slice('user')
-        when 'CreditCard::Create'
-          payload.slice('credit_card').merge(user_id: prev_result.val[:user_id])
-        else
-          payload
-        end
-      end
     end
   end
 end
