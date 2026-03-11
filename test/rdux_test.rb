@@ -116,7 +116,7 @@ module Rdux
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
         payload[:plan_id] = plans(:gold).id
-        res = Rdux.dispatch(Order::Create, payload, { user: users(:zbig) })
+        res = Rdux.dispatch(Order::Create, payload, opts: { user: users(:zbig) })
         assert_equal 2, Rdux::Action.ok(false).count
         assert_equal 1, Rdux::Action.ok.count
         assert_equal 'Order::Create', res.action.name

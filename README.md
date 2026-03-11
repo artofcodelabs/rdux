@@ -60,7 +60,7 @@ To dispatch an action using Rdux, use the `dispatch` method (aliased as `perform
 Definition:
 
 ```ruby
-def dispatch(action, payload, opts = {}, meta: nil)
+def dispatch(action, payload, opts: {}, meta: nil)
 
 alias perform dispatch
 ```
@@ -78,7 +78,7 @@ Example:
 Rdux.perform(
   Task::Create,
   { task: { name: 'Foo bar baz' } },
-  { ars: { user: current_user } },
+  opts: { ars: { user: current_user } },
   meta: { bar: 'baz' }
 )
 ```
@@ -269,7 +269,7 @@ class CreditCard
       private
 
       def create(payload, opts)
-        res = Rdux.perform(Create, payload, opts)
+        res = Rdux.perform(Create, payload, opts:)
         res.ok ? res : Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true]
       end
     end

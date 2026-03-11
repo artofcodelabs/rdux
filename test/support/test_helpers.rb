@@ -3,7 +3,7 @@
 module TestHelpers
   def create_task(user = users(:zbig), meta: {})
     opts = { ars: { user: } }
-    Rdux.dispatch(Task::Create, TestData::Payloads.task, opts, meta:)
+    Rdux.dispatch(Task::Create, TestData::Payloads.task, opts:, meta:)
   end
 
   def create_activity(task: tasks(:homework), meta: {})
