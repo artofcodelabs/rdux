@@ -19,7 +19,7 @@ module Rdux
 
       assign_to_action(res, action)
       persist(res, action)
-      action.process.resume(res)&.tap { return _1 } if action.rdux_process_id && action.ok
+      resume_process(action, res)&.tap { return _1 }
 
       res
     rescue StandardError => e
@@ -47,6 +47,14 @@ module Rdux
     def persist(res, action)
       res.action = action.tap(&:save!)
       res.nested&.each { |nested_res| action.rdux_actions << nested_res.action }
+    end
+
+    def resume_process(action, res)
+      return unless action.ok
+      return unless action.has_attribute?(:rdux_process_id)
+      return if action[:rdux_process_id].nil?
+
+      action.process.resume(res)
     end
 
     def handle_exception(exc, action)

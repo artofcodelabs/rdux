@@ -7,6 +7,31 @@ module Rdux
     include TestHelpers
 
     describe '#dispatch' do
+      it 'does not require process support to finish action processing' do
+        action = Class.new do
+          attr_accessor :ok, :result
+
+          def call(_opts)
+            Rdux::Result[ok: true, val: { ok: true }]
+          end
+
+          def save! # rubocop:disable Naming/PredicateMethod
+            true
+          end
+
+          def rdux_actions
+            []
+          end
+
+          def has_attribute?(_name) # rubocop:disable Naming/PredicatePrefix
+            false
+          end
+        end.new
+
+        res = Rdux.process(action, {})
+        assert res.ok
+      end
+
       it 'persists an action' do
         puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash['payload'].type}"
         create_task
