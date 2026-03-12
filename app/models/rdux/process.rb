@@ -9,7 +9,7 @@ module Rdux
     has_many :actions, class_name: 'Rdux::Action', foreign_key: 'rdux_process_id', inverse_of: :process,
                        dependent: :nullify
 
-    if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+    if table_exists? && columns_hash['payload']&.type == :text
       serialize :payload, coder: JSON
       serialize :steps, coder: JSON
     end

@@ -6,13 +6,23 @@ class CreateRduxProcesses < ActiveRecord::Migration[7.0]
     create_table :rdux_processes do |t|
       t.string :name
       t.boolean :ok
-      t.column :steps, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text),
+      t.column :steps, json_column_type,
                null: false,
-               default: (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? [] : '[]')
-      t.column :payload, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text), null: false
+               default: json_array_default
+      t.column :payload, json_column_type, null: false
       t.boolean :payload_sanitized, default: false, null: false
 
       t.timestamps
     end
+  end
+
+  private
+
+  def json_column_type
+    connection.adapter_name == 'PostgreSQL' ? :jsonb : :text
+  end
+
+  def json_array_default
+    connection.adapter_name == 'PostgreSQL' ? [] : '[]'
   end
 end

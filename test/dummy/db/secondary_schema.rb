@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_14_045118) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_12_092754) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_resources", force: :cascade do |t|
+    t.bigint "action_id", null: false
+    t.datetime "created_at", null: false
+    t.bigint "resource_id", null: false
+    t.string "resource_type", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action_id", "resource_type", "resource_id"], name: "idx_action_resources_on_action_resource", unique: true
+    t.index ["resource_type", "resource_id"], name: "idx_action_resources_on_resource"
+  end
 
   create_table "activities", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -64,6 +74,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_045118) do
     t.datetime "created_at", null: false
     t.string "name"
     t.boolean "ok"
+    t.jsonb "payload", null: false
+    t.boolean "payload_sanitized", default: false, null: false
     t.jsonb "steps", default: [], null: false
     t.datetime "updated_at", null: false
   end
@@ -93,6 +105,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_14_045118) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "action_resources", "rdux_actions", column: "action_id"
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
   add_foreign_key "credit_cards", "users"

@@ -10,7 +10,7 @@ module Rdux
     belongs_to :process, optional: true, class_name: 'Rdux::Process', foreign_key: 'rdux_process_id'
     has_many :rdux_actions, class_name: 'Rdux::Action', foreign_key: 'rdux_action_id'
 
-    if ActiveRecord::Base.connection.adapter_name != 'PostgreSQL'
+    if table_exists? && columns_hash['payload']&.type == :text
       serialize :payload, coder: JSON
       serialize :result, coder: JSON
       serialize :meta, coder: JSON

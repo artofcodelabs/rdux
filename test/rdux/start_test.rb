@@ -19,7 +19,7 @@ module Rdux
       it 'starts a process' do
         res = Rdux.start(Processes::Subscription::Create, subscription_create_payload)
         assert res.ok
-        assert_equal 1, res.val[:process].id
+        assert_predicate res.val[:process], :persisted?
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
                      res.val[:process].steps
         assert_equal ['Subscription::Preview', 'User::Create', 'CreditCard::Create', 'Payment::Create', 'Subscription::Create'],
