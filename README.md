@@ -345,6 +345,113 @@ def self.call(payload, opts)
 end
 ```
 
+## 🛠️ Helpers
+
+### `ActionResult`
+
+`ActionResult` is not part of Rdux itself, but a useful helper you can copy into your app to persist DB changes and resource relations alongside an action.
+
+It sets `action.result` with:
+
+* `relations` — a map of `"model_name#id" => id` (or raw hashes) for each resource that was modified or created
+* `db_changes` — `saved_changes` for each resource that was modified or created
+* any extra key/value pairs passed as keyword arguments
+
+It also creates an `ActionResource` record for each AR resource, linking it to the action via a polymorphic association.
+
+**Usage:**
+
+```ruby
+# inside an action performer
+opts[:action].result = ActionResult.call(
+  action: opts[:action],
+  resources: [task]
+)
+
+# action.result stored in DB:
+# {
+#   "relations"  => { "task#1" => 1 },
+#   "db_changes" => {
+#     "task#1" => {
+#       "id"         => [nil, 1],
+#       "name"       => [nil, "Foo bar baz"],
+#       "user_id"    => [nil, 42],
+#       "created_at" => [nil, "2024-06-28 21:35:36"],
+#       "updated_at" => [nil, "2024-06-28 21:35:36"]
+#     }
+#   }
+# }
+```
+
+Resources can be ActiveRecord objects or plain hashes (merged directly into `relations`):
+
+```ruby
+ActionResult.call(
+  action: opts[:action],
+  resources: [task, { user_id: user.id }],
+  additional_info: 'Foo Bar Baz'
+)
+```
+
+**`ActionResource` model** (`app/models/action_resource.rb`):
+
+```ruby
+class ActionResource < ApplicationRecord
+  belongs_to :action, class_name: 'Rdux::Action'
+  belongs_to :resource, polymorphic: true
+
+  validates :action_id, uniqueness: { scope: %i[resource_type resource_id] }
+  validates :resource_type, presence: true
+end
+```
+
+**`ActionResult` service** (`app/services/action_result.rb`):
+
+```ruby
+class ActionResult
+  class << self
+    def call(action:, resources:, **custom)
+      result = { relations: {}, db_changes: {} }
+
+      resources.each do |resource|
+        if resource.is_a?(Hash)
+          result[:relations].merge!(resource)
+          next
+        end
+
+        key = relation_key(resource)
+        result[:relations][key] = resource.id
+        result[:db_changes][key] = resource.saved_changes if resource.saved_changes.present?
+      end
+
+      persist_relations(result[:relations], action.id)
+      result.merge(custom)
+    end
+
+    private
+
+    def relation_key(resource)
+      "#{resource.class.name.underscore}##{resource.id}"
+    end
+
+    def resource_type_for(name)
+      type = name.sub(/_id$/, '').sub(/#\d+$/, '').camelize
+      resource_class = type.safe_constantize
+      resource_class && resource_class < ApplicationRecord ? type : nil
+    end
+
+    def persist_relations(relations, action_id)
+      relations.each do |name, id|
+        resource_type = resource_type_for(name)
+        next if resource_type.nil? || !id.to_s.match?(/\A\d+\z/)
+
+        ActionResource.create!(action_id:, resource_type:, resource_id: id)
+      end
+    end
+  end
+end
+```
+
 ## 👩🏽‍🔬 Testing
 
 ### 💉 Setup

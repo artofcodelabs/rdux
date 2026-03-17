@@ -157,7 +157,7 @@ module Rdux
       it 'sets result via opts[:action].result' do
         res = create_task
         assert_nil(res.result)
-        assert_equal({ 'task_id' => res.val[:task].id }, res.action.result)
+        assert_equal res.val[:task].id, res.action.result['relations']["task##{res.val[:task].id}"]
       end
     end
   end
