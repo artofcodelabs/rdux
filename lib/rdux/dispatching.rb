@@ -58,6 +58,8 @@ module Rdux
     end
 
     def handle_exception(exc, action)
+      raise(action.destroy && exc) if ENV['RDUX_DEV']
+
       action.ok = false
       action.result ||= {}
       action.result.merge!({ 'Exception' => {

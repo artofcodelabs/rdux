@@ -154,6 +154,16 @@ module Rdux
         assert_equal result, Rdux::Action.failed.last.result
       end
 
+      it 'does not persist failed action on exception when RDUX_DEV is set' do
+        ENV['RDUX_DEV'] = '1'
+        assert_raises(ActiveRecord::RecordNotFound) do
+          Rdux.dispatch(Task::Create, { user_id: 0 })
+        end
+        assert_equal 0, Rdux::Action.count
+      ensure
+        ENV.delete('RDUX_DEV')
+      end
+
       it 'sets result via opts[:action].result' do
         res = create_task
         assert_nil(res.result)

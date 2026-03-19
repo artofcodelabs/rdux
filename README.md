@@ -277,6 +277,16 @@ class CreditCard
 end
 ```
 
+### 🧹 Development Mode
+
+Set the `RDUX_DEV` environment variable to prevent Rdux from persisting failed actions on exceptions. When `RDUX_DEV` is set, the action record is destroyed and the exception is re-raised without storing error details in the database.
+
+```bash
+RDUX_DEV=1 bin/rails server
+```
+
+This keeps your development database clean from failed action records caused by exceptions during iterative development.
+
 ## 🧩 Process
 
 **Process** 👉 a series of actions or steps taken in order to achieve a particular end.
