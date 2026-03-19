@@ -49,7 +49,7 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
-⚠️ Note: Rdux uses `JSONB` datatype instead of `text` for Postgres.
+⚠️ Note: Rdux requires Rails 7.1+. It uses `jsonb` columns on PostgreSQL and `json` on other adapters.
 
 ## 🎮 Usage
 
@@ -282,7 +282,7 @@ end
 **Process** 👉 a series of actions or steps taken in order to achieve a particular end.
 
 `Rdux::Process` is a persisted model that groups multiple `Rdux::Action`s.
-It also stores an ordered list of `steps` (`jsonb`/`text`).
+It also stores an ordered list of `steps` (`jsonb`/`json`).
 
 When a process starts:
 
@@ -297,7 +297,7 @@ Key points:
 * `Rdux::Action` **belongs to** a process (`action.process`)
 * `Rdux.start(ProcessModuleOrClass, payload)` starts a process performer (a PORO namespace/class with a `STEPS` constant)
 * `STEPS` must be an `Array` (validated on `Rdux::Process`)
-* `steps` is stored as `jsonb` on PostgreSQL and as JSON-serialized `text` on other adapters (default: `[]`)
+* `steps` is stored as `jsonb` on PostgreSQL and `json` on other adapters (default: `[]`)
 * `STEPS` supports:
   * a step definition hash (`{ name: User::Create, payload: ->(payload, prev_res) { ... } }`)
   * a callable step (`->(payload, process) { ... }`)

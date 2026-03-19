@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CreateRduxActions < ActiveRecord::Migration[7.0]
+  include Rdux::MigrationHelpers
+
   def change
     create_table :rdux_actions do |t|
       t.string :name, null: false
@@ -14,11 +16,5 @@ class CreateRduxActions < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
-  end
-
-  private
-
-  def json_column_type
-    connection.adapter_name == 'PostgreSQL' ? :jsonb : :text
   end
 end

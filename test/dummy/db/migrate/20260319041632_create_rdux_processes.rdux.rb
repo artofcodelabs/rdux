@@ -2,6 +2,8 @@
 
 # This migration comes from rdux (originally 20260109000000)
 class CreateRduxProcesses < ActiveRecord::Migration[7.0]
+  include Rdux::MigrationHelpers
+
   def change
     create_table :rdux_processes do |t|
       t.string :name
@@ -14,15 +16,5 @@ class CreateRduxProcesses < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
-  end
-
-  private
-
-  def json_column_type
-    connection.adapter_name == 'PostgreSQL' ? :jsonb : :text
-  end
-
-  def json_array_default
-    connection.adapter_name == 'PostgreSQL' ? [] : '[]'
   end
 end

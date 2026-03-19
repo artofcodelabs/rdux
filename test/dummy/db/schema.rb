@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_12_092754) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_041634) do
   create_table "action_resources", force: :cascade do |t|
     t.integer "action_id", null: false
     t.datetime "created_at", null: false
@@ -54,14 +54,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_092754) do
 
   create_table "rdux_actions", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.text "meta"
+    t.json "meta"
     t.string "name", null: false
     t.boolean "ok"
-    t.text "payload", null: false
+    t.json "payload", null: false
     t.boolean "payload_sanitized", default: false, null: false
     t.integer "rdux_action_id"
     t.integer "rdux_process_id"
-    t.text "result"
+    t.json "result"
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
     t.index ["rdux_process_id"], name: "index_rdux_actions_on_rdux_process_id"
@@ -71,9 +71,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_12_092754) do
     t.datetime "created_at", null: false
     t.string "name"
     t.boolean "ok"
-    t.text "payload", null: false
+    t.json "payload", null: false
     t.boolean "payload_sanitized", default: false, null: false
-    t.text "steps", default: "[]", null: false
+    t.json "steps", default: [], null: false
     t.datetime "updated_at", null: false
   end
 
