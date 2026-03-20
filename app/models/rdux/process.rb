@@ -13,7 +13,7 @@ module Rdux
     validate :steps_must_be_array
 
     before_validation on: :create do
-      self.steps = performer::STEPS.map { _1.is_a?(Hash) ? _1[:name] : _1 } if steps.empty?
+      self.steps = performer::STEPS.map { _1.is_a?(Hash) ? _1[:name] : _1 }
     end
 
     def resume(res)
