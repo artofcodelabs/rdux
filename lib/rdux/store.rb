@@ -4,7 +4,7 @@ module Rdux
   module Store
     def self.call(name:, payload:, meta:, process:)
       action = Action.new(name:, payload:, meta:)
-      action.process = process
+      action.process = process if process
       Sanitize.call(action)
       action.save!
       action
