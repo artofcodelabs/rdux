@@ -10,7 +10,7 @@ class CreateRduxProcesses < ActiveRecord::Migration[7.0]
       t.boolean :ok
       t.column :steps, json_column_type,
                null: false,
-               default: json_array_default
+               default: []
       t.column :payload, json_column_type, null: false
       t.boolean :payload_sanitized, default: false, null: false
 
