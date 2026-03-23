@@ -52,7 +52,7 @@ module Rdux
     def resume_process(action, res)
       return unless action.ok
       return unless action.has_attribute?(:rdux_process_id)
-      return if action[:rdux_process_id].nil?
+      return if action.rdux_process_id.nil?
 
       action.process.resume(res)
     end
