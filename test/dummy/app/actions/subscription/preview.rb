@@ -13,7 +13,7 @@ class Subscription
         errors = {
           total_cents: ["must equal #{total_cents} (got #{payload['total_cents']})"]
         }
-        return Rdux::Result[ok: false, val: { errors: }, result: { errors: }, save: true]
+        return Rdux::Result[ok: false, val: { errors: }, result: { errors: }]
       end
 
       Rdux::Result[

@@ -16,6 +16,10 @@ module Rdux
     scope :ok, ->(val = true) { where(ok: val) }
     scope :failed, -> { where(ok: false) }
 
+    def process_defined?
+      has_attribute?(:rdux_process_id) && rdux_process_id
+    end
+
     def call(opts = {})
       return false if performed?
       return false if only_sanitized_payload?

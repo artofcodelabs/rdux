@@ -35,6 +35,7 @@ module Rdux
 
     def destroy_action(res, action)
       return false if res.ok || res.save
+      return false if action.process_defined?
 
       action.destroy
     end
@@ -54,8 +55,7 @@ module Rdux
 
     def resume_process(action, res)
       return unless action.ok
-      return unless action.has_attribute?(:rdux_process_id)
-      return if action.rdux_process_id.nil?
+      return unless action.process_defined?
 
       action.process.resume(res)
     end

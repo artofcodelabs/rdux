@@ -26,6 +26,10 @@ module Rdux
           def has_attribute?(_name) # rubocop:disable Naming/PredicatePrefix
             false
           end
+
+          def process_defined?
+            false
+          end
         end.new
 
         res = Rdux.process(action, {})
