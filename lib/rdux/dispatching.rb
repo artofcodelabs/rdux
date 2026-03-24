@@ -10,7 +10,10 @@ module Rdux
 
     def store(name, payload, ars: nil, meta: nil, process: nil)
       (ars || {}).each { |k, v| payload["#{k}_id"] = v.id }
-      Store.call(name:, payload:, meta:, process:)
+      action = Action.new(name:, payload:, meta:)
+      action.process = process if process
+      Sanitize.call(action)
+      action
     end
 
     def process(action, opts = {})
