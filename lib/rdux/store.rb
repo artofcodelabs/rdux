@@ -6,7 +6,6 @@ module Rdux
       action = Action.new(name:, payload:, meta:)
       action.process = process if process
       Sanitize.call(action)
-      action.save!
       action
     end
   end

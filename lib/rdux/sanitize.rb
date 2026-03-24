@@ -8,6 +8,7 @@ module Rdux
       aro.payload_sanitized = aro.payload != payload_sanitized
       aro.payload_unsanitized = aro.payload if aro.payload_sanitized
       aro.payload = payload_sanitized
+      aro.save! if aro.changed?
     end
   end
 end
