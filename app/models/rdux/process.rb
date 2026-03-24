@@ -19,8 +19,11 @@ module Rdux
     def resume(res)
       return res unless res.ok
 
-      ok_actions_count = actions.ok.count
-      update!(ok: true) && return if ok_actions_count == steps.size
+      ok_actions_count = 0
+      if res.val != :start
+        ok_actions_count = actions.ok.count
+        update!(ok: true) && return if ok_actions_count == steps.size
+      end
 
       call_step(index: ok_actions_count, prev_res: res)
     end
