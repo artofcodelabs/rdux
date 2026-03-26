@@ -11,6 +11,9 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_03_19_041634) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
   create_table "action_resources", force: :cascade do |t|
     t.integer "action_id", null: false
     t.datetime "created_at", null: false
@@ -69,7 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_041634) do
 
   create_table "rdux_processes", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "name"
+    t.string "name", null: false
     t.boolean "ok"
     t.json "payload", null: false
     t.boolean "payload_sanitized", default: false, null: false

@@ -72,7 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_19_041634) do
 
   create_table "rdux_processes", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "name"
+    t.string "name", null: false
     t.boolean "ok"
     t.jsonb "payload", null: false
     t.boolean "payload_sanitized", default: false, null: false

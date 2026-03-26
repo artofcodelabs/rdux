@@ -9,6 +9,7 @@ module Rdux
     has_many :actions, class_name: 'Rdux::Action', foreign_key: 'rdux_process_id', inverse_of: :process,
                        dependent: :nullify
 
+    validates :name, presence: true
     validates :payload, presence: true
     validate :steps_must_be_array
 

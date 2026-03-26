@@ -6,7 +6,7 @@ class CreateRduxProcesses < ActiveRecord::Migration[7.0]
 
   def change
     create_table :rdux_processes do |t|
-      t.string :name
+      t.string :name, null: false
       t.boolean :ok
       t.column :steps, json_column_type,
                null: false,
