@@ -49,7 +49,7 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
-⚠️ Note: Rdux uses `JSONB` datatype instead of `text` for Postgres.
+⚠️ Note: Rdux requires Rails 7.1+. It uses `jsonb` columns on PostgreSQL and `json` on other adapters.
 
 ## 🎮 Usage
 
@@ -60,7 +60,7 @@ To dispatch an action using Rdux, use the `dispatch` method (aliased as `perform
 Definition:
 
 ```ruby
-def dispatch(action, payload, opts = {}, meta: nil)
+def dispatch(action, payload, opts: {}, meta: nil)
 
 alias perform dispatch
 ```
@@ -78,7 +78,7 @@ Example:
 Rdux.perform(
   Task::Create,
   { task: { name: 'Foo bar baz' } },
-  { ars: { user: current_user } },
+  opts: { ars: { user: current_user } },
   meta: { bar: 'baz' }
 )
 ```
@@ -89,7 +89,7 @@ Rdux.perform(
 
 ### 🕵️‍♀️ Processing an action
 
-Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements a class or instance method `call`.
+Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements the `self.call` method.
 This method accepts a required `payload` and an optional `opts` argument.
 `opts[:action]` stores the Active Record object.
 `call` method processes the action and must return a `Rdux::Result` struct.
@@ -102,8 +102,8 @@ Example:
 # app/actions/task/create.rb
 
 class Task
-  class Create
-    def call(payload, opts)
+  module Create
+    def self.call(payload, opts)
       user = opts.dig(:ars, :user) || User.find(payload['user_id'])
       task = user.tasks.new(payload['task'])
       if task.save
@@ -269,8 +269,193 @@ class CreditCard
       private
 
       def create(payload, opts)
-        res = Rdux.perform(Create, payload, opts)
+        res = Rdux.perform(Create, payload, opts:)
         res.ok ? res : Rdux::Result[ok: false, val: { errors: res.val[:errors] }, save: true]
+      end
+    end
+  end
+end
+```
+
+### 🧹 Development Mode
+
+Set the `RDUX_DEV` environment variable to prevent Rdux from persisting failed actions on exceptions. When `RDUX_DEV` is set, the action record is destroyed and the exception is re-raised without storing error details in the database.
+
+```bash
+RDUX_DEV=1 bin/rails server
+```
+
+This keeps your development database clean from failed action records caused by exceptions during iterative development.
+
+## 🧩 Process
+
+**Process** 👉 a series of actions or steps taken in order to achieve a particular end.
+
+`Rdux::Process` is a persisted model that groups multiple `Rdux::Action`s.
+It also stores an ordered list of `steps` (`jsonb`/`json`).
+
+When a process starts:
+
+* Steps run **sequentially** in the order defined in `STEPS`
+* Process execution continues only when the latest process action returns `ok: true`
+* Execution stops on the first failed action step (`ok == false`)
+* `process.ok` is persisted from the latest non-`nil` step result
+
+Key points:
+
+* `Rdux::Process` **has many** `Rdux::Action`s (`process.actions`)
+* `Rdux::Action` **belongs to** a process (`action.process`)
+* `Rdux.start(ProcessModuleOrClass, payload)` starts a process performer (a PORO namespace/class with a `STEPS` constant)
+* `STEPS` must be an `Array` (validated on `Rdux::Process`)
+* `steps` is stored as `jsonb` on PostgreSQL and `json` on other adapters (default: `[]`)
+* `STEPS` supports:
+  * a step definition hash (`{ name: User::Create, payload: ->(payload, prev_res) { ... } }`)
+  * a callable step (`->(payload, process) { ... }`)
+* For hash steps, Rdux dispatches `Rdux.perform(step_name, step_payload, process: process)` (`step_payload` is the full process payload unless `payload:` proc is provided)
+* For callable steps, Rdux calls the step with `(safe_payload, process)` and the step is responsible for dispatching an action (with `Rdux.perform(..., process:)`)
+  * ⚠️ If a step returns `ok: false`, that step action is persisted (and can be assigned to the process) **only** when it also returns `save: true`. This is required.
+* Inside an action performer, use `opts[:action]` to access the current persisted action, then traverse `opts[:action].process.actions` (and their `result`)
+* Actions dispatched *inside* an action performer (via `Rdux.perform`) are linked via `rdux_action_id` (`action.rdux_actions`) and are not automatically assigned to the process
+
+Example:
+
+```ruby
+module Processes
+  module Subscription
+    module Create
+      STEPS = [
+        lambda { |payload, process|
+          payload = payload.slice('plan_id', 'user', 'total_cents')
+          Rdux.perform(::Subscription::Preview, payload, process:)
+        },
+        lambda { |payload, process|
+          payload = payload.slice('user')
+          Rdux.perform(User::Create, payload, process:)
+        },
+        { name: CreditCard::Create,
+          payload: lambda { |payload, prev_res|
+            payload.slice('credit_card').merge(user_id: prev_res.action.result['user_id'])
+          } },
+        { name: Payment::Create,
+          payload: ->(_, prev_res) { { token: prev_res.val[:credit_card].token } } },
+        { name: ::Subscription::Create,
+          payload: ->(payload, prev_res) { payload.slice('plan_id').merge(ext_charge_id: prev_res.val[:charge_id]) } }
+      ].freeze
+    end
+  end
+end
+
+res = Rdux.start(Processes::Subscription::Create, payload)
+process = res.val[:process]
+
+# from any action performer:
+def self.call(payload, opts)
+  results = opts[:action].process.actions.order(:id).pluck(:result)
+  # ...
+end
+```
+
+## 🛠️ Helpers
+
+### `ActionResult`
+
+`ActionResult` is not part of Rdux itself, but a useful helper you can copy into your app to persist DB changes and resource relations alongside an action.
+
+It sets `action.result` with:
+
+* `relations` — a map of `"model_name#id" => id` (or raw hashes) for each resource that was modified or created
+* `db_changes` — `saved_changes` for each resource that was modified or created
+* any extra key/value pairs passed as keyword arguments
+
+It also creates an `ActionResource` record for each AR resource, linking it to the action via a polymorphic association.
+
+**Usage:**
+
+```ruby
+# inside an action performer
+opts[:action].result = ActionResult.call(
+  action: opts[:action],
+  resources: [task]
+)
+
+# action.result stored in DB:
+# {
+#   "relations"  => { "task#1" => 1 },
+#   "db_changes" => {
+#     "task#1" => {
+#       "id"         => [nil, 1],
+#       "name"       => [nil, "Foo bar baz"],
+#       "user_id"    => [nil, 42],
+#       "created_at" => [nil, "2024-06-28 21:35:36"],
+#       "updated_at" => [nil, "2024-06-28 21:35:36"]
+#     }
+#   }
+# }
+```
+
+Resources can be ActiveRecord objects or plain hashes (merged directly into `relations`):
+
+```ruby
+ActionResult.call(
+  action: opts[:action],
+  resources: [task, { user_id: user.id }],
+  additional_info: 'Foo Bar Baz'
+)
+```
+
+**`ActionResource` model** (`app/models/action_resource.rb`):
+
+```ruby
+class ActionResource < ApplicationRecord
+  belongs_to :action, class_name: 'Rdux::Action'
+  belongs_to :resource, polymorphic: true
+
+  validates :action_id, uniqueness: { scope: %i[resource_type resource_id] }
+  validates :resource_type, presence: true
+end
+```
+
+**`ActionResult` service** (`app/services/action_result.rb`):
+
+```ruby
+class ActionResult
+  class << self
+    def call(action:, resources:, **custom)
+      result = { relations: {}, db_changes: {} }
+
+      resources.each do |resource|
+        if resource.is_a?(Hash)
+          result[:relations].merge!(resource)
+          next
+        end
+
+        key = relation_key(resource)
+        result[:relations][key] = resource.id
+        result[:db_changes][key] = resource.saved_changes if resource.saved_changes.present?
+      end
+
+      persist_relations(result[:relations], action.id)
+      result.merge(custom)
+    end
+
+    private
+
+    def relation_key(resource)
+      "#{resource.class.name.underscore}##{resource.id}"
+    end
+
+    def resource_type_for(name)
+      type = name.sub(/_id$/, '').sub(/#\d+$/, '').camelize
+      resource_class = type.safe_constantize
+      resource_class && resource_class < ApplicationRecord ? type : nil
+    end
+
+    def persist_relations(relations, action_id)
+      relations.each do |name, id|
+        resource_type = resource_type_for(name)
+        next if resource_type.nil? || !id.to_s.match?(/\A\d+\z/)
+
+        ActionResource.create!(action_id:, resource_type:, resource_id: id)
       end
     end
   end

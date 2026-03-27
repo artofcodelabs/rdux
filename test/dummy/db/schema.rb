@@ -10,71 +10,108 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_14_032501) do
-  create_table "activities", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "task_id", null: false
-    t.datetime "start_at"
-    t.datetime "end_at"
+ActiveRecord::Schema[8.1].define(version: 2026_03_19_041634) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_resources", force: :cascade do |t|
+    t.integer "action_id", null: false
     t.datetime "created_at", null: false
+    t.bigint "resource_id", null: false
+    t.string "resource_type", null: false
     t.datetime "updated_at", null: false
+    t.index ["action_id", "resource_type", "resource_id"], name: "idx_action_resources_on_action_resource", unique: true
+    t.index ["resource_type", "resource_id"], name: "idx_action_resources_on_resource"
+  end
+
+  create_table "activities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "end_at"
+    t.datetime "start_at"
+    t.integer "task_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
     t.index ["task_id"], name: "index_activities_on_task_id"
     t.index ["user_id"], name: "index_activities_on_user_id"
   end
 
   create_table "credit_cards", force: :cascade do |t|
-    t.string "first_name"
-    t.string "last_name"
-    t.string "last_four"
+    t.datetime "created_at", null: false
     t.integer "expiration_month"
     t.integer "expiration_year"
+    t.string "first_name"
+    t.string "last_four"
+    t.string "last_name"
     t.string "token"
-    t.integer "user_id"
-    t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["user_id"], name: "index_credit_cards_on_user_id"
   end
 
   create_table "plans", force: :cascade do |t|
-    t.string "name"
-    t.string "ext_charge_id"
-    t.integer "user_id", null: false
     t.datetime "created_at", null: false
+    t.string "name"
+    t.integer "price_cents", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_plans_on_user_id"
   end
 
   create_table "rdux_actions", force: :cascade do |t|
-    t.string "name", null: false
-    t.text "payload", null: false
-    t.boolean "payload_sanitized", default: false, null: false
-    t.text "result"
-    t.text "meta"
-    t.boolean "ok"
-    t.integer "rdux_action_id"
     t.datetime "created_at", null: false
+    t.json "meta"
+    t.string "name", null: false
+    t.boolean "ok"
+    t.json "payload", null: false
+    t.boolean "payload_sanitized", default: false, null: false
+    t.integer "rdux_action_id"
+    t.integer "rdux_process_id"
+    t.json "result"
     t.datetime "updated_at", null: false
     t.index ["rdux_action_id"], name: "index_rdux_actions_on_rdux_action_id"
+    t.index ["rdux_process_id"], name: "index_rdux_actions_on_rdux_process_id"
+  end
+
+  create_table "rdux_processes", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.boolean "ok"
+    t.json "payload", null: false
+    t.boolean "payload_sanitized", default: false, null: false
+    t.json "steps", default: [], null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "subscriptions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "ext_charge_id"
+    t.integer "plan_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["plan_id"], name: "index_subscriptions_on_plan_id"
+    t.index ["user_id"], name: "index_subscriptions_on_user_id"
   end
 
   create_table "tasks", force: :cascade do |t|
-    t.string "name"
-    t.integer "user_id"
     t.datetime "created_at", null: false
+    t.string "name"
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "name"
     t.datetime "created_at", null: false
+    t.string "name"
+    t.string "postal_code"
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "action_resources", "rdux_actions", column: "action_id"
   add_foreign_key "activities", "tasks"
   add_foreign_key "activities", "users"
   add_foreign_key "credit_cards", "users"
-  add_foreign_key "plans", "users"
   add_foreign_key "rdux_actions", "rdux_actions"
+  add_foreign_key "rdux_actions", "rdux_processes"
+  add_foreign_key "subscriptions", "plans"
+  add_foreign_key "subscriptions", "users"
   add_foreign_key "tasks", "users"
 end

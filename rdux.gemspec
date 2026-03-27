@@ -21,9 +21,9 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir['{app,config,db,lib}/**/*', 'MIT-LICENSE', 'Rakefile', 'README.md']
 
-  spec.required_ruby_version = '>= 3.1.2'
+  spec.required_ruby_version = '>= 3.3.8'
 
-  spec.add_dependency 'rails', '>= 7.0', '< 9.0'
+  spec.add_dependency 'rails', '>= 7.1', '< 9.0'
 
   spec.add_development_dependency 'pg', '>= 1.6.2'
   spec.add_development_dependency 'rubocop', '>= 1.80.2'

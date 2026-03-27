@@ -7,6 +7,35 @@ module Rdux
     include TestHelpers
 
     describe '#dispatch' do
+      it 'does not require process support to finish action processing' do
+        action = Class.new do
+          attr_accessor :ok, :result
+
+          def call(_opts)
+            Rdux::Result[ok: true, val: { ok: true }]
+          end
+
+          def save! # rubocop:disable Naming/PredicateMethod
+            true
+          end
+
+          def rdux_actions
+            []
+          end
+
+          def has_attribute?(_name) # rubocop:disable Naming/PredicatePrefix
+            false
+          end
+
+          def process_defined?
+            false
+          end
+        end.new
+
+        res = Rdux.process(action, {})
+        assert res.ok
+      end
+
       it 'persists an action' do
         puts "#{ActiveRecord::Base.connection.adapter_name}: #{Action.columns_hash['payload'].type}"
         create_task
@@ -90,11 +119,11 @@ module Rdux
       it 'can save both: actions and failed action assigned to failed action' do
         payload = TestData::Payloads.credit_card_create(users(:zbig))
         payload[:amount] = 99.99
-        payload[:plan] = 'gold'
-        res = Rdux.dispatch(Plan::Create, payload, { user: users(:zbig) })
+        payload[:plan_id] = plans(:gold).id
+        res = Rdux.dispatch(Order::Create, payload, opts: { user: users(:zbig) })
         assert_equal 2, Rdux::Action.ok(false).count
         assert_equal 1, Rdux::Action.ok.count
-        assert_equal 'Plan::Create', res.action.name
+        assert_equal 'Order::Create', res.action.name
         assert_equal ['CreditCard::Charge'], res.action.rdux_actions.failed.map(&:name)
         assert_equal ['CreditCard::Create'], res.action.rdux_actions.failed[0].rdux_actions.map(&:name)
       end
@@ -129,10 +158,20 @@ module Rdux
         assert_equal result, Rdux::Action.failed.last.result
       end
 
+      it 'does not persist failed action on exception when RDUX_DEV is set' do
+        ENV['RDUX_DEV'] = '1'
+        assert_raises(ActiveRecord::RecordNotFound) do
+          Rdux.dispatch(Task::Create, { user_id: 0 })
+        end
+        assert_equal 0, Rdux::Action.count
+      ensure
+        ENV.delete('RDUX_DEV')
+      end
+
       it 'sets result via opts[:action].result' do
         res = create_task
         assert_nil(res.result)
-        assert_equal({ 'task_id' => res.val[:task].id }, res.action.result)
+        assert_equal res.val[:task].id, res.action.result['relations']["task##{res.val[:task].id}"]
       end
     end
   end

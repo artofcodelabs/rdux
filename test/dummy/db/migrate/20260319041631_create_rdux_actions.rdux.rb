@@ -2,13 +2,15 @@
 
 # This migration comes from rdux (originally 20230621215718)
 class CreateRduxActions < ActiveRecord::Migration[7.0]
+  include Rdux::MigrationHelpers
+
   def change
     create_table :rdux_actions do |t|
       t.string :name, null: false
-      t.column :payload, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text), null: false
+      t.column :payload, json_column_type, null: false
       t.boolean :payload_sanitized, default: false, null: false
-      t.column :result, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
-      t.column :meta, (ActiveRecord::Base.connection.adapter_name == 'PostgreSQL' ? :jsonb : :text)
+      t.column :result, json_column_type
+      t.column :meta, json_column_type
       t.column :ok, :boolean
 
       t.belongs_to :rdux_action, index: true, foreign_key: true
