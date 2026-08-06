@@ -16,6 +16,7 @@ module Rdux
     scope :ok, ->(val = true) { where(ok: val) }
     scope :failed, -> { where(ok: false) }
 
+    # has_attribute? keeps Rdux working when the rdux_process_id migration has not been run
     def process_defined?
       has_attribute?(:rdux_process_id) && rdux_process_id
     end
@@ -24,25 +25,16 @@ module Rdux
       return false if performed?
       return false if only_sanitized_payload?
 
-      opts.merge!(action: self)
-      perform_action(opts)
+      performer = name.to_s.constantize
+      return performer.call(safe_payload) if performer.method(:call).arity == 1
+
+      performer.call(safe_payload, opts.merge(action: self))
     end
 
     private
 
     def performed?
       !ok.nil?
-    end
-
-    def perform_action(opts)
-      performer = name.to_s.constantize
-      return if performer.nil?
-
-      if performer.method(:call).arity.abs == 2
-        performer.call(safe_payload, opts)
-      else
-        performer.call(safe_payload)
-      end
     end
   end
 end
