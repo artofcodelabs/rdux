@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rdux (3.0.0)
+    rdux (3.1.0)
       rails (>= 7.1, < 9.0)
 
 GEM
