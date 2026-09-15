@@ -150,11 +150,7 @@ Definition:
 
 ```ruby
 module Rdux
-  Result = Struct.new(:ok, :val, :result, :save, :nested, :action) do
-    def save_failed?
-      ok == false && save ? true : false
-    end
-  end
+  Result = Struct.new(:ok, :val, :result, :save, :nested, :action)
 end
 ```
 
