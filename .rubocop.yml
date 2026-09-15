@@ -8,11 +8,6 @@ AllCops:
 Gemspec/DevelopmentDependencies:
   EnforcedStyle: gemspec
 
-Metrics/AbcSize:
-  Exclude:
-    - db/migrate/20230621215718_create_rdux_actions.rb
-    - test/dummy/db/migrate/*.rdux.rb
-
 Metrics/BlockLength:
   Exclude:
     - test/**/*_test.rb

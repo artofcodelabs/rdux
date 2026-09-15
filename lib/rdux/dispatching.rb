@@ -61,14 +61,13 @@ module Rdux
     end
 
     def handle_exception(exc, action)
-      raise(action.destroy && exc) if ENV['RDUX_DEV']
+      if ENV['RDUX_DEV']
+        action.destroy
+        raise exc
+      end
 
       action.ok = false
-      action.result ||= {}
-      action.result.merge!({ 'Exception' => {
-                             class: exc.class.name,
-                             message: exc.message
-                           } })
+      action.result = (action.result || {}).merge('Exception' => { class: exc.class.name, message: exc.message })
       action.save!
       raise exc
     end
