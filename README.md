@@ -87,6 +87,43 @@ Rdux.perform(
 
 ![Flow Diagram](docs/flow.png)
 
+```mermaid
+flowchart TD
+    caller["Rdux.perform(<br/>ActionPerformer,<br/>payload<br/>)"]
+    note1["💡 align action performer name<br/>with the action itself e.g.<br/>Task::Create"]:::note
+    performer[ActionPerformer]:::performer
+
+    subgraph Rdux
+        save_action["save action performer name and<br/>sanitised payload in DB<br/><br/>Action<br/>#name<br/>#payload"]
+        invoke["call .call method with<br/>deserialized payload<br/>(keys as String)"]
+        ok{"Result#ok"}
+        save{"Result#save"}
+        destroy["destroy<br/>Action"]
+        assign["assign<br/>Result #ok #result<br/>to<br/>Action #ok #result"]
+        persist["save<br/>Action in DB<br/>and assign to<br/>Result#action"]
+        nested["iterate over<br/>Result#nested<br/>and assign nested<br/>Result#action<br/>to<br/>Action #rdux_actions"]
+        note2["💡 all data structures are<br/>inside the Rdux namespace"]:::note
+    end
+
+    caller -->|"ActionPerformer<br/>payload"| save_action
+    caller ~~~ note1
+    save_action --> invoke
+    invoke -->|payload| performer
+    performer -->|"Rdux::Result"| invoke
+    invoke --> ok
+    ok -->|false| save
+    ok -->|true| assign
+    save -->|false| destroy
+    save -->|true| assign
+    assign --> persist --> nested
+    destroy -->|"Rdux::Result"| caller
+    nested -->|"Rdux::Result"| caller
+
+    classDef note fill:#fadf7f,stroke:#e8c84a,color:#000
+    classDef performer fill:#8fe0cf,stroke:#8fe0cf,color:#000
+    style Rdux fill:#f0d060,stroke:#333,stroke-dasharray:3 3,color:#000
+```
+
 ### 🕵️‍♀️ Processing an action
 
 Action in Rdux is processed by an action performer which is a Plain Old Ruby Object (PORO) that implements the `self.call` method.
