@@ -95,7 +95,7 @@ flowchart TD
 
     subgraph Rdux
         save_action["save action performer name and<br/>sanitised payload in DB<br/><br/>Action<br/>#name<br/>#payload"]
-        invoke["call .call method with<br/>deserialized payload<br/>(keys as String)"]
+        invoke["call .call method with<br/>unsanitized payload<br/>(keys as String)"]
         ok{"Result#ok"}
         save{"Result#save"}
         destroy["destroy<br/>Action"]
