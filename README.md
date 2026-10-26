@@ -85,43 +85,46 @@ Rdux.perform(
 
 ### 📈 Flow diagram
 
-![Flow Diagram](docs/flow.png)
-
 ```mermaid
 flowchart TD
-    caller["Rdux.perform(<br/>ActionPerformer,<br/>payload<br/>)"]
-    note1["💡 align action performer name<br/>with the action itself e.g.<br/>Task::Create"]:::note
-    performer[ActionPerformer]:::performer
+    subgraph entry[" "]
+        caller["<div style='text-align:left'><span style='color:#000'><span style='font-family:monospace'><span style='color:#e08a1e'>Rdux.perform</span></span><span style='font-family:monospace'><span style='color:#000'>(</span></span><br/><span style='padding-left:2ch'><span style='font-family:monospace'><span style='color:#8fe0cf'>ActionPerformer</span></span></span><span style='font-family:monospace'><span style='color:#000'>,</span></span><br/><span style='padding-left:2ch'><span style='font-family:monospace'><span style='color:#6f2dd8'>payload</span></span></span><br/><span style='font-family:monospace'><span style='color:#000'>)</span></span></span></div>"]:::caller
+        note1["<span style='color:#000'>💡 align action<br/>performer name<br/>with the action<br/>itself e.g.<br/><span style='font-family:monospace'><span style='color:#8fe0cf'>Task::Create</span></span></span>"]:::note
+    end
+    performer["<span style='color:#000'><span style='font-family:monospace'><span style='color:#000'>ActionPerformer</span></span></span>"]:::performer
 
-    subgraph Rdux
-        save_action["save action performer name and<br/>sanitised payload in DB<br/><br/>Action<br/>#name<br/>#payload"]
-        invoke["call .call method with<br/>unsanitized payload<br/>(keys as String)"]
-        ok{"Result#ok"}
-        save{"Result#save"}
-        destroy["destroy<br/>Action"]
-        assign["assign<br/>Result#ok<br/>to<br/>Action#ok<br/><br/>merge<br/>Result#result<br/>into<br/>Action#result"]
-        persist["save<br/>Action in DB<br/>and assign to<br/>Result#action"]
-        nested["iterate over<br/>Result#nested<br/>and assign nested<br/>Result#action<br/>to<br/>Action #rdux_actions"]
-        note2["💡 all data structures are<br/>inside the Rdux namespace"]:::note
+    subgraph Rdux["<span style='font-size:32px'><span style='color:#000'>Rdux</span></span>"]
+        save_action["<span style='color:#000'>save action<br/>performer name and<br/>sanitised payload in<br/>DB<br/><br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action#name</span></span><br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action#payload</span></span></span>"]:::box
+        invoke["<span style='color:#000'>call <span style='font-family:monospace'><span style='color:#8fe0cf'>.call</span></span> method<br/>with unsanitized<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>payload</span></span> (keys as<br/><span style='font-family:monospace'><span style='color:#000'>String</span></span>)</span>"]:::box
+        ok{"<span style='font-family:monospace'><span style='color:#d63a8c'>Result#ok</span></span>"}:::box
+        save{"<span style='font-family:monospace'><span style='color:#d63a8c'>Result<br/>#save</span></span>"}:::box
+        destroy["<span style='color:#000'>destroy<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action</span></span></span>"]:::box
+        assign["<span style='color:#000'>assign<br/><span style='font-family:monospace'><span style='color:#d63a8c'>Result#ok</span></span><br/>to<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action#ok</span></span><br/><br/>merge<br/><span style='font-family:monospace'><span style='color:#d63a8c'>Result#result</span></span><br/>into<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action#result</span></span></span>"]:::box
+        persist["<span style='color:#000'>save<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action</span></span> in DB<br/>and assign to<br/><span style='font-family:monospace'><span style='color:#d63a8c'>Result#action</span></span></span>"]:::box
+        nested["<span style='color:#000'>iterate over<br/><span style='font-family:monospace'><span style='color:#d63a8c'>Result#nested</span></span><br/>and assign nested<br/><span style='font-family:monospace'><span style='color:#d63a8c'>Result#action</span></span><br/>to<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Action#rdux_actions</span></span></span>"]:::box
+        note2["<span style='color:#000'>💡 all data<br/>structures are<br/>inside the<br/><span style='font-family:monospace'><span style='color:#6f2dd8'>Rdux</span></span><br/>namespace</span>"]:::note
     end
 
-    caller -->|"ActionPerformer<br/>payload"| save_action
-    caller ~~~ note1
+    caller -->|"<span style='font-family:monospace'><span style='color:#8fe0cf'>ActionPerformer</span></span><br/><span style='font-family:monospace'><span style='color:#6f2dd8'>payload</span></span>"| save_action
     save_action --> invoke
-    invoke -->|payload| performer
-    performer -->|"Rdux::Result"| invoke
+    invoke -->|"<span style='font-family:monospace'><span style='color:#6f2dd8'>payload</span></span>"| performer
+    performer -->|"<span style='font-family:monospace'><span style='color:#d63a8c'>Rdux::Result</span></span>"| invoke
     invoke --> ok
-    ok -->|false| save
-    ok -->|true| assign
-    save -->|false| destroy
-    save -->|true| assign
+    ok -->|"<span style='font-family:monospace'>false</span>"| save
+    ok -->|"<span style='font-family:monospace'>true</span>"| assign
+    save -->|"<span style='font-family:monospace'>false</span>"| destroy
+    save -->|"<span style='font-family:monospace'>true</span>"| assign
     assign --> persist --> nested
-    destroy -->|"Rdux::Result"| caller
-    nested -->|"Rdux::Result"| caller
+    destroy -->|"<span style='font-family:monospace'><span style='color:#d63a8c'>Rdux::Result</span></span>"| caller
+    nested -->|"<span style='font-family:monospace'><span style='color:#d63a8c'>Rdux::Result</span></span>"| caller
 
-    classDef note fill:#fadf7f,stroke:#e8c84a,color:#000
-    classDef performer fill:#8fe0cf,stroke:#8fe0cf,color:#000
-    style Rdux fill:#f0d060,stroke:#333,stroke-dasharray:3 3,color:#000
+    classDef caller fill:#fff,stroke:#000
+    classDef box fill:#fff,stroke:#555,stroke-dasharray:2 2
+    classDef note fill:#fadf7f,stroke:#fadf7f,font-size:18px
+    classDef performer fill:#8fe0cf,stroke:#8fe0cf
+    style entry fill:none,stroke:none
+    style Rdux fill:#f0d060,stroke:#333,stroke-dasharray:3 3
+    linkStyle default stroke:#333,stroke-width:1px
 ```
 
 ### 🕵️‍♀️ Processing an action
