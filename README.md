@@ -99,7 +99,7 @@ flowchart TD
         ok{"Result#ok"}
         save{"Result#save"}
         destroy["destroy<br/>Action"]
-        assign["assign<br/>Result #ok #result<br/>to<br/>Action #ok #result"]
+        assign["assign<br/>Result#ok<br/>to<br/>Action#ok<br/><br/>merge<br/>Result#result<br/>into<br/>Action#result"]
         persist["save<br/>Action in DB<br/>and assign to<br/>Result#action"]
         nested["iterate over<br/>Result#nested<br/>and assign nested<br/>Result#action<br/>to<br/>Action #rdux_actions"]
         note2["💡 all data structures are<br/>inside the Rdux namespace"]:::note
