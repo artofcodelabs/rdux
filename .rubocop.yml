@@ -1,3 +1,10 @@
+# Without this, the AllCops/Exclude below would *replace* RuboCop's default
+# exclude list rather than extend it, letting RuboCop walk into vendor/bundle
+# (where CI installs gems) and choke on a vendored gem's own .rubocop.yml.
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.3.8
