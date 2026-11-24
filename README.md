@@ -49,7 +49,7 @@ $ bin/rails rdux:install:migrations
 $ bin/rails db:migrate
 ```
 
-⚠️ Note: Rdux requires Rails 7.1+. It uses `jsonb` columns on PostgreSQL and `json` on other adapters.
+⚠️ Note: Rdux requires Rails 8.0+. It uses `jsonb` columns on PostgreSQL and `json` on other adapters.
 
 ## 🎮 Usage
 

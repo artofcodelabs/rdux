@@ -2,10 +2,8 @@
 
 $LOAD_PATH.push File.expand_path('lib', __dir__)
 
-# Maintain your gem's version:
 require 'rdux/version'
 
-# Describe your gem and declare its dependencies:
 Gem::Specification.new do |spec|
   spec.name        = 'rdux'
   spec.version     = Rdux::VERSION
@@ -23,12 +21,12 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 3.3.8'
 
-  spec.add_dependency 'rails', '>= 7.1', '< 9.0'
+  spec.add_dependency 'rails', '>= 8.0', '< 9.0'
 
-  spec.add_development_dependency 'pg', '>= 1.6.2'
-  spec.add_development_dependency 'rubocop', '>= 1.80.2'
-  spec.add_development_dependency 'rubocop-rails', '>= 2.33.3'
-  spec.add_development_dependency 'sqlite3', '>= 2.7.4'
+  spec.add_development_dependency 'pg', '>= 1.7.0'
+  spec.add_development_dependency 'rubocop', '>= 1.92.3'
+  spec.add_development_dependency 'rubocop-rails', '>= 2.38.0'
+  spec.add_development_dependency 'sqlite3', '>= 2.10.2'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 end
