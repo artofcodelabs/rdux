@@ -6,6 +6,7 @@
     <img width="500px" src="docs/logo.webp">
   </div>
 
+[![CI](https://github.com/artofcodelabs/rdux/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/artofcodelabs/rdux/actions/workflows/ci.yml)
 ![GitHub](https://img.shields.io/github/license/artofcodelabs/rdux)
 ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/artofcodelabs/rdux)
 
